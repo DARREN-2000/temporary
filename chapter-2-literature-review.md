@@ -6,9 +6,9 @@ This chapter provides a comprehensive review of the literature on AI-enhanced so
 
 The motivation for this review stems from the growing complexity of automotive software systems. Modern vehicles contain over 100 million lines of code distributed across dozens of electronic control units \cite{MLFuzzReview2020}. Testing such systems manually is impractical, creating demand for automated approaches that can identify vulnerabilities efficiently. Recent advances in large language models have opened new possibilities for test generation, but their applicability to safety-critical automotive systems remains underexplored.
 
-The scope of this review is constrained to C-based software, reflecting the predominant language in embedded automotive systems. While research on LLM-based testing has focused largely on Python and JavaScript, the specific challenges of C—including pointer arithmetic, manual memory management, and undefined behavior—require dedicated investigation. This chapter examines how existing techniques might be adapted for automotive contexts and identifies gaps that this thesis aims to address.
+The scope of this review is constrained to C-based software, reflecting the predominant language in embedded automotive systems. While research on LLM-based testing has focused largely on Python and JavaScript, the specific challenges of C, including pointer arithmetic, manual memory management, and undefined behavior, require dedicated investigation. This chapter examines how existing techniques might be adapted for automotive contexts and identifies gaps that this thesis aims to address.
 
-The review is organized thematically rather than chronologically. Section 2.2 examines traditional AI approaches that predate large language models. Section 2.3 traces the evolution of LLMs and their application to code generation. Section 2.4 covers fuzzing fundamentals from early random testing to coverage-guided approaches. Section 2.5 surveys the current state-of-the-art in AI-enhanced fuzzing, including LLM-based methods, neural network-guided approaches, and reinforcement learning applications. Section 2.6 addresses C programming standards relevant to automotive development. Section 2.7 identifies research gaps and positions this thesis within the literature. Section 2.8 concludes with an overview of automotive software development practices.
+The review is organized thematically rather than chronologically. Section 2.2 examines traditional AI approaches that predate large language models. Section 2.3 traces the evolution of LLMs and their application to code generation. Section 2.4 covers fuzzing fundamentals from early random testing to coverage-guided approaches. Section 2.5 surveys the current state of the art in AI-enhanced fuzzing, including LLM-based methods, neural network-guided approaches, and reinforcement learning applications. Section 2.6 addresses C programming standards relevant to automotive development. Section 2.7 identifies research gaps and positions this thesis within the literature. Section 2.8 concludes with an overview of automotive software development practices.
 
 
 ## 2.2 Traditional AI Approaches in Software Testing
@@ -17,7 +17,7 @@ Prior to the emergence of large language models, researchers explored various AI
 
 Genetic algorithms represent one of the earliest applications of AI to software testing. These evolutionary approaches maintain populations of test cases that undergo selection, crossover, and mutation operations over successive generations. Wang et al. \cite{MLFuzzReview2020} provide a systematic review of this history, documenting how evolutionary testing dominated research from the late 1990s through the early 2010s. The key insight underlying these approaches was that test generation could be formulated as an optimization problem: define a fitness function based on coverage or fault detection, and allow evolution to discover effective test inputs.
 
-The limitations of evolutionary approaches became apparent over time. Fitness function design proved challenging—maximizing code coverage did not necessarily correlate with bug detection. Multi-objective optimization helped balance competing goals, but genetic algorithms fundamentally lacked the ability to reason about program semantics. They could explore the input space efficiently but could not understand what made certain inputs more meaningful than others.
+The limitations of evolutionary approaches became apparent over time. Fitness function design proved challenging, as maximizing code coverage did not necessarily correlate with bug detection. Multi-objective optimization helped balance competing goals, but genetic algorithms fundamentally lacked the ability to reason about program semantics. They could explore the input space efficiently but could not understand what made certain inputs more meaningful than others.
 
 Symbolic execution offered an alternative paradigm based on constraint solving rather than random search. The approach treats program inputs as symbolic values and accumulates path constraints during execution. Solving these constraints yields concrete inputs guaranteed to exercise specific program paths. Godefroid, Levin, and Tauth demonstrated the practical viability of this approach with SAGE \cite{SAGE2008}, which Microsoft deployed internally for security testing. SAGE processed billions of machine instructions and found vulnerabilities that conventional testing had missed.
 
@@ -27,7 +27,7 @@ Machine learning entered software testing research in supporting roles around 20
 
 Neural networks enabled more ambitious applications. Pei et al. \cite{DeepXplore2017} introduced DeepXplore for testing deep learning systems, defining neuron coverage as a testing adequacy criterion. Odena et al. \cite{TensorFuzz2019} extended coverage-guided fuzzing to neural networks with TensorFuzz, demonstrating that coverage-based feedback could guide test generation for ML models themselves. These works showed that neural networks could participate actively in the testing process, not merely support it.
 
-The transition to generative approaches—using AI to create tests rather than select or prioritize them—marked a qualitative shift. This transition accelerated dramatically with the advent of large language models capable of producing syntactically valid code from natural language descriptions.
+The transition to generative approaches, using AI to create tests rather than select or prioritize them, marked a qualitative shift. This transition accelerated dramatically with the advent of large language models capable of producing syntactically valid code from natural language descriptions.
 
 
 ## 2.3 Large Language Models: Evolution and Code Generation
@@ -38,18 +38,18 @@ The foundation for modern LLMs was established with the Transformer architecture
 
 Code-specific models followed rapidly. Codex, fine-tuned on publicly available source code, powered GitHub Copilot and achieved 28.8% success on the HumanEval benchmark in initial evaluations, rising to 70.2% with multiple sampling attempts. GPT-4 further improved code generation capabilities, with better contextual understanding and reduced occurrence of subtle errors. The expansion of context windows from 2K to 128K tokens enabled inclusion of multiple source files, header definitions, and detailed documentation in prompts.
 
-Open-source alternatives have emerged as important counterparts to proprietary models. Meta's LLaMA demonstrated that competitive performance was achievable with smaller, publicly available models. Code-specific variants including StarCoder and CodeLLaMA targeted programming tasks specifically. These models enable local deployment without transmitting proprietary code to external services—a consideration relevant to automotive applications with intellectual property constraints.
+Open-source alternatives have emerged as important counterparts to proprietary models. Meta's LLaMA demonstrated that competitive performance was achievable with smaller, publicly available models. Code-specific variants including StarCoder and CodeLLaMA targeted programming tasks specifically. These models enable local deployment without transmitting proprietary code to external services, a consideration relevant to automotive applications with intellectual property constraints.
 
 Research has probed the boundaries of LLM code generation capabilities systematically. Deng et al. \cite{TitanFuzz2022} found that while models generated syntactically valid code at high rates, the generated code frequently contained semantic issues. Tests compiled successfully but exercised APIs in unintended ways. Wang et al. \cite{LLMMutationTesting2024} observed similar patterns in mutation testing experiments: high success rates on simple cases with degrading performance as complexity increased.
 
-C presents particular challenges for LLM-based code generation. Training data skews heavily toward Python, JavaScript, and other high-level languages. C's distinctive features—pointer arithmetic, manual memory management, preprocessor macros, undefined behavior—are less well represented. Empirical evaluations consistently show worse performance on C compared to Python. This gap has direct implications for automotive applications, where C remains the dominant language for embedded systems.
+C presents particular challenges for LLM-based code generation. Training data skews heavily toward Python, JavaScript, and other high-level languages. C's distinctive features, such as pointer arithmetic, manual memory management, preprocessor macros, and undefined behavior, are less well represented. Empirical evaluations consistently show worse performance on C compared to Python. This gap has direct implications for automotive applications, where C remains the dominant language for embedded systems.
 
 Context utilization presents an ongoing research question. While modern models accept 128K tokens or more, whether they effectively use all provided context remains unclear. Shrivastava et al. found that repository-level context improved generation quality but with diminishing returns as context length increased. For complex libraries with extensive APIs, even large context windows may prove insufficient.
 
 
 ## 2.4 Fuzzing Techniques: Foundations to AI-Guided Methods
 
-Fuzzing—testing software through automated generation of inputs—has evolved from simple random generation to sophisticated AI-guided approaches. This section traces that evolution and identifies the challenges that motivate integration with large language models.
+Fuzzing, which involves testing software through automated generation of inputs, has evolved from simple random generation to sophisticated AI-guided approaches. This section traces that evolution and identifies the challenges that motivate integration with large language models.
 
 The origins of fuzzing are traced to Barton Miller's 1988 experiments at the University of Wisconsin. Students subjected UNIX utilities to streams of random input and found that approximately 25% crashed or hung. This finding established fuzzing as a viable technique for uncovering reliability issues in production software.
 
@@ -59,14 +59,14 @@ Coverage-guided fuzzing represented a fundamental advance. AFL (American Fuzzy L
 
 AFL spawned an ecosystem of derivative tools. AFL++ \cite{AFLPlusPlus} added performance optimizations and additional mutation strategies. LibFuzzer integrated coverage-guided fuzzing into the LLVM toolchain. Syzkaller \cite{Syzkaller2020} adapted coverage-guided techniques for kernel testing. Google's OSS-Fuzz project deployed these tools at scale, continuously fuzzing hundreds of open-source projects. Ding and Le Goues \cite{OSSFuzzBugs2021} analyzed bugs found by OSS-Fuzz, documenting vulnerability classes that other testing methods had missed.
 
-Grammar-based fuzzing addressed the structural validity problem. Random byte mutations rarely produce syntactically valid inputs for complex formats—a randomly mutated JSON file is almost certainly invalid JSON. Grammar-based fuzzers generate inputs according to specified grammars, ensuring structural validity while still exploring variations. This approach proved particularly effective for protocol parsers and file format handlers.
+Grammar-based fuzzing addressed the structural validity problem. Random byte mutations rarely produce syntactically valid inputs for complex formats. A randomly mutated JSON file is almost certainly invalid JSON. Grammar-based fuzzers generate inputs according to specified grammars, ensuring structural validity while still exploring variations. This approach proved particularly effective for protocol parsers and file format handlers.
 
-Despite these advances, several challenges persist. Writing fuzz harnesses—the glue code that connects fuzzers to target libraries—remains manual and labor-intensive. Coverage plateaus occur when random mutation cannot discover paths beyond certain checkpoints. These limitations create opportunities for AI-enhanced approaches that can reason about program structure and generate more targeted inputs.
+Despite these advances, several challenges persist. Writing fuzz harnesses, which are the glue code that connects fuzzers to target libraries, remains manual and labor-intensive. Coverage plateaus occur when random mutation cannot discover paths beyond certain checkpoints. These limitations create opportunities for AI-enhanced approaches that can reason about program structure and generate more targeted inputs.
 
 
-## 2.5 AI-Enhanced Fuzzing: State-of-the-Art
+## 2.5 AI-Enhanced Fuzzing: State of the Art
 
-The convergence of machine learning and fuzzing has produced a rapidly growing body of research. This section surveys the current state-of-the-art, organized by the primary AI technique employed.
+The convergence of machine learning and fuzzing has produced a rapidly growing body of research. This section surveys the current state of the art, organized by the primary AI technique employed.
 
 
 ### 2.5.1 LLM-Based Test Case Generation
@@ -79,7 +79,7 @@ FuzzGPT \cite{FuzzGPT2023} extended this approach with a focus on edge cases. Th
 
 Fuzz4All \cite{Fuzz4All2023} pursued a more general approach, targeting multiple programming languages and application domains. The system used LLMs to generate both test inputs and the harness code to execute them. Coverage improvements over random generation were substantial, though still below expert-written harnesses.
 
-Zhang et al. \cite{LLMDriverGenEffectiveness2023} directly evaluated the effectiveness of LLM-generated fuzz drivers compared to manually written alternatives. Results varied significantly across libraries: some LLM drivers achieved 80-90% of manual driver coverage, while others reached only 50%. Performance correlated with documentation quality and API complexity.
+Zhang et al. \cite{LLMDriverGenEffectiveness2023} directly evaluated the effectiveness of LLM-generated fuzz drivers compared to manually written alternatives. Results varied significantly across libraries: some LLM drivers achieved 80 to 90 percent of manual driver coverage, while others reached only 50 percent. Performance correlated with documentation quality and API complexity.
 
 Recent work has explored combining LLM generation with traditional techniques. WhiteFox \cite{WhiteFox2023} uses LLMs for targeted compiler fuzzing. CKGFuzzer \cite{CKGFuzzer2024} augments LLM generation with code knowledge graphs. HyLLfuzz \cite{HyLLfuzz2024} combines LLM-generated seeds with mutation-based fuzzing. These hybrid approaches attempt to leverage LLM strengths while mitigating their limitations.
 
@@ -90,7 +90,7 @@ A consistent finding across this literature is the gap between syntactic validit
 
 Before LLMs dominated attention, researchers explored using smaller neural networks to guide fuzzing decisions. These approaches remain relevant due to their lower computational overhead.
 
-Wang et al. developed NeuFuzz \cite{NeuFuzz2019}, training neural networks to predict which inputs would discover new coverage. Models learned from historical fuzzing data, observing which mutations proved productive. NeuFuzz achieved 15-30% coverage improvements over baseline AFL in experiments.
+Wang et al. developed NeuFuzz \cite{NeuFuzz2019}, training neural networks to predict which inputs would discover new coverage. Models learned from historical fuzzing data, observing which mutations proved productive. NeuFuzz achieved 15 to 30 percent coverage improvements over baseline AFL in experiments.
 
 She, Woo, and Brumley introduced NEUZZ \cite{NEUZZ2018}, using neural networks to approximate program gradients. In smooth functions, gradient information indicates which input bytes most influence behavior. Programs contain discrete branches and are not inherently smooth, but neural approximation proved surprisingly effective. NEUZZ achieved substantial coverage improvements on several benchmarks.
 
@@ -107,7 +107,7 @@ Böttinger, Godefroid, and Singh explored deep reinforcement learning for fuzzin
 
 BertRLFuzzer \cite{BertRLFuzzer2023} combined BERT language models with reinforcement learning, using the language model to understand input structure and RL to determine mutation locations. The combination outperformed either approach alone.
 
-Reinforcement learning approaches face practical challenges including reward sparsity—new coverage may occur only every thousands of trials—and substantial training costs. These factors limit applicability to settings where long training times are acceptable.
+Reinforcement learning approaches face practical challenges including reward sparsity, as new coverage may occur only every thousands of trials, and substantial training costs. These factors limit applicability to settings where long training times are acceptable.
 
 
 ## 2.6 C and Safety Standards
@@ -122,7 +122,7 @@ ISO 26262 specifies functional safety requirements for automotive systems. The s
 
 ISO/SAE 21434 addresses automotive cybersecurity specifically. Unlike ISO 26262's focus on functional safety, ISO/SAE 21434 targets security throughout the vehicle lifecycle. The standard explicitly mentions fuzzing as a relevant testing technique, reflecting growing regulatory acceptance of the approach.
 
-The AUTOSAR framework standardizes software architecture for automotive applications. Standardized interfaces facilitate automated testing—tests can target well-defined APIs rather than project-specific implementations. This standardization potentially enables broader applicability of LLM-generated tests, assuming models can learn AUTOSAR conventions.
+The AUTOSAR framework standardizes software architecture for automotive applications. Standardized interfaces facilitate automated testing, as tests can target well-defined APIs rather than project-specific implementations. This standardization potentially enables broader applicability of LLM-generated tests, assuming models can learn AUTOSAR conventions.
 
 
 ## 2.7 Research Gaps and Thesis Positioning
@@ -131,9 +131,9 @@ Analysis of the literature reveals several gaps that this thesis aims to address
 
 First, integration with development workflows is underexplored. Academic research typically evaluates techniques in isolation, but practical deployment requires integration with CI/CD pipelines, code review processes, and compliance workflows. Klooster et al. \cite{CiCdFuzzing2022} examined fuzzing in CI/CD environments and identified practical challenges including speed, reliability, and determinism that benchmark evaluations do not capture.
 
-Second, C-specific evaluation is limited. Most LLM fuzzing research targets Python or JavaScript, with C receiving comparatively little attention. The distinctive challenges of C—memory safety, undefined behavior, preprocessor complexity—merit dedicated investigation. Works such as ECG \cite{ECG2024} and GDBFuzz \cite{GDBFuzz2023} address embedded systems but remain exceptions.
+Second, C-specific evaluation is limited. Most LLM fuzzing research targets Python or JavaScript, with C receiving comparatively little attention. The distinctive challenges of C, specifically memory safety, undefined behavior, and preprocessor complexity, merit dedicated investigation. Works such as ECG \cite{ECG2024} and GDBFuzz \cite{GDBFuzz2023} address embedded systems but remain exceptions.
 
-Third, semantic quality lacks established metrics. Existing evaluations focus on compilation success and coverage achievement. Whether generated tests exercise meaningful behavior—rather than simply reaching code through trivial paths—is rarely assessed systematically.
+Third, semantic quality lacks established metrics. Existing evaluations focus on compilation success and coverage achievement. Whether generated tests exercise meaningful behavior, rather than simply reaching code through trivial paths, is rarely assessed systematically.
 
 Fourth, automotive-specific evaluation is rare. Claims of applicability to safety-critical systems are common, but actual evaluation on automotive software is uncommon. SAFLITE \cite{SAFLITE2024} and research on CAN bus testing \cite{CANBusFuzzAI2021} demonstrate feasibility but do not provide comprehensive evaluation frameworks.
 
@@ -144,7 +144,7 @@ This thesis positions itself at the intersection of these gaps. We investigate L
 
 Automotive software development has characteristics that distinguish it from other software domains and influence the applicability of AI-enhanced testing approaches.
 
-Development cycles in automotive are substantially longer than in consumer software. A vehicle platform may require 3-5 years from conception to production, with software frozen months before launch. This timeline limits the applicability of techniques that assume rapid iteration.
+Development cycles in automotive are substantially longer than in consumer software. A vehicle platform may require 3 to 5 years from conception to production, with software frozen months before launch. This timeline limits the applicability of techniques that assume rapid iteration.
 
 Supply chain complexity introduces additional considerations. Modern vehicles incorporate software from numerous suppliers, each with independent development processes. OEMs may receive compiled binaries without source code access, limiting testing options. When source code is available, modification rights may be restricted.
 
@@ -154,7 +154,7 @@ Software-defined vehicles represent an emerging paradigm shift. Companies like C
 
 Cybersecurity requirements have increased significantly. Connected vehicles face threats that isolated systems never encountered. Regulations including UNECE WP.29 R155 mandate cybersecurity capabilities throughout the vehicle lifecycle. Fuzzing directly supports compliance with these requirements by identifying vulnerabilities before deployment.
 
-CI Spark \cite{CISpark2023} and similar industry initiatives indicate growing interest in LLM-assisted testing for CI/CD integration. The practical deployment of such tools in automotive contexts—with their specific constraints and requirements—is an area where this thesis aims to contribute.
+CI Spark \cite{CISpark2023} and similar industry initiatives indicate growing interest in LLM-assisted testing for CI/CD integration. The practical deployment of such tools in automotive contexts, with their specific constraints and requirements, is an area where this thesis aims to contribute.
 
 ---
 
