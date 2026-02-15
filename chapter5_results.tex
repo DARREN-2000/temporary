@@ -14,7 +14,7 @@ In this chapter, we present the experimental findings from our three-phase resea
 
 Choosing the right target libraries proved more difficult than expected. We needed C++ libraries because safety-critical automotive systems---those running on AUTOSAR (AUTomotive Open System ARchitecture) \cite{autosar} platforms---are predominantly written in C or C++. AUTOSAR is the dominant software architecture standard for automotive electronic control units (ECUs), making C++ relevance essential for practical automotive application. Testing on Python would have been simpler, but less relevant to the real problem we faced at CARIAD.
 
-After evaluating several candidates, we selected yaml-cpp as our primary target. This library parses YAML configuration files, a common task in automotive software where configuration management matters significantly. The library contains 35 source files with 1,061 potential fuzzing candidates identified through cifuzz spark analysis. More importantly, it is well-documented and actively maintained. OSS-Fuzz \cite{ossfuzz} already covers it, which gave us a baseline for comparison---we could measure whether our AI-generated drivers matched, exceeded, or fell short of existing human-written ones.
+After evaluating several candidates, we selected yaml-cpp as our primary target. This library parses YAML configuration files, a common task in automotive software where configuration management matters significantly. The library contains 35 source files with 1,061 potential fuzzing candidates identified through cifuzz spark analysis. More importantly, it is well-documented and actively maintained. OSS-Fuzz \cite{OSSFuzzBugs2021} already covers it, which gave us a baseline for comparison---we could measure whether our AI-generated drivers matched, exceeded, or fell short of existing human-written ones.
 
 Additional targets included pugixml, jsoncons, fmt, spdlog, and glm. These provided broader validation, though the detailed analysis focuses on yaml-cpp where we collected the most complete data.
 
@@ -105,7 +105,7 @@ Having established that specialized models outperform general-purpose ones, we i
 
 Based on Phase 1 results, we selected the Qwen 2.5-Coder 1.5B model for fine-tuning experiments. The goal was to determine whether a small, fine-tuned model could match larger models while using far fewer resources.
 
-We applied Low-Rank Adaptation (LoRA) \cite{lora} fine-tuning using fuzz drivers from Google's OSS-Fuzz project as training data. This approach builds on recent work in LLM-based fuzzing \cite{llm4fuzz,titanfuzz} but applies more aggressive model compression through fine-tuning. Two datasets were curated: a small one with 172 examples and an extended one with 709 examples. Each example consisted of a fuzz driver paired with its target API context, focused on security vulnerability patterns, fuzzing techniques, and automotive-specific code patterns.
+We applied Low-Rank Adaptation (LoRA) \cite{Hu2021} fine-tuning using fuzz drivers from Google's OSS-Fuzz project as training data. This approach builds on recent work in LLM-based fuzzing \cite{llm4fuzz,TitanFuzz2022} but applies more aggressive model compression through fine-tuning. Two datasets were curated: a small one with 172 examples and an extended one with 709 examples. Each example consisted of a fuzz driver paired with its target API context, focused on security vulnerability patterns, fuzzing techniques, and automotive-specific code patterns.
 
 Our fine-tuning configuration:
 \begin{itemize}
