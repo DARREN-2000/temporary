@@ -96,7 +96,7 @@ We evaluated 14 models spanning a wide range of sizes and architectures. The sel
 **Extra Large Models (above 40 billion parameters):**
 - Mixtral 46.7B
 
-- **Medium Models (7-14 billion parameters):**
+**Medium Models (7-14 billion parameters):**
 - Qwen 2.5-Coder 7B and 14B
 - DeepSeek Coder V2 Lite 16B
 - Gemma 3 9B and 27B
