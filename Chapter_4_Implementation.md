@@ -76,49 +76,26 @@ cmake_minimum_required(VERSION 3.10...3.22)
 cmake_policy(VERSION 3.10...3.22)
 ```
 
-The complete toolchain architecture is illustrated in Figure 4.1, showing how local development components connect through Cifuzz Spark to either local LLMs or Azure OpenAI, with output flowing through libFuzzer for security testing.
+The LLM-assisted fuzzing workflow is illustrated in Figure 4.1, showing the complete process from source code analysis through LLM-based test generation to crash detection and reporting. This conceptual workflow, introduced in Chapter 3, demonstrates how LLMs integrate into the fuzzing pipeline to automatically generate test cases from source code.
 
-**Figure 4.1: Toolchain Architecture**
+**Figure 4.1: LLM-Assisted Fuzzing Workflow**
 
 ```mermaid
-flowchart TB
-    subgraph Local["Local Development Environment (Mac M1 Pro)"]
-        Podman[Podman Container<br/>4 CPUs, 8GB RAM]
-        Ollama[Ollama Server<br/>Local Model Inference]
-    end
+flowchart LR
+    SourceCode[Source Code] --> DefineTarget[Define Target]
+    DefineTarget --> LLM[LLM<br/>Fuzz Test Generation]
+    SeedInputs[Seed Inputs] --> ExecuteTests[Execute Tests]
+    LLM --> ExecuteTests
+    ExecuteTests --> FuzzEngine[Fuzzing Engine]
+    FuzzEngine --> CrashDetected{Crash<br/>Detected?}
+    CrashDetected -->|Yes| Reports[Reports]
+    CrashDetected -->|No| MutateInputs[Mutate Inputs]
+    MutateInputs --> FuzzEngine
     
-    subgraph Spark["Cifuzz Spark"]
-        direction TB
-        API[API Extraction<br/>from CMake Target]
-        Prompt[Prompt Generation<br/>+ Context]
-    end
-    
-    Podman --> API
-    Ollama --> Spark
-    API --> Prompt
-    
-    Prompt --> LocalLLM[Local LLM<br/>Qwen/Gemma/etc.]
-    Prompt --> AzureAPI[Azure OpenAI<br/>GPT-4o]
-    
-    LocalLLM --> Driver[Generated<br/>Fuzz Driver]
-    AzureAPI --> Driver
-    
-    Driver --> LibFuzzer[libFuzzer Execution]
-    
-    subgraph Sanitizers["Runtime Sanitizers"]
-        ASan[AddressSanitizer<br/>Memory Errors]
-        UBSan[UndefinedBehaviorSanitizer<br/>Undefined Behavior]
-    end
-    
-    LibFuzzer --> Sanitizers
-    
-    Sanitizers --> Coverage[Coverage Reports<br/>llvm-cov]
-    Sanitizers --> Crashes[Crash Reports<br/>Bug Detection]
-    
-    style LocalLLM fill:#E6F3FF
-    style AzureAPI fill:#E6F3FF
-    style Driver fill:#90EE90
-    style Crashes fill:#FFE6E6
+    style LLM fill:#E6F3FF
+    style Reports fill:#90EE90
+    style CrashDetected fill:#FFE6CC
+    style FuzzEngine fill:#FFFFCC
 ```
 
 ## 4.2 Phase 1: Local LLM Evaluation Setup
@@ -190,40 +167,25 @@ We ran each model five times on yaml-cpp to ensure consistency and account for s
 
 A full evaluation cycle for one model on one target took approximately 10-15 minutes. With 14 models and 6 primary targets, plus five runs per configuration for consistency checking, the complete Phase 1 evaluation required approximately two weeks of continuous testing.
 
-The evaluation pipeline is shown in Figure 4.2, which illustrates the workflow from model server initialization through driver generation, compilation checking, fuzzing execution, and coverage measurement.
+The general fuzzing workflow is shown in Figure 4.2, illustrating the standard fuzzing cycle: defining targets from source code, generating fuzz tests, executing them through the fuzzing engine, detecting crashes, and either reporting findings or mutating inputs for continued testing. This workflow forms the foundation of our evaluation methodology.
 
-**Figure 4.2: Evaluation Pipeline Flowchart**
+**Figure 4.2: Fuzzing Workflow**
 
 ```mermaid
-flowchart TD
-    Start([Model Server Running])
-    Generate[cifuzz spark<br/>generates driver]
-    Compile{Compiles?}
-    RecordFail[Record Failure<br/>- Model name<br/>- Error message]
-    StopFail([Stop - Failure])
-    RunFuzz[Run Fuzzer<br/>60 seconds<br/>with sanitizers]
-    Coverage[Record Coverage<br/>with llvm-cov<br/>- Line coverage<br/>- Branch coverage]
-    Store[Store Results<br/>in database]
-    End([Complete - Success])
+flowchart LR
+    SourceCode[Source Code] --> DefineTarget[Define Target]
+    DefineTarget --> FuzzTestGen[Fuzz Test<br/>Generation]
+    FuzzTestGen --> ExecuteTests[Execute Tests]
+    ExecuteTests --> FuzzEngine[Fuzzing Engine]
+    FuzzEngine --> CrashDetected{Crash<br/>Detected?}
+    CrashDetected -->|Yes| Developer[Developer<br/>Reports]
+    CrashDetected -->|No| MutateInputs[Mutate Inputs]
+    MutateInputs --> FuzzEngine
     
-    Start --> Generate
-    Generate --> Compile
-    Compile -->|No| RecordFail
-    RecordFail --> StopFail
-    Compile -->|Yes| RunFuzz
-    RunFuzz --> Coverage
-    Coverage --> Store
-    Store --> End
-    
-    style Start fill:#E6F3FF
-    style Generate fill:#FFFFCC
-    style Compile fill:#FFE6CC
-    style RecordFail fill:#FFE6E6
-    style StopFail fill:#FFE6E6
-    style RunFuzz fill:#E6FFE6
-    style Coverage fill:#E6FFE6
-    style Store fill:#E6F3FF
-    style End fill:#90EE90
+    style FuzzEngine fill:#FFFFCC
+    style CrashDetected fill:#FFE6CC
+    style Developer fill:#90EE90
+    style MutateInputs fill:#E6FFE6
 ```
 
 ## 4.3 Phase 2: Model Optimization with LoRA Fine-Tuning
