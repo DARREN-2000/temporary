@@ -8,13 +8,13 @@ Before writing any code, we needed to select the right tools. This decision was 
 
 ### 4.1.1 Fuzzing Infrastructure
 
-For the fuzzing engine itself, we chose libFuzzer combined with Clang sanitizers. This was not a controversial choice. libFuzzer is the industry standard for coverage-guided fuzzing in C and C++ projects. It integrates directly with the LLVM toolchain, which means compilation and fuzzing use the same infrastructure. Google uses libFuzzer for OSS-Fuzz, so the documentation and community support are excellent.
+For the fuzzing engine itself, we chose libFuzzer combined with Clang sanitizers. This was not a controversial choice. libFuzzer is the industry standard for coverage-guided fuzzing in C and C++ projects [23]. It integrates directly with the LLVM toolchain, which means compilation and fuzzing use the same infrastructure. Google uses libFuzzer for OSS-Fuzz [8], so the documentation and community support are excellent.
 
-We compiled all targets with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled. ASan catches memory errors like buffer overflows, use-after-free, and memory leaks. UBSan catches undefined behavior like signed integer overflow and null pointer dereferences. These sanitizers add runtime overhead, but for security testing the overhead is acceptable. Finding bugs is more important than running fast.
+We compiled all targets with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled. ASan catches memory errors like buffer overflows, use-after-free, and memory leaks [23]. UBSan catches undefined behavior like signed integer overflow and null pointer dereferences. These sanitizers add runtime overhead, but for security testing the overhead is acceptable. Finding bugs is more important than running fast.
 
 For integration with our build systems, we used cifuzz from Code Intelligence. Cifuzz wraps libFuzzer and provides additional functionality like corpus management, coverage reporting, and build system integration. The critical feature for our work was cifuzz spark, which handles the LLM integration. Spark takes a CMake target as input, extracts API information automatically, sends it to the configured LLM, and produces a fuzz driver ready for execution.
 
-Our choice of cifuzz was deliberate. We evaluated several alternatives including Google's ClusterFuzz and standalone libFuzzer setups. Cifuzz offered the best balance between ease of use and enterprise features. Its spark module specifically addressed our core research question by providing a clean interface between the fuzzing infrastructure and LLM backends.
+Our choice of cifuzz was deliberate. We evaluated several alternatives including Google's ClusterFuzz [8] and standalone libFuzzer setups. Cifuzz offered the best balance between ease of use and enterprise features. Its spark module specifically addressed our core research question by providing a clean interface between the fuzzing infrastructure and LLM backends.
 
 ### 4.1.2 LLM Infrastructure
 
@@ -234,7 +234,7 @@ After the initial evaluation showed promising results from Qwen 2.5-Coder models
 
 Most important for fine-tuning is the training data. High-quality examples of fuzz drivers paired with source code were essential.
 
-To build our dataset, we extracted training examples from OSS-Fuzz. Google has fuzz-tested hundreds of open-source projects through OSS-Fuzz, and the fuzz drivers are publicly available. We focused on C and C++ drivers because those matched our target domain.
+To build our dataset, we extracted training examples from OSS-Fuzz [8]. Google has fuzz-tested hundreds of open-source projects through OSS-Fuzz, and the fuzz drivers are publicly available. We focused on C and C++ drivers because those matched our target domain.
 
 Our extraction process involved four steps:
 
@@ -253,7 +253,7 @@ Quality control was important. We manually reviewed a sample of the extracted dr
 
 ### 4.3.2 LoRA Configuration and Training
 
-We used Low-Rank Adaptation (LoRA) rather than full fine-tuning. Full fine-tuning updates all model weights, which requires enormous compute resources. LoRA adds small trainable matrices alongside the frozen base model. This reduces memory requirements by a large margin while achieving similar results on specialized tasks.
+We used Low-Rank Adaptation (LoRA) [12] rather than full fine-tuning. Full fine-tuning updates all model weights, which requires enormous compute resources. LoRA adds small trainable matrices alongside the frozen base model. This reduces memory requirements by a large margin while achieving similar results on specialized tasks.
 
 Our LoRA configuration:
 
