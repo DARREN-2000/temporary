@@ -142,7 +142,7 @@ The structural errors were often recoverable through prompt refinement. Adding e
 
 Our work has several technical limitations that affect how the results should be interpreted.
 
-**Model selection scope.** We evaluated 14 open-source LLMs, but this represents a small fraction of available models. New models appear monthly. Some models we did not test might perform better or worse than our selections. We chose models based on availability, documentation, and community adoption rather than exhaustive search.
+**Model selection scope.** We evaluated 14 open-source LLMs, but this represents a small fraction of available models. New models appear monthly, including more advanced versions of GPT-4 [16] and other commercial offerings we could not test due to cost or access restrictions. Some models we did not test might perform better or worse than our selections. We chose models based on availability, documentation, and community adoption rather than exhaustive search.
 
 **Single target language.** All experiments focused on C++ libraries. Results might differ for other languages. C has similar challenges, but Python or Rust might show different patterns due to different memory safety characteristics and training data distribution.
 
@@ -158,7 +158,7 @@ Beyond technical limitations, our methodology has boundaries that constrain gene
 
 **Single organization context.** The enterprise integration work happened at CARIAD. Their network architecture, security policies, and tooling differ from other organizations. The specific solutions we developed (Azure Private Link, self-hosted runners) may not transfer directly to other environments.
 
-**Limited manual driver comparison.** We compared against OSS-Fuzz drivers where available, but did not commission expert written drivers specifically for comparison. The human baseline is somewhat indirect.
+**Limited manual driver comparison.** We compared against OSS-Fuzz drivers where available, but did not commission expert written drivers specifically for comparison. Recent research on LLM-assisted fuzzing [28] suggests that efficient fine-tuning can improve parameter efficiency substantially. The human baseline is somewhat indirect.
 
 **No user study.** We did not evaluate how developers interact with generated drivers in practice. Do they trust the output? Do they modify it before use? These human factors affect practical deployment but were outside our scope.
 
