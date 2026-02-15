@@ -1,4 +1,4 @@
-# Chapter 6: Discussion and Conclusion
+# 6 Discussion and Conclusion
 
 This chapter interprets the experimental results from Chapter 5, connects them to the research questions posed in Chapter 1, and examines what the findings mean for practitioners. We discuss both successes and failures, then close with recommendations for future research and a summary of contributions.
 
@@ -172,7 +172,7 @@ These limitations do not invalidate our findings, but they define the scope with
 
 The automotive industry faces a particular combination of pressures that makes LLM-assisted fuzzing attractive.
 
-Regulatory requirements are tightening. UNECE Regulation 155 mandates cybersecurity management systems. ISO/SAE 21434 requires systematic security engineering throughout the vehicle lifecycle. Manufacturers must demonstrate that they have addressed security risks. Fuzzing provides evidence of security testing that regulators recognize.
+Regulatory requirements are tightening. UNECE Regulation 155 (United Nations Economic Commission for Europe cybersecurity regulation) mandates cybersecurity management systems for vehicle manufacturers. ISO/SAE 21434 (International Organization for Standardization and Society of Automotive Engineers standard for automotive cybersecurity management) requires systematic security engineering throughout the vehicle lifecycle. Manufacturers must demonstrate that they have addressed security risks. Fuzzing provides evidence of security testing that regulators recognize.
 
 Software complexity continues to grow. Modern vehicles contain millions of lines of code across networked ECUs. Manual security review cannot scale to this volume. Automated approaches are necessary just to maintain coverage.
 

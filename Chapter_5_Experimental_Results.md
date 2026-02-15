@@ -7,7 +7,7 @@ In this chapter, we present the experimental findings from our three-phase resea
 
 ### 5.1.1 Target Selection and Criteria
 
-Choosing the right target libraries proved more difficult than expected. We needed C++ libraries because safety-critical automotive systems—those running on AUTOSAR platforms—are predominantly written in C or C++. Testing on Python would have been simpler, but less relevant to the real problem we faced at CARIAD.
+Choosing the right target libraries proved more difficult than expected. We needed C++ libraries because safety-critical automotive systems—those running on AUTOSAR (AUTomotive Open System ARchitecture) platforms—are predominantly written in C or C++. AUTOSAR is the dominant software architecture standard for automotive electronic control units (ECUs), making C++ relevance essential for practical automotive application. Testing on Python would have been simpler, but less relevant to the real problem we faced at CARIAD.
 
 After evaluating several candidates, we selected yaml-cpp as our primary target. This library parses YAML configuration files, a common task in automotive software where configuration management matters significantly. The library contains 35 source files with 1,061 potential fuzzing candidates identified through cifuzz spark analysis. More importantly, it is well-documented and actively maintained. OSS-Fuzz already covers it, which gave us a baseline for comparison—we could measure whether our AI-generated drivers matched, exceeded, or fell short of existing human-written ones.
 
@@ -74,7 +74,11 @@ A clear pattern emerged: code-specialized models outperformed larger general-pur
 
 ## 5.3 Model Optimization Results
 
+Having established that specialized models outperform general-purpose ones, we investigated whether fine-tuning could further improve efficiency while reducing computational requirements. This phase directly addresses the optimization aspect of **RQ2**: can smaller models with domain-specific training match or exceed larger general-purpose models?
+
 ### 5.3.1 LoRA Fine-Tuning Efficiency
+
+We applied Low-Rank Adaptation (LoRA) fine-tuning to a 1.5 billion parameter model using fuzz driver examples extracted from OSS-Fuzz. The goal was to determine whether domain-specific adaptation could produce a model that rivals larger specialized models while requiring fewer computational resources.
 
 Based on Phase 1 results, we selected the Qwen 2.5-Coder 1.5B model for fine-tuning experiments. The goal was to determine whether a small, fine-tuned model could match larger models while using far fewer resources.
 
@@ -105,9 +109,12 @@ Training data quality and quantity both matter, though quality appears more impo
 One key insight: a fine-tuned small model can match larger models while using far fewer computational resources. This makes enterprise deployment practical—you do not need expensive GPU infrastructure to run effective fuzz driver generation.
 
 However, we should be honest about limitations. The fine-tuned 1.5B model still does not match the coverage achieved by the larger Qwen 32B or Gemma 27B models. What it offers is efficiency: acceptable coverage at much lower cost and resource requirements.
+The efficiency gains from fine-tuning directly impact deployment feasibility in resource-constrained environments. However, efficiency alone does not determine practical viability—cost considerations are equally critical for enterprise adoption.
 
 
 ## 5.4 Economic Analysis and Resource Metrics
+
+Beyond technical performance, successful enterprise deployment requires favorable economics. This section addresses the cost component of **RQ3**: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? We analyzed both direct infrastructure costs and opportunity costs relative to manual approaches.
 
 We analyzed costs in detail because the ultimate question is not just "does this work?" but "is this economically viable for real deployment?"
 
