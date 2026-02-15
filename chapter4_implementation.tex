@@ -89,15 +89,17 @@ Phase 1 focused on understanding which models could actually generate useful fuz
 
 \subsection{Benchmarked Models}
 
-We evaluated 14 models spanning a wide range of sizes and architectures. The selection included both general-purpose models and code-specialized variants. Our goal was to understand whether model size, training data, or architecture had the biggest impact on fuzz driver quality.
+We evaluated 15 models spanning a wide range of sizes and architectures. The selection included both general-purpose models, code-specialized variants, and one reasoning-focused model. Our goal was to understand whether model size, training data, or architecture had the biggest impact on fuzz driver quality.
 
 \textbf{Large Models (25-35 billion parameters):}
 \begin{itemize}
     \item Qwen 2.5-Coder 32B
     \item DeepSeek Coder 33B
+    \item DeepSeek R1 (reasoning-focused model)
     \item CodeLlama 34B Instruct
     \item WizardCoder 34B
     \item Yi 34B
+    \item Gemma 3 27B
 \end{itemize}
 
 \textbf{Extra Large Models (above 40 billion parameters):}
@@ -105,21 +107,21 @@ We evaluated 14 models spanning a wide range of sizes and architectures. The sel
     \item Mixtral 46.7B
 \end{itemize}
 
-\textbf{Medium Models (7-14 billion parameters):}
+\textbf{Medium Models (7-16 billion parameters):}
 \begin{itemize}
     \item Qwen 2.5-Coder 7B and 14B
+    \item Phi-4 14B
     \item DeepSeek Coder V2 Lite 16B
-    \item Gemma 3 9B and 27B
+    \item Gemma 3 9B
 \end{itemize}
 
 \textbf{Small Models (below 7 billion parameters):}
 \begin{itemize}
     \item Qwen 2.5-Coder 1.5B
     \item Gemma 3 4B
-    \item Phi 4 3.8B
 \end{itemize}
 
-Code-specialized models like Qwen Coder and DeepSeek Coder were trained specifically on programming tasks. General-purpose models like Mixtral were included to investigate whether raw scale could compensate for lack of specialization. This allowed us to test a key hypothesis: does a 46B general model outperform a 7B code-specialized model? Results, discussed in Chapter 5, were surprising: general-purpose models like Mixtral (46.7B) and CodeLlama (34B) achieved 0\% code coverage, while the specialized Qwen 2.5-Coder (32B) and Gemma 3 (27B) consistently achieved over 43\% line coverage.
+Code-specialized models like Qwen Coder, DeepSeek Coder, and CodeLlama were trained specifically on programming tasks. General-purpose models like Mixtral and Yi were included to investigate whether raw scale could compensate for lack of specialization. This allowed us to test a key hypothesis: does a 46B general model outperform a 7B code-specialized model? Results, discussed in Chapter 5, were surprising: general-purpose models like Mixtral (46.7B) and Yi (34B) achieved 0\% code coverage, while the specialized Qwen 2.5-Coder (32B) and Gemma 3 (27B) consistently achieved over 43\% line coverage. Even some code-specialized models like CodeLlama (34B) failed to produce working drivers, suggesting that specialization alone is not sufficient without adequate training on fuzz-driver-specific patterns.
 
 Installing these models required significant disk space. The larger models exceeded 20GB each in their quantized forms. We used 4-bit and 5-bit quantization to fit models into available VRAM while maintaining reasonable output quality.
 
@@ -161,7 +163,7 @@ Each model's evaluation followed these steps:
 
 We ran each model five times on yaml-cpp to ensure consistency and account for stochastic output variation. Some models produced different outputs on identical prompts, making multiple runs necessary for reliable statistical analysis. This variability was itself an interesting finding that we discuss further in Chapter 5.
 
-A full evaluation cycle for one model on one target took approximately 10-15 minutes. With 14 models and 6 primary targets, plus five runs per configuration for consistency checking, the complete Phase 1 evaluation required approximately two weeks of continuous testing.
+A full evaluation cycle for one model on one target took approximately 10-15 minutes. With 15 models and 6 primary targets, plus five runs per configuration for consistency checking, the complete Phase 1 evaluation required approximately two weeks of continuous testing.
 
 The general fuzzing workflow (as introduced in earlier chapters) forms the foundation of our evaluation methodology: defining targets from source code, generating fuzz tests via LLM, executing them through the fuzzing engine (libFuzzer with sanitizers), detecting crashes, and either reporting findings or mutating inputs for continued testing. Each evaluation cycle involved generating a driver, checking compilation, running the fuzzer for 60 seconds, measuring coverage with llvm-cov, and storing results.
 
@@ -226,7 +228,7 @@ Training used standard supervised fine-tuning:
 
 \subsection{Fine-Tuned Model Evaluation}
 
-After training, we evaluated the fine-tuned models on the same yaml-cpp benchmark used in Phase 1. The results showed that fine-tuning provided significant efficiency improvements:
+After training, we evaluated the fine-tuned models on the same yaml-cpp benchmark used in Phase 1. The results showed measurable efficiency improvements:
 
 \begin{itemize}
     \item \textbf{Generation time reduced by 33\%} compared to the base model
@@ -236,7 +238,7 @@ After training, we evaluated the fine-tuned models on the same yaml-cpp benchmar
 
 Fine-tuned models generated more concise code. They learned the structure of fuzz drivers and did not waste tokens on unnecessary explanations or boilerplate. These efficiency gains meant that generating each driver took substantially less time and fewer API tokens, which directly impacts operational costs.
 
-Interestingly, more training data did not always help. The 709-example dataset included some lower-quality drivers, and this may have hurt the model's output. Quality matters more than quantity for fine-tuning specialized tasks. This finding aligns with recent research on data quality in LLM training.
+Interestingly, more training data did not always produce proportionally better results. The 709-example dataset achieved the best efficiency improvements (see Chapter 5 for detailed metrics), but it included some lower-quality drivers that may have introduced noise. While the extended dataset reduced generation time and token usage, the coverage quality did not improve proportionally. Quality matters more than quantity for fine-tuning specialized tasks.
 
 We also tested the fine-tuned models on RapidJSON and pugixml to check generalization. Performance was similar to yaml-cpp, suggesting the fine-tuning improved general fuzz driver generation rather than overfitting to specific libraries.
 
@@ -428,7 +430,7 @@ These costs are minimal compared to hiring dedicated security engineers. Even th
 
 LLM outputs are not deterministic. Sometimes the generated driver does not compile. Sometimes it compiles but crashes immediately. The pipeline was designed to handle these cases gracefully.
 
-We added fallback logic: if the LLM-generated driver fails, the pipeline falls back to any existing manually-written drivers. The build does not fail just because AI generation had a bad day. Generated drivers that work are kept. Those that fail are logged for review but do not block the pipeline.
+We added fallback logic: if the LLM-generated driver fails, the pipeline falls back to any existing manually-written drivers. The build does not fail due to unsuccessful AI generation. Generated drivers that work are kept. Those that fail are logged for review but do not block the pipeline.
 
 \textbf{Security Review}
 

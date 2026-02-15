@@ -57,7 +57,7 @@ The architecture of this solution is illustrated in Figure \ref{fig:enterprise_n
 \end{itemize}}}}
 \end{figure}
 
-Setting up Private Link required organizational coordination. Approval processes, security reviews, configuration testing, and documentation all added time. The technical configuration itself was straightforward once approvals were obtained, requiring approximately three weeks from initial request to operational deployment.
+Setting up Private Link required organizational coordination. Approval processes, security reviews, configuration testing, and documentation all added time. The technical configuration itself was straightforward once approvals were obtained, requiring approximately one month from initial request to operational deployment.
 
 This experience taught us something important about AI deployment in enterprise environments. The machine learning challenges are often the easy part. Corporate IT infrastructure, security policies, and approval processes create friction that academic research rarely addresses. Anyone planning to deploy LLM-based tools in large organizations should budget significant time for infrastructure integration beyond the technical implementation. Based on our experience, organizations should allocate 2-3 months for enterprise integration even when the core technology is proven.
 
@@ -138,7 +138,7 @@ The structural errors were often recoverable through prompt refinement. Adding e
 
 Our work has several technical limitations that affect how the results should be interpreted.
 
-\textbf{Model selection scope.} We evaluated 14 open-source LLMs, but this represents a small fraction of available models. New models appear monthly, including more advanced versions of GPT-4 \cite{gpt4} and other commercial offerings we could not test due to cost or access restrictions. Some models we did not test might perform better or worse than our selections. We chose models based on availability, documentation, and community adoption rather than exhaustive search.
+\textbf{Model selection scope.} We evaluated 15 open-source LLMs, but this represents a small fraction of available models. New models appear monthly, including more advanced versions of GPT-4 \cite{gpt4} and other commercial offerings we could not test due to cost or access restrictions. Some models we did not test might perform better or worse than our selections. We chose models based on availability, documentation, and community adoption rather than exhaustive search.
 
 \textbf{Single target language.} All experiments focused on C++ libraries. Results might differ for other languages. C has similar challenges, but Python or Rust might show different patterns due to different memory safety characteristics and training data distribution.
 
@@ -201,7 +201,7 @@ The clash between AI deployment models and enterprise security models creates fr
 
 We see several responses to this challenge:
 
-\textbf{Private deployment of models.} Running models on internal infrastructure avoids external network traffic entirely. This works for smaller models but requires significant compute resources for larger ones. Our local experiments used a workstation with 24GB GPU memory for inference, which limits model size options. Organizations must weigh infrastructure costs (hardware, maintenance, power) against API costs when choosing deployment approaches.
+\textbf{Private deployment of models.} Running models on internal infrastructure avoids external network traffic entirely. This works for smaller models but requires significant compute resources for larger ones. Our local experiments used a workstation with unified memory shared between CPU and GPU, which limits model size options. Organizations must weigh infrastructure costs (hardware, maintenance, power) against API costs when choosing deployment approaches.
 
 \textbf{Cloud provider private connectivity.} Services like Azure Private Link \cite{azure_private_link}, AWS PrivateLink, and Google Cloud Private Service Connect create private paths to cloud services. These maintain security boundaries while enabling access. Configuration requires coordination between cloud and enterprise network teams.
 
@@ -241,7 +241,7 @@ Our work opens several directions for future research.
 
 This thesis makes several contributions to the understanding of LLM-assisted security testing in automotive contexts.
 
-\textbf{Empirical evaluation of model capabilities.} We systematically evaluated 14 LLMs for fuzz driver generation, establishing that specialized code models outperform larger general-purpose models for this task. This finding challenges common assumptions about model scaling.
+\textbf{Empirical evaluation of model capabilities.} We systematically evaluated 15 LLMs for fuzz driver generation, establishing that specialized code models outperform larger general-purpose models for this task. This finding challenges common assumptions about model scaling.
 
 \textbf{Demonstration of fine-tuning effectiveness.} Our LoRA experiments showed that small models adapted to the fuzzing domain can match larger models at reduced cost. This provides a practical path for resource-constrained deployments.
 
@@ -259,7 +259,7 @@ The practical impact extends beyond academic contribution. CARIAD can deploy the
 \section{Conclusion}
 \label{sec:discussion_conclusion}
 
-This work began with a straightforward question: can Large Language Models automate fuzz driver generation for automotive software? After four months of research, implementation, and deployment effort at CARIAD (May to September 2025), the answer is a qualified yes.
+This work began with a straightforward question: can Large Language Models automate fuzz driver generation for automotive software? After five months of research, implementation, and deployment effort at CARIAD (May to September 2025), the answer is a qualified yes.
 
 The qualification matters. Not all models work. General-purpose models, even large ones, frequently failed at this task. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is not an afterthought---it is a critical design decision.
 
