@@ -1,0 +1,16 @@
+flowchart LR
+    A[Corporate Network<br/>CARIAD]
+    B[Corporate<br/>Firewall]
+    C[Azure Private Link<br/>Secure Connection]
+    D[Azure OpenAI<br/>LLM Service]
+    Internet((Internet<br/>Public))
+    
+    A -->|GitHub Actions<br/>Runner| B
+    B -.->|❌ Blocked<br/>Direct Access| Internet
+    B -->|✓ Allowed<br/>Private Link| C
+    C -->|Secure<br/>Connection| D
+    
+    style B fill:#f9f,stroke:#333,stroke-width:2px
+    style C fill:#9f9,stroke:#333,stroke-width:2px
+    style Internet fill:#f99,stroke:#333,stroke-width:2px
+    style D fill:#99f,stroke:#333,stroke-width:2px
