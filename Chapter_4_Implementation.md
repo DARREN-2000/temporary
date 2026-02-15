@@ -40,7 +40,7 @@ export CIFUZZ_LLM_API_TOKEN="<api-key>"
 export CIFUZZ_LLM_MAX_TOKENS=40000
 ```
 
-A token limit of 40000 was necessary because fuzz driver generation requires substantial context. Prompts include header files, example code, and detailed instructions. Smaller token limits caused truncation and worse results.
+A token limit of 40,000 was necessary because fuzz driver generation requires substantial context. Prompts include header files, example code, and detailed instructions. Smaller token limits caused truncation and worse results.
 
 ### 4.1.3 Development Environment
 
@@ -215,7 +215,7 @@ Interestingly, more training data did not always help. The 709-example dataset i
 
 We also tested the fine-tuned models on RapidJSON and pugixml to check generalization. Performance was similar to yaml-cpp, suggesting the fine-tuning improved general fuzz driver generation rather than overfitting to specific libraries.
 
-**[Figure 4.3: Bar chart comparing fine-tuning efficiency gains: 33% reduction in generation time, 55% reduction in token usage, while maintaining comparable coverage to larger models.]**
+
 
 ## 4.4 Phase 3: Enterprise CI/CD Integration
 

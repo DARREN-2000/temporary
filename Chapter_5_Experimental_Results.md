@@ -161,36 +161,10 @@ xychart-beta
     bar [45.06, 43.08, 34.26, 0]
 ```
 
-### Figure 5.2: LoRA Fine-Tuning Efficiency
 
-```mermaid
-%%{init: {'theme': 'neutral'}}%%
-xychart-beta
-    title "Fine-Tuning Impact on 1.5B Model"
-    x-axis ["Base Model", "172 Examples", "709 Examples"]
-    y-axis "Tokens (thousands)" 0 --> 120
-    bar [112, 65, 50]
-```
 
-### Figure 5.3: Annual Cost by Usage Level
 
-```mermaid
-%%{init: {'theme': 'neutral'}}%%
-xychart-beta
-    title "Annual Cost by Usage Level (€)"
-    x-axis ["Light", "Moderate", "Heavy", "Enterprise"]
-    y-axis "Annual Cost (€)" 0 --> 1600
-    bar [73.92, 219.12, 726.00, 1452.00]
-```
 
-### Figure 5.4: Cost Comparison (Manual vs LLM)
 
-```mermaid
-%%{init: {'theme': 'neutral'}}%%
-pie showData
-    title "Annual Cost Comparison (€)"
-    "Manual Approach (min 50,000)" : 50000
-    "LLM Enterprise (1,452)" : 1452
-```
 
 **Note:** Render diagrams using Mermaid Live Editor (https://mermaid.live), VS Code with Mermaid extension, or command-line tool `mmdc -i diagram.mmd -o diagram.pdf`. Export as PDF or PNG for LaTeX.

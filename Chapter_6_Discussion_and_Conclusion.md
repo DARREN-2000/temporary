@@ -38,13 +38,6 @@ Setting up Private Link required organizational coordination. Approval processes
 
 This experience taught us something important about AI deployment in enterprise environments. The machine learning challenges are often the easy part. Corporate IT infrastructure, security policies, and approval processes create friction that academic research rarely addresses. Anyone planning to deploy LLM-based tools in large organizations should budget significant time for infrastructure integration. We underestimated this. Most organizations will too.
 
-The self-hosted runner approach we ultimately implemented has broader implications. Traditional CI/CD uses cloud hosted runners that scale automatically. Self-hosted runners require managing physical or virtual machines within the corporate network. This adds operational complexity but enables access to internal resources that cloud runners cannot reach.
-
-We documented our architecture so other teams at CARIAD could replicate it. The combination of self-hosted runners plus Azure Private Link provides a template for integrating cloud AI services into secure enterprise environments. This pattern should apply beyond fuzzing to any use case requiring LLM access from CI/CD pipelines.
-
-**[Suggested Diagram: Network Architecture Flow]**
-*A diagram showing the data flow from CI/CD runner through Azure Private Link to the LLM API would help visualize this architecture. The diagram should show the security boundary between the corporate network and public cloud, with Private Link bridging them securely.*
-
 ## 6.2 Addressing Research Questions
 
 ### 6.2.1 Primary Research Question Analysis
@@ -178,9 +171,6 @@ We see several responses to this challenge:
 
 Our Azure Private Link solution represents one point in this design space. It preserved CARIAD's security model while enabling cloud AI access. Other organizations will make different tradeoffs based on their specific constraints.
 
-**[Suggested Diagram: Enterprise AI Deployment Options]**
-*A comparison diagram showing different deployment models (fully cloud, private link, self-hosted, edge) with their tradeoffs in terms of security, cost, scalability, and operational complexity would be valuable here.*
-
 ## 6.5 Future Research Directions
 
 Our work opens several directions for future research.
@@ -245,18 +235,9 @@ I should note that when we started this work, we underestimated how much infrast
 
 ## Mermaid Diagram Code for Chapter 6 Figures
 
-### Figure 6.1: Model Performance Comparison
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4472C4'}}}%%
-xychart-beta
-    title "Code Coverage by Model (yaml-cpp)"
-    x-axis ["Gemma 3 (27B)", "Qwen 2.5-Coder (32B)", "Phi (14B)", "Yi 34B", "Deepseek-r1", "Mixtral (46.7B)"]
-    y-axis "Line Coverage (%)" 0 --> 50
-    bar [45.06, 43.08, 34.26, 0, 0, 0]
-```
 
-### Figure 6.2: Enterprise Network Architecture
+### Figure 6.1: Enterprise Network Architecture
 
 ```mermaid
 flowchart LR
@@ -291,140 +272,8 @@ flowchart LR
     style Azure fill:#FFF3E6
 ```
 
-### Figure 6.3: AI Deployment Options Comparison
 
-```mermaid
-quadrantChart
-    title AI Deployment Options Trade-offs
-    x-axis Low Cost --> High Cost
-    y-axis Low Security --> High Security
-    quadrant-1 High Security, High Cost
-    quadrant-2 High Security, Low Cost
-    quadrant-3 Low Security, Low Cost
-    quadrant-4 Low Security, High Cost
-    
-    Self-hosted Models: [0.75, 0.85]
-    Azure Private Link: [0.55, 0.80]
-    Edge Deployment: [0.65, 0.70]
-    Cloud API Direct: [0.35, 0.25]
-```
 
-Alternative table format for Figure 6.3:
 
-```mermaid
-flowchart TB
-    subgraph Comparison["AI Deployment Options Comparison"]
-        direction TB
-        
-        subgraph Headers[" "]
-            H1[Option]
-            H2[Security]
-            H3[Cost]
-            H4[Scalability]
-            H5[Complexity]
-        end
-        
-        subgraph Row1["Cloud API (Direct)"]
-            R1C1[Cloud API]
-            R1C2[Low]
-            R1C3[Low]
-            R1C4[High]
-            R1C5[Low]
-        end
-        
-        subgraph Row2["Private Link"]
-            R2C1[Private Link]
-            R2C2[High]
-            R2C3[Medium]
-            R2C4[High]
-            R2C5[Medium]
-        end
-        
-        subgraph Row3["Self-hosted"]
-            R3C1[Self-hosted]
-            R3C2[High]
-            R3C3[High]
-            R3C4[Low]
-            R3C5[High]
-        end
-        
-        subgraph Row4["Edge"]
-            R4C1[Edge]
-            R4C2[High]
-            R4C3[Medium]
-            R4C4[Low]
-            R4C5[Medium]
-        end
-    end
-    
-    style R1C2 fill:#ffcccc
-    style R2C2 fill:#90EE90
-    style R3C2 fill:#90EE90
-    style R4C2 fill:#90EE90
-```
 
-### Figure 6.4: Research Questions Summary
 
-```mermaid
-flowchart TB
-    subgraph RQ1["RQ1: Effectiveness"]
-        Q1[Can LLMs generate<br>fuzz drivers?]
-        A1[Yes, with qualifications]
-        E1[43-45% coverage<br>2000+ test cases]
-        Q1 --> A1 --> E1
-    end
-    
-    subgraph RQ2["RQ2: Optimization"]
-        Q2[Does model size<br>determine quality?]
-        A2[No, domain-specific<br>training matters more]
-        E2[32B Qwen > 46.7B Mixtral<br>1.5B LoRA competitive]
-        Q2 --> A2 --> E2
-    end
-    
-    subgraph RQ3["RQ3: Feasibility"]
-        Q3[Can it integrate into<br>enterprise CI/CD?]
-        A3[Yes, with significant<br>infrastructure effort]
-        E3[Azure Private Link<br>Self-hosted runners<br>€74-€1,452/year]
-        Q3 --> A3 --> E3
-    end
-    
-    RQ1 --- RQ2 --- RQ3
-    
-    style A1 fill:#90EE90
-    style A2 fill:#90EE90
-    style A3 fill:#FFFFCC
-```
-
-### Additional Figure: LLM Fuzz Driver Generation Workflow
-
-```mermaid
-flowchart LR
-    subgraph Input["Input Layer"]
-        SC[Source Code<br>Headers]
-        API[API<br>Documentation]
-    end
-    
-    subgraph Generation["Generation Layer"]
-        PE[Prompt<br>Engineering]
-        LLM[LLM Model<br>Qwen 2.5-Coder]
-    end
-    
-    subgraph Execution["Execution Layer"]
-        COMP[Compilation<br>Check]
-        SAN[Sanitizer<br>ASan/UBSan]
-        FUZZ[libFuzzer<br>Execution]
-        COV[Coverage<br>Measurement]
-    end
-    
-    SC --> PE
-    API --> PE
-    PE --> LLM
-    LLM --> COMP
-    COMP -->|Success| SAN
-    COMP -->|Fail| PE
-    SAN --> FUZZ
-    FUZZ --> COV
-    
-    style COMP fill:#FFFFCC
-    style COV fill:#90EE90
-```
