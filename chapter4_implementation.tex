@@ -8,7 +8,7 @@ This chapter describes how we turned the methodology from Chapter 3 into working
 \section{Toolchain Selection and Rationale}
 \label{sec:impl_toolchain}
 
-Before writing any code, we needed to select the right tools. This decision was not straightforward because we had constraints from multiple directions. The university wanted reproducible research. CARIAD needed enterprise compatibility. And we wanted tools that would work on the hardware we had available.
+Before writing any code, we needed to select the right tools. This decision was not straightforward because several factors influenced the selection. Research reproducibility required tools with stable APIs and clear documentation. Industrial deployment demanded compatibility with CARIAD's existing infrastructure. Hardware availability constrained which models could run locally with acceptable performance.
 
 \subsection{Fuzzing Infrastructure}
 
@@ -22,7 +22,7 @@ Our choice of cifuzz was deliberate. We evaluated several alternatives including
 
 \subsection{LLM Infrastructure}
 
-We needed to run models locally for several reasons. First, we wanted to evaluate many different models, and running them through paid APIs would have been expensive. Second, some models are open-source and only available for local deployment. Third, for the enterprise integration phase, we needed to understand how local deployment might work as an alternative to cloud APIs.
+We needed to run models locally for several reasons. First, evaluating many different models through paid APIs would have been cost-prohibitive. Second, some models are open-source and only available for local deployment. Third, understanding local deployment options was essential for the enterprise integration phase.
 
 We selected Ollama \cite{ollama} as our primary local inference server. Ollama simplifies model management. Installing a new model is one command: \texttt{ollama pull qwen2.5-coder:32b}. The server exposes an OpenAI-compatible API, which meant cifuzz spark worked without modification. Ollama handled quantized models well, which let us run larger models on the available hardware.
 
@@ -33,7 +33,7 @@ llama-gguf-split --merge qwen2.5-coder-14b-instruct-q5_k_m-00001-of-00002.gguf \
                  qwen2.5-coder-14b-instruct-q5_k_m.gguf
 \end{lstlisting}
 
-This merging step added complexity to our workflow but was necessary for the larger models we wanted to evaluate.
+This merging step added complexity to our workflow but was necessary for evaluating the larger models.
 
 For cloud deployment in the enterprise phase, we configured Azure OpenAI \cite{azure_openai}. Azure provided GPT-4o through a managed endpoint. The authentication used API keys stored as GitHub secrets. We configured the following environment variables:
 
@@ -119,13 +119,13 @@ We evaluated 14 models spanning a wide range of sizes and architectures. The sel
     \item Phi 4 3.8B
 \end{itemize}
 
-Code-specialized models like Qwen Coder and DeepSeek Coder were trained specifically on programming tasks. General-purpose models like Mixtral were included to test whether raw scale could compensate for lack of specialization. We wanted to know: does a 46B general model outperform a 7B code-specialized model? Results, discussed in Chapter 5, were surprising: general-purpose models like Mixtral (46.7B) and CodeLlama (34B) achieved 0\% code coverage, while the specialized Qwen 2.5-Coder (32B) and Gemma 3 (27B) consistently achieved over 43\% line coverage.
+Code-specialized models like Qwen Coder and DeepSeek Coder were trained specifically on programming tasks. General-purpose models like Mixtral were included to investigate whether raw scale could compensate for lack of specialization. This allowed us to test a key hypothesis: does a 46B general model outperform a 7B code-specialized model? Results, discussed in Chapter 5, were surprising: general-purpose models like Mixtral (46.7B) and CodeLlama (34B) achieved 0\% code coverage, while the specialized Qwen 2.5-Coder (32B) and Gemma 3 (27B) consistently achieved over 43\% line coverage.
 
 Installing these models required significant disk space. The larger models exceeded 20GB each in their quantized forms. We used 4-bit and 5-bit quantization to fit models into available VRAM while maintaining reasonable output quality.
 
 \subsection{Target Repositories}
 
-We needed consistent test targets to compare models fairly. Our selection included open-source C++ libraries with varying complexity:
+Consistent test targets were required to ensure fair model comparison. Our selection included open-source C++ libraries with varying complexity:
 
 \textbf{Primary Target: yaml-cpp}
 
@@ -213,7 +213,7 @@ DTYPE = "float16"       # Memory-efficient precision
 
 A rank of 16 was a balance between adaptation capacity and training speed. Higher ranks can capture more complex patterns but require more memory and training time. We tested ranks of 8, 16, and 32. Rank 16 gave the best results for our dataset size.
 
-We trained on the Qwen 2.5-Coder 1.5B base model. This is a small model that runs quickly on modest hardware. We chose this size specifically because we wanted to test whether fine-tuning could make small models competitive with larger ones.
+We trained on the Qwen 2.5-Coder 1.5B base model. This is a small model that runs quickly on modest hardware. This size was chosen to investigate whether fine-tuning could make small models competitive with larger ones.
 
 Training used standard supervised fine-tuning:
 \begin{itemize}
@@ -283,7 +283,7 @@ Did not help because the issue was firewall policy, not DNS resolution.
 
 \textbf{Challenge 3: Credential Management}
 
-Even if network connectivity worked, we needed to securely pass API keys to the container. GitHub Actions secrets provided the storage, but injecting them into Buildah containers required explicit environment variable passing:
+Even with network connectivity established, API keys needed to be securely passed to the container. GitHub Actions secrets provided the storage, but injecting them into Buildah containers required explicit environment variable passing:
 
 \begin{lstlisting}[language=bash]
 buildah run \
@@ -426,7 +426,7 @@ These costs are minimal compared to hiring dedicated security engineers. Even th
 
 \textbf{Failure Handling}
 
-LLM outputs are not deterministic. Sometimes the generated driver does not compile. Sometimes it compiles but crashes immediately. The pipeline needed to handle these cases gracefully.
+LLM outputs are not deterministic. Sometimes the generated driver does not compile. Sometimes it compiles but crashes immediately. The pipeline was designed to handle these cases gracefully.
 
 We added fallback logic: if the LLM-generated driver fails, the pipeline falls back to any existing manually-written drivers. The build does not fail just because AI generation had a bad day. Generated drivers that work are kept. Those that fail are logged for review but do not block the pipeline.
 
