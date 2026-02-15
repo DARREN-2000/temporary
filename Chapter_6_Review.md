@@ -49,7 +49,7 @@
 
 ### 2.1 Minor Grammar Issues
 - **Line 58:** "Model selection is critical. In practice, the question 'can LLMs do this' should really be 'which LLMs can do this, and under what conditions.'"  
-  - The period should be inside the closing quotation mark (or use a question mark, since the quoted text is a question): "which LLMs can do this, and under what conditions?"
+  - The quoted text is a question but ends with a period. Consider: "which LLMs can do this, and under what conditions?" (Punctuation placement may depend on your style guide — APA/American places it inside; British English may differ.)
 
 - **Line 157:** "Start with non safety-critical subsystems"  
   - Should be hyphenated: "non-safety-critical subsystems"
