@@ -103,11 +103,9 @@ Having established that specialized models outperform general-purpose ones, we i
 \subsection{LoRA Fine-Tuning Efficiency}
 \label{sec:results_lora_efficiency}
 
-We applied Low-Rank Adaptation (LoRA) fine-tuning to a 1.5 billion parameter model using fuzz driver examples extracted from OSS-Fuzz. The goal was to determine whether domain-specific adaptation could produce a model that rivals larger specialized models while requiring fewer computational resources.
-
 Based on Phase 1 results, we selected the Qwen 2.5-Coder 1.5B model for fine-tuning experiments. The goal was to determine whether a small, fine-tuned model could match larger models while using far fewer resources.
 
-For this experiment, we applied Low-Rank Adaptation (LoRA) fine-tuning using fuzz drivers from Google's OSS-Fuzz project as training data. This approach builds on recent work in LLM-based fuzzing \cite{llm4fuzz,titanfuzz} but applies more aggressive model compression through fine-tuning. Two datasets were curated: a small one with 172 examples and an extended one with 709 examples. Each example consisted of a fuzz driver paired with its target API context, focused on security vulnerability patterns, fuzzing techniques, and automotive-specific code patterns.
+We applied Low-Rank Adaptation (LoRA) \cite{lora} fine-tuning using fuzz drivers from Google's OSS-Fuzz project as training data. This approach builds on recent work in LLM-based fuzzing \cite{llm4fuzz,titanfuzz} but applies more aggressive model compression through fine-tuning. Two datasets were curated: a small one with 172 examples and an extended one with 709 examples. Each example consisted of a fuzz driver paired with its target API context, focused on security vulnerability patterns, fuzzing techniques, and automotive-specific code patterns.
 
 Our fine-tuning configuration:
 \begin{itemize}
@@ -118,7 +116,7 @@ Our fine-tuning configuration:
     \item Precision: float16
 \end{itemize}
 
-Results showed significant efficiency improvements:
+Results showed measurable efficiency improvements:
 
 \begin{table}[htbp]
 \centering
@@ -209,7 +207,7 @@ First, model specialization matters more than size. Gemma 3 27B outperformed Yi 
 
 Second, fine-tuning enables efficient deployment. The fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens compared to the base model, though it still did not match the coverage of larger specialized models.
 
-Third, the economics are favorable---at least on paper. Annual costs range from \texteuro{}74 for light usage to \texteuro{}1,452 for full enterprise deployment, compared to \texteuro{}50,000+ for manual approaches. But this comparison assumes appropriate human oversight, which has its own costs.
+Third, the economics are favorable---at least on paper. Annual infrastructure costs range from \texteuro{}74 for light usage to \texteuro{}1,452 for full enterprise deployment. For comparison, a full-time security engineer costs \texteuro{}50,000+ annually, though the two are not directly substitutable---the LLM automates initial driver creation while human expertise remains necessary for review and refinement.
 
 These findings directly address our research questions:
 

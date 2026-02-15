@@ -82,7 +82,7 @@ While respectable, these coverage numbers likely trail expert human performance.
 
 Our data strongly supports the second hypothesis. Domain-specific training matters more than raw parameter count for this task.
 
-Evidence from Chapter 5 Section 5.2 is clear: code-specialized models succeeded where larger general-purpose models failed completely. Our LoRA fine-tuned 1.5B model achieved significant efficiency improvements while producing usable fuzz drivers (see Section 5.3). These specialized models understood what a fuzz driver should look like because they had seen relevant examples during training.
+Evidence from Chapter 5 Section 5.2 is clear: code-specialized models succeeded where larger general-purpose models failed completely. Our LoRA fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens while producing usable fuzz drivers (see Section 5.3). These specialized models understood what a fuzz driver should look like because they had seen relevant examples during training.
 
 This finding has practical implications. Organizations deploying LLM-based fuzzing do not need expensive API access to the largest available models. A well-chosen mid-sized model, or a fine-tuned smaller model, provides better results at lower cost.
 
@@ -263,7 +263,7 @@ This work began with a straightforward question: can Large Language Models autom
 
 The qualification matters. Not all models work. General-purpose models, even large ones, frequently failed at this task. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is not an afterthought---it is a critical design decision.
 
-Fine-tuning small models proved surprisingly effective. Our LoRA adapted 1.5B model achieved significant efficiency gains (detailed in Chapter 5) while producing usable fuzz drivers. For organizations with compute constraints or cost sensitivity, this approach deserves consideration.
+Fine-tuning small models proved surprisingly effective. Our LoRA adapted 1.5B model achieved measurable efficiency gains (detailed in Chapter 5) while producing usable fuzz drivers. For organizations with compute constraints or cost sensitivity, this approach deserves consideration.
 
 The biggest surprise was infrastructure. We expected the hard problem to be generating good code. The actual bottleneck was deploying our solution within corporate network policies. Proxy configurations failed. Boundary client integration failed. Container networking failed. All blocked by fundamental firewall policies. The solution ultimately required organizational support for Azure Private Link architecture.
 
