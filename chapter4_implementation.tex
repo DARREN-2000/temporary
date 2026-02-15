@@ -48,7 +48,7 @@ A token limit of 40,000 was necessary because fuzz driver generation requires su
 
 \subsection{Development Environment}
 
-Local development happened on a MacBook Pro with an M1 Pro chip. This created some challenges. Docker Desktop had performance issues on Apple Silicon, so we switched to Podman. Podman provided better Linux container compatibility---which mattered because the enterprise CI/CD runners used Linux.
+Local development happened on a MacBook Pro with an M1 Pro chip. This created some challenges. Docker Desktop had performance issues on Apple Silicon, so we switched to Podman. Podman provided better Linux container compatibility, which mattered because the enterprise CI/CD runners used Linux.
 
 \begin{lstlisting}[language=bash, caption={Podman Setup on macOS}]
 brew install podman
@@ -58,7 +58,7 @@ podman machine start
 
 Transitioning from Docker to Podman wasn't entirely smooth. Some scripts assumed Docker-specific behavior, requiring approximately one week to debug container networking issues before achieving reliable operation.
 
-For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah instead of Docker for container operations. Buildah is daemonless---which fits better with security policies that restrict long-running processes.
+For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah instead of Docker for container operations. Buildah is daemonless, which fits better with security policies that restrict long-running processes.
 
 Our build toolchain used CMake for project configuration and Clang for compilation. We required CMake version 3.5 or higher because cifuzz integration depends on features from that version. CMake configuration for enabling fuzzing was straightforward:
 
@@ -91,7 +91,7 @@ Phase 1 focused on understanding which models could actually generate useful fuz
 
 We evaluated 14 models spanning a wide range of sizes and architectures. The selection included both general-purpose models and code-specialized variants. Our goal was to understand whether model size, training data, or architecture had the biggest impact on fuzz driver quality.
 
-\textbf{Large Models (25--35 billion parameters):}
+\textbf{Large Models (25 to 35 billion parameters):}
 \begin{itemize}
     \item Qwen 2.5-Coder 32B
     \item DeepSeek Coder 33B
@@ -106,7 +106,7 @@ We evaluated 14 models spanning a wide range of sizes and architectures. The sel
     \item Mixtral 46.7B (Mixture-of-Experts architecture, approximately 12.9B active parameters per inference)
 \end{itemize}
 
-\textbf{Medium Models (7--16 billion parameters):}
+\textbf{Medium Models (7 to 16 billion parameters):}
 \begin{itemize}
     \item Qwen 2.5-Coder 7B and 14B
     \item Phi-4 14B
@@ -162,7 +162,7 @@ Each model's evaluation followed these steps:
 
 We ran each model five times on yaml-cpp to ensure consistency and account for stochastic output variation. Some models produced different outputs on identical prompts, making multiple runs necessary for reliable statistical analysis. This variability was itself an interesting finding that we discuss further in Chapter 5.
 
-A full evaluation cycle for one model on one target took approximately 10--15 minutes. With 14 models and 6 primary targets, plus five runs per configuration for consistency checking, the complete Phase 1 evaluation required approximately two weeks of continuous testing.
+A full evaluation cycle for one model on one target took approximately 10 to 15 minutes. With 14 models and 6 primary targets, plus five runs per configuration for consistency checking, the complete Phase 1 evaluation required approximately two weeks of continuous testing.
 
 The general fuzzing workflow (as introduced in earlier chapters) forms the foundation of our evaluation methodology: defining targets from source code, generating fuzz tests via LLM, executing them through the fuzzing engine (libFuzzer with sanitizers), detecting crashes, and either reporting findings or mutating inputs for continued testing. Each evaluation cycle involved generating a driver, checking compilation, running the fuzzer for 60 seconds, measuring coverage with llvm-cov, and storing results.
 
@@ -198,7 +198,7 @@ Quality control was important. We manually reviewed a sample of the extracted dr
 
 \subsection{LoRA Configuration and Training}
 
-We used Low-Rank Adaptation (LoRA) \cite{Hu2021} rather than full fine-tuning. Full fine-tuning updates all model weights---which requires enormous compute resources. LoRA adds small trainable matrices alongside the frozen base model. This reduces memory requirements by a large margin while achieving similar results on specialized tasks.
+We used Low-Rank Adaptation (LoRA) \cite{Hu2021} rather than full fine-tuning. Full fine-tuning updates all model weights, which requires enormous compute resources. LoRA adds small trainable matrices alongside the frozen base model. This reduces memory requirements by a large margin while achieving similar results on specialized tasks.
 
 Our LoRA configuration:
 

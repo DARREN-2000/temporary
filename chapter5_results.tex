@@ -3,7 +3,7 @@
 \chapter{Experimental Results}
 \label{chap:results}
 
-In this chapter, we present the experimental findings from our three-phase research conducted between May and September 2025. The goal was straightforward: determine whether LLMs can generate useful fuzz drivers, and if so, under what conditions. The results were mixed---some genuinely surprising, others confirming what we suspected from the start. These findings directly address the research questions defined in Chapter 1.
+In this chapter, we present the experimental findings from our three-phase research conducted between May and September 2025. The goal was straightforward: determine whether LLMs can generate useful fuzz drivers, and if so, under what conditions. The results were mixed, some genuinely surprising, others confirming what we suspected from the start. These findings directly address the research questions defined in Chapter 1.
 
 
 \section{Experimental Setup}
@@ -12,9 +12,9 @@ In this chapter, we present the experimental findings from our three-phase resea
 \subsection{Target Selection and Criteria}
 \label{sec:exp_targets}
 
-Choosing the right target libraries proved more difficult than expected. We needed C++ libraries because safety-critical automotive systems---those running on AUTOSAR (AUTomotive Open System ARchitecture) \cite{autosar} platforms---are predominantly written in C or C++. AUTOSAR is the dominant software architecture standard for automotive electronic control units (ECUs), making C++ relevance essential for practical automotive application. Testing on Python would have been simpler, but less relevant to the real problem we faced at CARIAD.
+Choosing the right target libraries proved more difficult than expected. We needed C++ libraries because safety-critical automotive systems, those running on AUTOSAR (AUTomotive Open System ARchitecture) \cite{autosar} platforms, are predominantly written in C or C++. AUTOSAR is the dominant software architecture standard for automotive electronic control units (ECUs), making C++ relevance essential for practical automotive application. Testing on Python would have been simpler, but less relevant to the real problem we faced at CARIAD.
 
-After evaluating several candidates, we selected yaml-cpp as our primary target. This library parses YAML configuration files, a common task in automotive software where configuration management matters significantly. The library contains 35 source files with 1,061 potential fuzzing candidates identified through cifuzz spark analysis. More importantly, it is well-documented and actively maintained. OSS-Fuzz \cite{OSSFuzzBugs2021} already covers it, which gave us a baseline for comparison---we could measure whether our AI-generated drivers matched, exceeded, or fell short of existing human-written ones.
+After evaluating several candidates, we selected yaml-cpp as our primary target. This library parses YAML configuration files, a common task in automotive software where configuration management matters significantly. The library contains 35 source files with 1,061 potential fuzzing candidates identified through cifuzz spark analysis. More importantly, it is well-documented and actively maintained. OSS-Fuzz \cite{OSSFuzzBugs2021} already covers it, which gave us a baseline for comparison. We could measure whether our AI-generated drivers matched, exceeded, or fell short of existing human-written ones.
 
 Additional targets included pugixml, jsoncons, fmt, spdlog, and glm. These provided broader validation, though the detailed analysis focuses on yaml-cpp where we collected the most complete data.
 
@@ -22,9 +22,9 @@ Additional targets included pugixml, jsoncons, fmt, spdlog, and glm. These provi
 \subsection{Hardware and Software Configuration}
 \label{sec:exp_hardware}
 
-All local experiments ran on macOS with an Apple M1 Pro processor. The container runtime used Podman with 4 CPUs and 8 GB memory allocated. This choice was deliberate---we wanted hardware that typical automotive development teams have access to. If our approach required expensive GPU clusters, adoption would be severely limited in practice.
+All local experiments ran on macOS with an Apple M1 Pro processor. The container runtime used Podman with 4 CPUs and 8 GB memory allocated. This choice was deliberate, we wanted hardware that typical automotive development teams have access to. If our approach required expensive GPU clusters, adoption would be severely limited in practice.
 
-Our software stack consisted of Podman for containers (chosen over Docker for enterprise compatibility reasons that became painfully clear during CI/CD integration), CMake with Clang for building, libFuzzer via cifuzz for fuzzing, and Ollama for local model inference. For enterprise deployment testing, we used Azure OpenAI with GPT-4o connected via Azure Private Link---a configuration that took weeks to properly establish, as detailed in Chapter 4.
+Our software stack consisted of Podman for containers (chosen over Docker for enterprise compatibility reasons that became painfully clear during CI/CD integration), CMake with Clang for building, libFuzzer via cifuzz for fuzzing, and Ollama for local model inference. For enterprise deployment testing, we used Azure OpenAI with GPT-4o connected via Azure Private Link, a configuration that took weeks to properly establish, as detailed in Chapter 4.
 
 
 \section{LLM Fuzz Driver Generation Results}
@@ -50,13 +50,13 @@ Phi-4 14B & 34.26\% & 36m 36s & 71.5k & 2,220 & 1 \\
 \end{tabular}
 \end{table}
 
-The ``Successful Tests'' column requires explanation: this metric counts tests that discovered actual bugs or edge cases, not tests that simply compiled and ran. Most generated tests exercised valid code paths without finding vulnerabilities---which is expected behavior, not failure. The high number of unique test cases with few ``successful'' findings reflects that fuzzing is a numbers game: you generate many tests hoping a few will discover issues.
+The ``Successful Tests'' column requires explanation: this metric counts tests that discovered actual bugs or edge cases, not tests that simply compiled and ran. Most generated tests exercised valid code paths without finding vulnerabilities, which is expected behavior, not failure. The high number of unique test cases with few ``successful'' findings reflects that fuzzing is a numbers game: you generate many tests hoping a few will discover issues.
 
-Gemma 3 27B achieved the highest code coverage at 45.06\%, slightly outperforming the larger Qwen 2.5-Coder 32B which reached 43.08\%. This was unexpected---the smaller model outperformed the larger one while using fewer tokens. We initially suspected measurement error, but the results held across multiple runs with consistent reproducibility.
+Gemma 3 27B achieved the highest code coverage at 45.06\%, slightly outperforming the larger Qwen 2.5-Coder 32B which reached 43.08\%. This was unexpected, the smaller model outperformed the larger one while using fewer tokens. We initially suspected measurement error, but the results held across multiple runs with consistent reproducibility.
 
-That said, these numbers require context. While 45\% coverage represents substantial automated achievement, analysis of comparable manually-written fuzz drivers in OSS-Fuzz projects (based on examination of yaml-cpp and similar parsing library drivers) suggests expert-crafted drivers typically achieve 60--80\% line coverage for libraries of similar complexity. Our best AI-generated driver falls short of expert human work in absolute coverage terms. The value proposition is not surpassing humans---it is automating what would otherwise require substantial manual effort.
+That said, these numbers require context. While 45\% coverage represents substantial automated achievement, analysis of comparable manually-written fuzz drivers in OSS-Fuzz projects (based on examination of yaml-cpp and similar parsing library drivers) suggests expert-crafted drivers typically achieve 60 to 80\% line coverage for libraries of similar complexity. Our best AI-generated driver falls short of expert human work in absolute coverage terms. The value proposition is not surpassing humans, it is automating what would otherwise require substantial manual effort.
 
-Phi-4 14B showed lower coverage at 34.26\% despite generating more unique test cases (2,220 vs 2,050). It required significantly more tokens---71.5k compared to Gemma's 40.2k---making it far less efficient for production use. More test cases don't necessarily mean better coverage.
+Phi-4 14B showed lower coverage at 34.26\% despite generating more unique test cases (2,220 vs 2,050). It required significantly more tokens, 71.5k compared to Gemma's 40.2k, making it far less efficient for production use. More test cases don't necessarily mean better coverage.
 
 The comparative performance of these models is visualized in Figure \ref{fig:model_comparison}, which clearly shows Gemma 3 27B and Qwen 2.5-Coder 32B achieving similar coverage levels (45\% and 43\% respectively), while Phi-4 14B achieved 34\% and general-purpose models like Yi 34B completely failed with 0\% coverage.
 
@@ -88,9 +88,9 @@ Mixtral 46.7B & Resource constraints due to size & Hardware limitations require 
 \end{tabular}
 \end{table}
 
-Yi 34B demonstrated a fundamental limitation of general-purpose models for specialized code tasks. Despite having 34 billion parameters, it produced hallucinated outputs that achieved zero percent coverage. The generated drivers compiled successfully in some cases---they were not syntactically broken---but they did nothing useful. Functions were called with nonsensical parameter combinations, or the driver simply returned immediately without exercising any library functionality. We spent considerable time verifying this wasn't a prompt engineering problem. It was not.
+Yi 34B demonstrated a fundamental limitation of general-purpose models for specialized code tasks. Despite having 34 billion parameters, it produced hallucinated outputs that achieved zero percent coverage. The generated drivers compiled successfully in some cases, they were not syntactically broken, but they did nothing useful. Functions were called with nonsensical parameter combinations, or the driver simply returned immediately without exercising any library functionality. We spent considerable time verifying this wasn't a prompt engineering problem. It was not.
 
-We also tested DeepSeek R1, a reasoning-focused model, outside the original 14-model benchmark. It was designed for reasoning tasks, but in our experiments, that capability did not translate to effective fuzz driver generation. Mixtral's 46.7 billion parameters simply exceeded available hardware resources---we could not even complete a full evaluation run.
+We also tested DeepSeek R1, a reasoning-focused model, outside the original 14-model benchmark. It was designed for reasoning tasks, but in our experiments, that capability did not translate to effective fuzz driver generation. Mixtral's 46.7 billion parameters simply exceeded available hardware resources, we could not even complete a full evaluation run.
 
 A clear pattern emerged: code-specialized models outperformed larger general-purpose models by substantial margins. Size alone does not determine quality for specialized tasks like fuzz driver generation.
 
@@ -133,7 +133,7 @@ Base 1.5B & 15 min & 112k & Baseline \\
 \end{tabular}
 \end{table}
 
-With 709 examples, the extended dataset achieved the best results: 33\% faster generation and 55\% fewer tokens compared to the base model. Domain-specific fine-tuning works---the model learned to generate more concise, targeted code rather than verbose outputs padded with unnecessary boilerplate.
+With 709 examples, the extended dataset achieved the best results: 33\% faster generation and 55\% fewer tokens compared to the base model. Domain-specific fine-tuning works, the model learned to generate more concise, targeted code rather than verbose outputs padded with unnecessary boilerplate.
 
 
 \subsection{Comparative Analysis}
@@ -141,11 +141,11 @@ With 709 examples, the extended dataset achieved the best results: 33\% faster g
 
 Training data quality and quantity both matter, though quality appears more important. The 709-example dataset outperformed the 172-example dataset, but the improvement was incremental rather than dramatic. More diverse examples help the model generalize, but there are diminishing returns.
 
-One key insight: a fine-tuned small model can match larger models while using far fewer computational resources. This makes enterprise deployment practical---you don't need expensive GPU infrastructure to run effective fuzz driver generation.
+One key insight: a fine-tuned small model can match larger models while using far fewer computational resources. This makes enterprise deployment practical, you don't need expensive GPU infrastructure to run effective fuzz driver generation.
 
 However, we should be honest about limitations. The fine-tuned 1.5B model still doesn't match the coverage achieved by the larger Qwen 32B or Gemma 27B models. What it offers is efficiency: acceptable coverage at much lower cost and resource requirements.
 
-The efficiency gains from fine-tuning directly impact deployment feasibility in resource-constrained environments. However, efficiency alone does not determine practical viability---cost considerations are equally critical for enterprise adoption.
+The efficiency gains from fine-tuning directly impact deployment feasibility in resource-constrained environments. However, efficiency alone does not determine practical viability, cost considerations are equally critical for enterprise adoption.
 
 
 \section{Economic Analysis and Resource Metrics}
@@ -176,7 +176,7 @@ Enterprise & \texteuro{}5.50 & \texteuro{}121.00 & \texteuro{}1,452.00 & Complet
 \end{tabular}
 \end{table}
 
-Even at the enterprise level with complete automation, annual costs stay under \texteuro{}1,500. This is minimal compared to alternatives---but it only tells part of the story.
+Even at the enterprise level with complete automation, annual costs stay under \texteuro{}1,500. This is minimal compared to alternatives, but it only tells part of the story.
 
 
 \subsection{Comparison with Manual Testing}
@@ -184,18 +184,18 @@ Even at the enterprise level with complete automation, annual costs stay under \
 
 CARIAD internal estimates for manual fuzz driver development:
 \begin{itemize}
-    \item Senior security engineer hourly rate: \texteuro{}80--120
-    \item Time to write an effective fuzz driver: 2--8 hours per target
+    \item Senior security engineer hourly rate: \texteuro{}80 to 120
+    \item Time to write an effective fuzz driver: 2 to 8 hours per target
     \item Annual cost for a full-time security engineer: \texteuro{}50,000-\texteuro{}200,000
 \end{itemize}
 
 The AI-driven approach offers:
 \begin{itemize}
     \item Infrastructure cost: \texteuro{}219-\texteuro{}1,452 annually
-    \item Estimated time savings: 75--94\% reduction in initial driver creation time (based on comparison of approximately 30 minutes automated generation vs. 2--8 hours of manual writing per target)
+    \item Estimated time savings: 75 to 94\% reduction in initial driver creation time (based on comparison of approximately 30 minutes automated generation vs. 2 to 8 hours of manual writing per target)
 \end{itemize}
 
-The economic advantage appears substantial---but there's an important caveat. The LLM doesn't understand automotive safety requirements, can't reason about ISO 26262 compliance, and occasionally generates syntactically correct but semantically meaningless tests. Human oversight remains essential. The time savings estimate assumes engineers spend their time reviewing and improving AI-generated drivers rather than writing from scratch, not that AI fully replaces human judgment. The cost of this human oversight isn't captured in the infrastructure costs above, and the actual savings will vary depending on the complexity of the target library and the quality of the generated driver.
+The economic advantage appears substantial, but there's an important caveat. The LLM doesn't understand automotive safety requirements, can't reason about ISO 26262 compliance, and occasionally generates syntactically correct but semantically meaningless tests. Human oversight remains essential. The time savings estimate assumes engineers spend their time reviewing and improving AI-generated drivers rather than writing from scratch, not that AI fully replaces human judgment. The cost of this human oversight isn't captured in the infrastructure costs above, and the actual savings will vary depending on the complexity of the target library and the quality of the generated driver.
 
 
 \section{Summary}
@@ -207,12 +207,12 @@ First, model specialization matters more than size. Gemma 3 27B outperformed Yi 
 
 Second, fine-tuning enables efficient deployment. The fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens compared to the base model, though it still didn't match the coverage of larger specialized models.
 
-Third, the economics are favorable---at least on paper. Annual infrastructure costs range from \texteuro{}74 for light usage to \texteuro{}1,452 for full enterprise deployment. For comparison, a full-time security engineer costs \texteuro{}50,000+ annually, though the two are not directly substitutable---the LLM automates initial driver creation while human expertise remains necessary for review and refinement.
+Third, the economics are favorable, at least on paper. Annual infrastructure costs range from \texteuro{}74 for light usage to \texteuro{}1,452 for full enterprise deployment. For comparison, a full-time security engineer costs \texteuro{}50,000+ annually, though the two are not directly substitutable, the LLM automates initial driver creation while human expertise remains necessary for review and refinement.
 
 These findings directly address our research questions:
 
-\textbf{RQ1 (Effectiveness)}: Can Large Language Models generate fuzz drivers for C++ code that compile successfully, execute without errors, and achieve meaningful code coverage? Yes---our best models achieved over 40\% coverage on yaml-cpp, with drivers that compiled and executed correctly. We consider 40\%+ coverage ``meaningful'' because it represents automated baseline coverage that would otherwise require 2--8 hours of manual engineering per target. While this falls short of expert human-written drivers (60--80\% coverage), the value lies in automation at scale, not matching human experts.
+\textbf{RQ1 (Effectiveness)}: Can Large Language Models generate fuzz drivers for C++ code that compile successfully, execute without errors, and achieve meaningful code coverage? Yes, our best models achieved over 40\% coverage on yaml-cpp, with drivers that compiled and executed correctly. We consider 40\%+ coverage ``meaningful'' because it represents automated baseline coverage that would otherwise require 2 to 8 hours of manual engineering per target. While this falls short of expert human-written drivers (60 to 80\% coverage), the value lies in automation at scale, not matching human experts.
 
 \textbf{RQ2 (Optimization)}: Does model size determine fuzz driver quality, or can smaller models with domain-specific training match or exceed larger general-purpose models? Smaller specialized models consistently outperformed larger general-purpose models. Fine-tuning further improved efficiency, though not coverage.
 
-\textbf{RQ3 (Feasibility)}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? Yes, at costs under \texteuro{}1,500 annually---but integration required significant infrastructure work (Azure Private Link) that is not trivial to set up in regulated environments.
+\textbf{RQ3 (Feasibility)}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? Yes, at costs under \texteuro{}1,500 annually, but integration required significant infrastructure work (Azure Private Link) that is not trivial to set up in regulated environments.
