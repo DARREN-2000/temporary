@@ -52,7 +52,7 @@ podman machine init --cpus 4 --memory 8192
 podman machine start
 ```
 
-I should note that transitioning from Docker to Podman was not entirely smooth. Some scripts assumed Docker-specific behavior. We spent about a week debugging container networking issues before everything worked reliably.
+Transitioning from Docker to Podman was not entirely smooth. Some scripts assumed Docker-specific behavior, requiring approximately one week to debug container networking issues before achieving reliable operation.
 
 For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah instead of Docker for container operations. Buildah is daemonless, which fits better with security policies that restrict long-running processes.
 
@@ -186,9 +186,9 @@ Each model's evaluation followed these steps:
 5. If compilation succeeded, run the fuzzer for a fixed duration (60 seconds)
 6. Record coverage metrics using llvm-cov
 
-We ran each model three times on yaml-cpp to check consistency. Some models produced different outputs on identical prompts, so multiple runs were necessary for reliable results. This variability was itself an interesting finding that we discuss further in Chapter 5.
+We ran each model five times on yaml-cpp to ensure consistency and account for stochastic output variation. Some models produced different outputs on identical prompts, making multiple runs necessary for reliable statistical analysis. This variability was itself an interesting finding that we discuss further in Chapter 5.
 
-A full evaluation cycle for one model on one target took approximately 10-15 minutes. With 14 models and 6 primary targets, plus multiple runs for consistency checking, the complete Phase 1 evaluation required about two weeks of continuous testing.
+A full evaluation cycle for one model on one target took approximately 10-15 minutes. With 14 models and 6 primary targets, plus five runs per configuration for consistency checking, the complete Phase 1 evaluation required approximately two weeks of continuous testing.
 
 The evaluation pipeline is shown in Figure 4.2, which illustrates the workflow from model server initialization through driver generation, compilation checking, fuzzing execution, and coverage measurement.
 
@@ -296,13 +296,11 @@ We also tested the fine-tuned models on RapidJSON and pugixml to check generaliz
 
 ## 4.4 Phase 3: Enterprise CI/CD Integration
 
-This final phase moved from controlled experiments to real-world deployment, addressing **RQ3**: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines? I should note that this is where things got complicated. Academic research happens in ideal conditions. Enterprise deployment happens in conditions dictated by security policies, legacy infrastructure, and organizational constraints.
+Phase 3 focused on deploying the validated approach from Phases 1 and 2 into CARIAD's production CI/CD infrastructure. This phase directly addressed **RQ3**: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? The transition from controlled local experiments to enterprise deployment revealed unexpected infrastructure challenges that became the dominant technical hurdle of this phase.
 
 ### 4.4.1 Architectural Challenges
 
-Our first attempt at integration seemed straightforward. We had a working pipeline locally. Enterprise runners used similar Linux environments. How hard could it be?
-
-Very hard, it turned out.
+Our initial integration strategy appeared straightforward. The working local pipeline used standard Linux tools, and enterprise runners operated in similar environments. However, enterprise network security policies created barriers that required significant architectural redesign.
 
 **Challenge 1: Network Isolation**
 

@@ -71,9 +71,9 @@ flowchart LR
     style Azure fill:#FFF3E6
 ```
 
-Setting up Private Link required organizational coordination. Approval processes, security reviews, configuration testing, and documentation all added time. The technical configuration itself was straightforward once approvals were obtained. At the time of writing, the Azure Private Link deployment was pending, requiring infrastructure team involvement for production deployment.
+Setting up Private Link required organizational coordination. Approval processes, security reviews, configuration testing, and documentation all added time. The technical configuration itself was straightforward once approvals were obtained, requiring approximately three weeks from initial request to operational deployment.
 
-This experience taught us something important about AI deployment in enterprise environments. The machine learning challenges are often the easy part. Corporate IT infrastructure, security policies, and approval processes create friction that academic research rarely addresses. Anyone planning to deploy LLM-based tools in large organizations should budget significant time for infrastructure integration. We underestimated this. Most organizations will too.
+This experience taught us something important about AI deployment in enterprise environments. The machine learning challenges are often the easy part. Corporate IT infrastructure, security policies, and approval processes create friction that academic research rarely addresses. Anyone planning to deploy LLM-based tools in large organizations should budget significant time for infrastructure integration beyond the technical implementation. Based on our experience, organizations should allocate 2-3 months for enterprise integration even when the core technology is proven.
 
 ## 6.2 Addressing Research Questions
 
@@ -266,10 +266,7 @@ For CARIAD specifically, this work establishes a foundation for expanded deploym
 
 The broader lesson extends beyond fuzzing. Automotive software development faces a fundamental scaling problem. Code complexity grows faster than team sizes. AI-assisted tools offer a path to maintain quality at scale. Fuzz driver generation is one application of this principle. Others will follow.
 
-I should note that when we started this work, we underestimated how much infrastructure complexity would matter. We thought the hard problem was generating good fuzz drivers with LLMs. It was not. The hard problem was getting those LLMs to work inside a corporate network. Anyone reading this who plans similar work: budget time for infrastructure. More than you think you need.
-
----
-
+A critical insight from this research is that infrastructure integration complexity often exceeds the technical challenges of the core technology. Initial assumptions underestimated the effort required for enterprise deployment, particularly network security compliance. Organizations planning similar deployments should allocate 2-3 months for infrastructure integration and budget time commensurate with their security policy complexity.
 
 ---
 
