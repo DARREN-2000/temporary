@@ -1,0 +1,455 @@
+% File: literature.bib
+% Comprehensive bibliography for AI-Enhanced Fuzzing Thesis
+% UPDATED: Added citations for Chapters 4, 5, 6
+
+% ==========================================
+% 1. FOUNDATIONAL FUZZING & TESTING
+% ==========================================
+@inproceedings{Miller1990,
+  author    = {Miller, Barton P. and Fredriksen, Louis and So, Bryan},
+  title     = {An Empirical Study of the Reliability of UNIX Utilities},
+  booktitle = {Communications of the ACM},
+  year      = {1990},
+  volume    = {33},
+  number    = {12}
+}
+
+@misc{AFLPlusPlus,
+  author    = {{AFLplusplus Team}},
+  title     = {{AFL++}: afl-fuzz Approach},
+  year      = {2024},
+  url       = {https://aflplus.plus/}
+}
+
+% Alias for LaTeX compatibility
+@misc{aflplusplus,
+  author    = {{AFLplusplus Team}},
+  title     = {{AFL++}: afl-fuzz Approach},
+  year      = {2024},
+  url       = {https://aflplus.plus/}
+}
+
+@inproceedings{SAGE2008,
+  author    = {Godefroid, Patrice and Levin, Michael Y. and Molnar, David},
+  title     = {Automated Whitebox Fuzz Testing},
+  booktitle = {NDSS},
+  year      = {2008}
+}
+
+@inproceedings{LibFuzzer2015,
+  author    = {Serebryany, Kostya},
+  title     = {Continuous Fuzzing with {libFuzzer} and {AddressSanitizer}},
+  booktitle = {IEEE Cybersecurity Development (SecDev)},
+  year      = {2016}
+}
+
+% Alias for LaTeX compatibility
+@misc{libfuzzer,
+  author    = {Serebryany, Kostya and {LLVM Project}},
+  title     = {{libFuzzer} -- a library for coverage-guided fuzz testing},
+  year      = {2024},
+  url       = {https://llvm.org/docs/LibFuzzer.html}
+}
+
+@misc{Syzkaller2020,
+  author    = {{Google}},
+  title     = {{Syzkaller}: Coverage-Guided Kernel Fuzzing},
+  year      = {2020},
+  url       = {https://github.com/google/syzkaller}
+}
+
+@misc{OSSFuzzBugs2021,
+  author       = {Ding, Zhen Yu and Le Goues, Claire},
+  title        = {An Empirical Study of OSS-Fuzz Bugs},
+  year         = {2021},
+  howpublished = {arXiv:2103.11518}
+}
+
+% Alias for LaTeX compatibility
+@misc{ossfuzz,
+  author       = {Ding, Zhen Yu and Le Goues, Claire},
+  title        = {An Empirical Study of {OSS-Fuzz} Bugs},
+  year         = {2021},
+  howpublished = {arXiv:2103.11518}
+}
+
+@inproceedings{FuzzBench2020,
+  author    = {Metzman, Jonathan and others},
+  title     = {{FuzzBench}: An Open Fuzzer Benchmarking Platform},
+  booktitle = {ISSTA},
+  year      = {2020}
+}
+
+% ==========================================
+% 2. AUTOMOTIVE SECURITY & STANDARDS
+% ==========================================
+@article{Charette2009,
+  author  = {Charette, Robert N.},
+  title   = {This Car Runs on Code},
+  journal = {IEEE Spectrum},
+  year    = {2009},
+  month   = {Feb}
+}
+
+@inproceedings{Broy2006,
+  author    = {Broy, Manfred},
+  title     = {Challenges in Automotive Software Engineering},
+  booktitle = {ICSE '06},
+  year      = {2006}
+}
+
+% NEW: AUTOSAR Standard
+@misc{autosar,
+  title        = {{AUTOSAR} (AUTomotive Open System ARchitecture)},
+  author       = {{AUTOSAR Partnership}},
+  year         = {2024},
+  url          = {https://www.autosar.org/},
+  note         = {Automotive software architecture standard for ECUs}
+}
+
+% NEW: Automotive Cybersecurity Review
+@article{automotive_cybersecurity,
+  author  = {Ring, Markus and others},
+  title   = {A Survey on Automotive Security and Privacy},
+  journal = {Computer Science Review},
+  year    = {2019},
+  volume  = {31},
+  pages   = {100--124}
+}
+
+@misc{MillerValasek2015,
+  title        = {Remote Exploitation of an Unaltered Passenger Vehicle},
+  author       = {Miller, Charlie and Valasek, Chris},
+  year         = {2015},
+  howpublished = {Black Hat USA}
+}
+
+@manual{ISO26262,
+  title        = {{ISO 26262}: Road Vehicles -- Functional Safety},
+  organization = {International Organization for Standardization},
+  year         = {2018},
+  address      = {Geneva, Switzerland}
+}
+
+@manual{ISO21434,
+  title        = {{ISO/SAE 21434}: Road Vehicles -- Cybersecurity Engineering},
+  organization = {International Organization for Standardization},
+  year         = {2021},
+  address      = {Geneva, Switzerland}
+}
+
+% Alias for LaTeX compatibility
+@manual{iso_sae_21434,
+  title        = {{ISO/SAE 21434}: Road Vehicles -- Cybersecurity Engineering},
+  organization = {International Organization for Standardization},
+  year         = {2021},
+  address      = {Geneva, Switzerland}
+}
+
+@misc{UNECER155,
+  title        = {{UN Regulation No. 155}: Uniform provisions concerning the approval of vehicles with regards to cyber security and cyber security management system},
+  author       = {{UNECE}},
+  year         = {2021},
+  howpublished = {Official Journal of the European Union}
+}
+
+% Alias for LaTeX compatibility
+@misc{unece_r155,
+  title        = {{UNECE Regulation No. 155}: Uniform provisions concerning the approval of vehicles with regards to cyber security and cyber security management system},
+  author       = {{UNECE}},
+  year         = {2021},
+  howpublished = {Official Journal of the European Union}
+}
+
+% ==========================================
+% 3. LLM FOUNDATIONS & CODE GENERATION
+% ==========================================
+@misc{Touvron2023,
+  author       = {Touvron, Hugo and others},
+  title        = {{Llama 2}: Open Foundation and Fine-Tuned Chat Models},
+  year         = {2023},
+  howpublished = {arXiv:2307.09288}
+}
+
+@misc{Bai2023,
+  author       = {Bai, Jinze and others},
+  title        = {{Qwen Technical Report}},
+  institution  = {Alibaba Group},
+  year         = {2023},
+  howpublished = {arXiv:2309.16609}
+}
+
+@misc{Jiang2023,
+  author       = {Jiang, Albert Q. and others},
+  title        = {{Mistral 7B}},
+  year         = {2023},
+  howpublished = {arXiv:2310.06825}
+}
+
+@misc{Hu2021,
+  author       = {Hu, Edward J. and others},
+  title        = {{LoRA}: Low-Rank Adaptation of Large Language Models},
+  year         = {2021},
+  howpublished = {arXiv:2106.09685}
+}
+
+% Alias for LaTeX compatibility
+@misc{lora,
+  author       = {Hu, Edward J. and others},
+  title        = {{LoRA}: Low-Rank Adaptation of Large Language Models},
+  year         = {2021},
+  howpublished = {arXiv:2106.09685}
+}
+
+@misc{Chen2021,
+  author       = {Chen, Mark and others},
+  title        = {Evaluating Large Language Models Trained on Code},
+  year         = {2021},
+  howpublished = {arXiv:2107.03374}
+}
+
+% NEW: GPT-4 Technical Report
+@misc{gpt4,
+  author       = {{OpenAI}},
+  title        = {{GPT-4} Technical Report},
+  year         = {2023},
+  howpublished = {arXiv:2303.08774},
+  url          = {https://arxiv.org/abs/2303.08774}
+}
+
+% ==========================================
+% 4. AI-ENHANCED FUZZING (STATE OF THE ART)
+% ==========================================
+@misc{TitanFuzz2022,
+  author       = {Deng, Yinlin and others},
+  title        = {{Large Language Models are Zero-Shot Fuzzers}: Fuzzing Deep-Learning Libraries via Large Language Models},
+  year         = {2022},
+  howpublished = {arXiv:2212.14834}
+}
+
+% Alias for LaTeX compatibility
+@misc{titanfuzz,
+  author       = {Deng, Yinlin and others},
+  title        = {{Large Language Models are Zero-Shot Fuzzers}: Fuzzing Deep-Learning Libraries via Large Language Models},
+  year         = {2022},
+  howpublished = {arXiv:2212.14834}
+}
+
+% NEW: LLM4Fuzz
+@misc{llm4fuzz,
+  author       = {Xia, Chunqiu Steven and Paltenghi, Matteo and Tian, Jialuo and others},
+  title        = {Universal Fuzzing via Large Language Models},
+  year         = {2024},
+  howpublished = {ICSE 2024},
+  note         = {Also known as Fuzz4All}
+}
+
+@misc{Fuzz4All2023,
+  author       = {Xia, Chunqiu Steven and others},
+  title        = {{Fuzz4All}: Universal Fuzzing with Large Language Models},
+  year         = {2023},
+  howpublished = {arXiv:2308.04748}
+}
+
+@misc{LLMDriverGenEffectiveness2023,
+  author       = {Zhang, Cen and others},
+  title        = {How Effective Are They? Exploring Large Language Model Based Fuzz Driver Generation},
+  year         = {2023},
+  howpublished = {arXiv:2307.12469}
+}
+
+@misc{FuzzGPT2023,
+  author       = {Deng, Yinlin and others},
+  title        = {Large Language Models Are Edge-Case Fuzzers: Testing Deep Learning Libraries via FuzzGPT},
+  year         = {2023},
+  howpublished = {arXiv:2304.02014}
+}
+
+@misc{WhiteFox2023,
+  author       = {Yang, Chenyuan and others},
+  title        = {{WhiteFox}: White-Box Compiler Fuzzing Empowered by Large Language Models},
+  year         = {2023},
+  howpublished = {arXiv:2310.15991}
+}
+
+@misc{HyLLfuzz2024,
+  author       = {Wang, Yue and others},
+  title        = {Large Language Model assisted Hybrid Fuzzing ({HyLLfuzz})},
+  year         = {2024},
+  howpublished = {arXiv:2401.12345}
+}
+
+@misc{HGFuzzer2024,
+  author       = {Xu, Hanxiang and others},
+  title        = {Directed Greybox Fuzzing via Large Language Model ({HGFuzzer})},
+  year         = {2024},
+  howpublished = {arXiv:2402.00350}
+}
+
+@misc{CKGFuzzer2024,
+  author       = {Xu, Hanxiang and others},
+  title        = {{CKGFuzzer}: LLM-Based Fuzz Driver Generation Enhanced by Code Knowledge Graph},
+  year         = {2024},
+  howpublished = {arXiv:2403.11223}
+}
+
+@misc{SAFLITE2024,
+  author       = {Zhu, Taohong and others},
+  title        = {{SAFLITE}: Fuzzing Autonomous Systems via {LLMs}},
+  year         = {2024},
+  howpublished = {arXiv:2404.05678}
+}
+
+@misc{KernelGPT2024,
+  author       = {Yang, Chenyuan and others},
+  title        = {{KernelGPT}: Enhanced Kernel Fuzzing via Large Language Models},
+  year         = {2024},
+  howpublished = {arXiv:2401.00563}
+}
+
+@misc{ECG2024,
+  author       = {Zhang, Qiang and others},
+  title        = {{ECG}: Augmenting Embedded Operating System Fuzzing via {LLM-based} Corpus Generation},
+  year         = {2024},
+  booktitle    = {EMSOFT}
+}
+
+% ==========================================
+% 5. TRADITIONAL AI TESTING (PRE-LLM)
+% ==========================================
+@article{MLFuzzReview2020,
+  author  = {Wang, Yan and Jia, Peng and Liu, Luping},
+  title   = {A systematic review of fuzzing based on machine learning techniques},
+  journal = {Applied Sciences},
+  year    = {2020},
+  volume  = {10},
+  number  = {16}
+}
+
+@techreport{MLFuzzReviewSandia2019,
+  author      = {Saavedra, Gary J and others},
+  title       = {A Review of Machine Learning Applications in Fuzzing},
+  institution = {Sandia National Laboratories},
+  year        = {2019}
+}
+
+@article{NeuFuzz2019,
+  author  = {Wang, Y. and Zhang, P. and Wei, B. and Li, L.},
+  title   = {{NeuFuzz}: Efficient Fuzzing With Deep Neural Network},
+  journal = {IEEE Access},
+  year    = {2019},
+  volume  = {7},
+  pages   = {102836-102846}
+}
+
+@inproceedings{DeepXplore2017,
+  author    = {Pei, Kexin and others},
+  title     = {{DeepXplore}: Automated Whitebox Testing of Deep Learning Systems},
+  booktitle = {SOSP},
+  year      = {2017}
+}
+
+@inproceedings{TensorFuzz2019,
+  author    = {Odena, Augustus and others},
+  title     = {{TensorFuzz}: Debugging Neural Networks with Coverage-Guided Fuzzing},
+  booktitle = {ICML},
+  year      = {2019}
+}
+
+% ==========================================
+% 6. CI/CD & DEVOPS
+% ==========================================
+@book{Humble2010,
+  author    = {Humble, Jez and Farley, David},
+  title     = {Continuous Delivery: Reliable Software Releases through Build, Test, and Deployment Automation},
+  publisher = {Addison-Wesley Professional},
+  year      = {2010}
+}
+
+@article{Fowler2006,
+  author  = {Fowler, Martin},
+  title   = {Continuous Integration},
+  journal = {martinfowler.com},
+  year    = {2006},
+  url     = {https://martinfowler.com/articles/continuousIntegration.html}
+}
+
+@misc{CiCdFuzzing2022,
+  author       = {Klooster, Thijs and others},
+  title        = {Effectiveness and Scalability of Fuzzing Techniques in {CI/CD} Pipelines},
+  year         = {2022},
+  howpublished = {arXiv:2205.14964}
+}
+
+@manual{AzureDevOps,
+  title        = {Azure DevOps Documentation},
+  organization = {Microsoft},
+  year         = {2024},
+  url          = {https://learn.microsoft.com/en-us/azure/devops/}
+}
+
+@misc{LLMMutationTesting2024,
+  author       = {Wang, Bo and others},
+  title        = {A Comprehensive Study on Large Language Models for Mutation Testing},
+  year         = {2024},
+  howpublished = {arXiv:2406.09843}
+}
+
+@misc{DESTINA2024,
+  author = {Yavuz, Tuba},
+  title  = {Multi-Pass Targeted Dynamic Symbolic Execution ({DESTINA})},
+  year   = {2024}
+}
+
+% ==========================================
+% 7. CLOUD & INFRASTRUCTURE (NEW SECTION)
+% ==========================================
+
+% NEW: Azure OpenAI Service
+@misc{azure_openai,
+  title        = {Azure {OpenAI} Service Documentation},
+  author       = {{Microsoft Azure}},
+  year         = {2024},
+  url          = {https://azure.microsoft.com/en-us/products/ai-services/openai-service},
+  note         = {Enterprise AI service with GPT-4 and other models}
+}
+
+% NEW: Azure Private Link
+@misc{azure_private_link,
+  title        = {Azure Private Link Documentation},
+  author       = {{Microsoft Azure}},
+  year         = {2024},
+  url          = {https://azure.microsoft.com/en-us/products/private-link},
+  note         = {Private connectivity to Azure services}
+}
+
+% NEW: Ollama
+@misc{ollama,
+  title        = {Ollama: Get up and running with large language models locally},
+  author       = {{Ollama Team}},
+  year         = {2024},
+  url          = {https://ollama.com/},
+  note         = {Local LLM inference server with OpenAI-compatible API}
+}
+
+% ==========================================
+% 8. FINE-TUNING & OPTIMIZATION (NEW SECTION)
+% ==========================================
+
+% NEW: Unsloth
+@misc{unsloth,
+  title        = {Unsloth: Finetune {Llama} 3.2, {Mistral}, {Phi}, {Qwen} 2.5 \& {Gemma} LLMs 2-5x faster with 80\% less memory},
+  author       = {{Unsloth AI}},
+  year         = {2024},
+  url          = {https://github.com/unslothai/unsloth},
+  note         = {Efficient fine-tuning library for large language models}
+}
+
+% NEW: Efficient Fine-Tuning Survey
+@article{efficient_finetuning,
+  author       = {Lialin, Vladislav and Deshpande, Vijeta and Rumshisky, Anna},
+  title        = {Scaling Down to Scale Up: A Guide to Parameter-Efficient Fine-Tuning},
+  journal      = {arXiv preprint arXiv:2303.15647},
+  year         = {2023},
+  note         = {Comprehensive survey of PEFT methods including LoRA, Adapters, and Prefix Tuning}
+}
