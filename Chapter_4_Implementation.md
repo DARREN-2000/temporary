@@ -76,7 +76,50 @@ cmake_minimum_required(VERSION 3.10...3.22)
 cmake_policy(VERSION 3.10...3.22)
 ```
 
-**[Figure 4.1: Toolchain architecture diagram showing the relationships between components. Local Development (Mac with Podman, Ollama) connects to Cifuzz Spark, which connects to either Local LLM or Azure OpenAI. Output flows to libFuzzer with ASan/UBSan, producing Coverage Reports and Crash Reports.]**
+The complete toolchain architecture is illustrated in Figure 4.1, showing how local development components connect through Cifuzz Spark to either local LLMs or Azure OpenAI, with output flowing through libFuzzer for security testing.
+
+**Figure 4.1: Toolchain Architecture**
+
+```mermaid
+flowchart TB
+    subgraph Local["Local Development Environment (Mac M1 Pro)"]
+        Podman[Podman Container<br/>4 CPUs, 8GB RAM]
+        Ollama[Ollama Server<br/>Local Model Inference]
+    end
+    
+    subgraph Spark["Cifuzz Spark"]
+        direction TB
+        API[API Extraction<br/>from CMake Target]
+        Prompt[Prompt Generation<br/>+ Context]
+    end
+    
+    Podman --> API
+    Ollama --> Spark
+    API --> Prompt
+    
+    Prompt --> LocalLLM[Local LLM<br/>Qwen/Gemma/etc.]
+    Prompt --> AzureAPI[Azure OpenAI<br/>GPT-4o]
+    
+    LocalLLM --> Driver[Generated<br/>Fuzz Driver]
+    AzureAPI --> Driver
+    
+    Driver --> LibFuzzer[libFuzzer Execution]
+    
+    subgraph Sanitizers["Runtime Sanitizers"]
+        ASan[AddressSanitizer<br/>Memory Errors]
+        UBSan[UndefinedBehaviorSanitizer<br/>Undefined Behavior]
+    end
+    
+    LibFuzzer --> Sanitizers
+    
+    Sanitizers --> Coverage[Coverage Reports<br/>llvm-cov]
+    Sanitizers --> Crashes[Crash Reports<br/>Bug Detection]
+    
+    style LocalLLM fill:#E6F3FF
+    style AzureAPI fill:#E6F3FF
+    style Driver fill:#90EE90
+    style Crashes fill:#FFE6E6
+```
 
 ## 4.2 Phase 1: Local LLM Evaluation Setup
 
@@ -147,7 +190,41 @@ We ran each model three times on yaml-cpp to check consistency. Some models prod
 
 A full evaluation cycle for one model on one target took approximately 10-15 minutes. With 14 models and 6 primary targets, plus multiple runs for consistency checking, the complete Phase 1 evaluation required about two weeks of continuous testing.
 
-**[Figure 4.2: Evaluation pipeline flowchart. Start with "Model Server Running", then "cifuzz spark generates driver", then decision diamond "Compiles?", if No record failure and stop, if Yes continue to "Run Fuzzer (60s)", then "Record Coverage with llvm-cov", finally "Store Results".]**
+The evaluation pipeline is shown in Figure 4.2, which illustrates the workflow from model server initialization through driver generation, compilation checking, fuzzing execution, and coverage measurement.
+
+**Figure 4.2: Evaluation Pipeline Flowchart**
+
+```mermaid
+flowchart TD
+    Start([Model Server Running])
+    Generate[cifuzz spark<br/>generates driver]
+    Compile{Compiles?}
+    RecordFail[Record Failure<br/>- Model name<br/>- Error message]
+    StopFail([Stop - Failure])
+    RunFuzz[Run Fuzzer<br/>60 seconds<br/>with sanitizers]
+    Coverage[Record Coverage<br/>with llvm-cov<br/>- Line coverage<br/>- Branch coverage]
+    Store[Store Results<br/>in database]
+    End([Complete - Success])
+    
+    Start --> Generate
+    Generate --> Compile
+    Compile -->|No| RecordFail
+    RecordFail --> StopFail
+    Compile -->|Yes| RunFuzz
+    RunFuzz --> Coverage
+    Coverage --> Store
+    Store --> End
+    
+    style Start fill:#E6F3FF
+    style Generate fill:#FFFFCC
+    style Compile fill:#FFE6CC
+    style RecordFail fill:#FFE6E6
+    style StopFail fill:#FFE6E6
+    style RunFuzz fill:#E6FFE6
+    style Coverage fill:#E6FFE6
+    style Store fill:#E6F3FF
+    style End fill:#90EE90
+```
 
 ## 4.3 Phase 2: Model Optimization with LoRA Fine-Tuning
 
@@ -390,7 +467,45 @@ jobs:
 
 Our pipeline includes corpus persistence through JFrog Artifactory. Each run downloads the previous corpus, runs fuzzing to extend it, and uploads the updated corpus. This ensures coverage improvements accumulate over time rather than starting fresh each build.
 
-**[Figure 4.4: Network architecture diagram showing the Azure Private Link setup. The CI/CD Runner in CARIAD internal network connects through Azure Private Link Endpoint to Azure OpenAI. Firewall boundaries are illustrated to show why direct connections fail but Private Link succeeds.]**
+The network architecture required for this deployment is illustrated in Figure 4.4. This diagram shows how the Azure Private Link setup enables secure communication between the CARIAD internal network and Azure OpenAI services, bypassing the restrictions of the corporate firewall while maintaining security compliance.
+
+**Figure 4.4: Network Architecture with Azure Private Link**
+
+```mermaid
+flowchart TB
+    subgraph Internal["CARIAD Internal Network"]
+        direction TB
+        Repo[Source Code<br/>Repository]
+        Runner[CI/CD Runner<br/>self-hosted, auto-buildah-base]
+        Firewall[Corporate Firewall<br/>Zero-Trust Security]
+    end
+    
+    subgraph Azure["Azure Cloud Infrastructure"]
+        direction TB
+        PrivateLink[Azure Private Link<br/>Private Endpoint<br/>10.x.x.x internal IP]
+        OpenAI[Azure OpenAI Service<br/>GPT-4o Deployment<br/>40K token limit]
+    end
+    
+    Internet((Public Internet<br/>External APIs))
+    
+    Repo --> Runner
+    Runner --> Firewall
+    
+    Firewall -.->|❌ Blocked<br/>Direct connection| Internet
+    Firewall -->|✅ Private Connection<br/>No public internet| PrivateLink
+    
+    PrivateLink <-->|Secure tunnel| OpenAI
+    
+    OpenAI -.->|Generated<br/>Fuzz Driver| PrivateLink
+    PrivateLink -.->|Returns code| Firewall
+    Firewall -.->|Deploy| Runner
+    
+    style Internet fill:#ffcccc,stroke:#cc0000,stroke-width:3px
+    style PrivateLink fill:#90EE90,stroke:#006600,stroke-width:2px
+    style Firewall fill:#FFE6CC,stroke:#CC6600,stroke-width:2px
+    style OpenAI fill:#E6F3FF,stroke:#0066CC,stroke-width:2px
+    style Runner fill:#FFFFCC
+```
 
 ### 4.4.3 Operational Considerations
 

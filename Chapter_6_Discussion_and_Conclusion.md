@@ -34,6 +34,43 @@ This problem consumed significant effort. We explored multiple workarounds. Tunn
 
 The solution required involving CARIAD's infrastructure team. We worked with them to provision Azure Private Link endpoints. This technology creates a private connection between the corporate network and Azure services, appearing as an internal address rather than external internet. The LLM API becomes reachable without traversing the public internet.
 
+The architecture of this solution is illustrated in Figure 6.1, which shows how the Azure Private Link creates a secure tunnel between the CARIAD internal network and Azure OpenAI services, bypassing the corporate firewall's restrictions on public internet access while maintaining security compliance.
+
+**Figure 6.1: Enterprise Network Architecture with Azure Private Link**
+
+```mermaid
+flowchart LR
+    subgraph Corporate["Corporate Network (CARIAD)"]
+        direction TB
+        GH[GitHub Actions<br>Self-hosted Runner]
+        Code[Source Code<br>Repository]
+    end
+    
+    subgraph Azure["Azure Cloud"]
+        direction TB
+        PL[Azure Private Link<br>Endpoint]
+        LLM[Azure OpenAI<br>LLM Service]
+    end
+    
+    subgraph Security["Security Boundary"]
+        FW[Corporate<br>Firewall]
+    end
+    
+    Code --> GH
+    GH --> FW
+    FW -.->|❌ Blocked| Internet((Public<br>Internet))
+    FW -->|✅ Private Connection| PL
+    PL --> LLM
+    LLM -->|Generated<br>Fuzz Driver| PL
+    PL --> FW
+    FW --> GH
+    
+    style Internet fill:#ffcccc
+    style PL fill:#90EE90
+    style Corporate fill:#E6F3FF
+    style Azure fill:#FFF3E6
+```
+
 Setting up Private Link required organizational coordination. Approval processes, security reviews, configuration testing, and documentation all added time. The technical configuration itself was straightforward once approvals were obtained. At the time of writing, the Azure Private Link deployment was pending, requiring infrastructure team involvement for production deployment.
 
 This experience taught us something important about AI deployment in enterprise environments. The machine learning challenges are often the easy part. Corporate IT infrastructure, security policies, and approval processes create friction that academic research rarely addresses. Anyone planning to deploy LLM-based tools in large organizations should budget significant time for infrastructure integration. We underestimated this. Most organizations will too.
@@ -233,47 +270,7 @@ I should note that when we started this work, we underestimated how much infrast
 
 ---
 
-## Mermaid Diagram Code for Chapter 6 Figures
 
+---
 
-
-### Figure 6.1: Enterprise Network Architecture
-
-```mermaid
-flowchart LR
-    subgraph Corporate["Corporate Network (CARIAD)"]
-        direction TB
-        GH[GitHub Actions<br>Self-hosted Runner]
-        Code[Source Code<br>Repository]
-    end
-    
-    subgraph Azure["Azure Cloud"]
-        direction TB
-        PL[Azure Private Link<br>Endpoint]
-        LLM[Azure OpenAI<br>LLM Service]
-    end
-    
-    subgraph Security["Security Boundary"]
-        FW[Corporate<br>Firewall]
-    end
-    
-    Code --> GH
-    GH --> FW
-    FW -.->|Blocked| Internet((Public<br>Internet))
-    FW -->|Private Connection| PL
-    PL --> LLM
-    LLM -->|Generated<br>Fuzz Driver| PL
-    PL --> FW
-    FW --> GH
-    
-    style Internet fill:#ffcccc
-    style PL fill:#90EE90
-    style Corporate fill:#E6F3FF
-    style Azure fill:#FFF3E6
-```
-
-
-
-
-
-
+**Note:** For LaTeX compilation, render all Mermaid diagrams using Mermaid Live Editor (https://mermaid.live), VS Code with Mermaid extension, or command-line tool `mmdc -i diagram.mmd -o diagram.pdf`. Export as PDF or PNG and include in final document.

@@ -41,6 +41,19 @@ That said, these numbers need context. 45% coverage sounds reasonable until you 
 
 Phi 14B showed lower coverage at 34.26% despite generating more unique test cases (2,220 vs 2,050). It required significantly more tokens—71.5k compared to Gemma's 40.2k—making it far less efficient for production use. More test cases do not necessarily mean better coverage.
 
+The comparative performance of these models is visualized in Figure 5.1, which clearly shows Gemma 3 27B and Qwen 2.5-Coder 32B achieving similar coverage levels (45% and 43% respectively), while Phi 14B achieved 34% and general-purpose models like Yi 34B completely failed with 0% coverage.
+
+**Figure 5.1: Model Performance Comparison (yaml-cpp)**
+
+```mermaid
+%%{init: {'theme': 'neutral'}}%%
+xychart-beta
+    title "Code Coverage by Model (yaml-cpp)"
+    x-axis ["Gemma 3 27B", "Qwen 32B", "Phi 14B", "Yi 34B"]
+    y-axis "Line Coverage (%)" 0 --> 50
+    bar [45.06, 43.08, 34.26, 0]
+```
+
 
 ### 5.2.2 Unsuccessful Models: Critical Findings
 
@@ -148,23 +161,7 @@ These findings directly address our research questions:
 
 ---
 
-## Mermaid Diagram Code for Chapter 5
 
-### Figure 5.1: Model Performance Comparison (yaml-cpp)
+---
 
-```mermaid
-%%{init: {'theme': 'neutral'}}%%
-xychart-beta
-    title "Code Coverage by Model (yaml-cpp)"
-    x-axis ["Gemma 3 27B", "Qwen 32B", "Phi 14B", "Yi 34B"]
-    y-axis "Line Coverage (%)" 0 --> 50
-    bar [45.06, 43.08, 34.26, 0]
-```
-
-
-
-
-
-
-
-**Note:** Render diagrams using Mermaid Live Editor (https://mermaid.live), VS Code with Mermaid extension, or command-line tool `mmdc -i diagram.mmd -o diagram.pdf`. Export as PDF or PNG for LaTeX.
+**Note:** For LaTeX compilation, render Mermaid diagrams using Mermaid Live Editor (https://mermaid.live), VS Code with Mermaid extension, or command-line tool `mmdc -i diagram.mmd -o diagram.pdf`. Export as PDF or PNG and include in final document.
