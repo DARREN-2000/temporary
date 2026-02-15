@@ -465,45 +465,7 @@ jobs:
 
 Our pipeline includes corpus persistence through JFrog Artifactory. Each run downloads the previous corpus, runs fuzzing to extend it, and uploads the updated corpus. This ensures coverage improvements accumulate over time rather than starting fresh each build.
 
-The network architecture required for this deployment is illustrated in Figure 4.4. This diagram shows how the Azure Private Link setup enables secure communication between the CARIAD internal network and Azure OpenAI services, bypassing the restrictions of the corporate firewall while maintaining security compliance.
-
-**Figure 4.4: Network Architecture with Azure Private Link**
-
-```mermaid
-flowchart TB
-    subgraph Internal["CARIAD Internal Network"]
-        direction TB
-        Repo[Source Code<br/>Repository]
-        Runner[CI/CD Runner<br/>self-hosted, auto-buildah-base]
-        Firewall[Corporate Firewall<br/>Zero-Trust Security]
-    end
-    
-    subgraph Azure["Azure Cloud Infrastructure"]
-        direction TB
-        PrivateLink[Azure Private Link<br/>Private Endpoint<br/>10.x.x.x internal IP]
-        OpenAI[Azure OpenAI Service<br/>GPT-4o Deployment<br/>40K token limit]
-    end
-    
-    Internet((Public Internet<br/>External APIs))
-    
-    Repo --> Runner
-    Runner --> Firewall
-    
-    Firewall -.->|❌ Blocked<br/>Direct connection| Internet
-    Firewall -->|✅ Private Connection<br/>No public internet| PrivateLink
-    
-    PrivateLink <-->|Secure tunnel| OpenAI
-    
-    OpenAI -.->|Generated<br/>Fuzz Driver| PrivateLink
-    PrivateLink -.->|Returns code| Firewall
-    Firewall -.->|Deploy| Runner
-    
-    style Internet fill:#ffcccc,stroke:#cc0000,stroke-width:3px
-    style PrivateLink fill:#90EE90,stroke:#006600,stroke-width:2px
-    style Firewall fill:#FFE6CC,stroke:#CC6600,stroke-width:2px
-    style OpenAI fill:#E6F3FF,stroke:#0066CC,stroke-width:2px
-    style Runner fill:#FFFFCC
-```
+The network architecture required for this deployment is illustrated in Figure 6.1 (Chapter 6). As discussed in the subsequent Discussion chapter, the Azure Private Link setup enables secure communication between the CARIAD internal network and Azure OpenAI services, bypassing the restrictions of the corporate firewall while maintaining security compliance. This architectural solution became the critical enabler for enterprise deployment.
 
 ### 4.4.3 Operational Considerations
 
