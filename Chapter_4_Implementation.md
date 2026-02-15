@@ -8,7 +8,7 @@ Before writing any code, we needed to select the right tools. This decision was 
 
 ### 4.1.1 Fuzzing Infrastructure
 
-For the fuzzing engine itself, we chose libFuzzer combined with Clang sanitizers. This was not a controversial choice. libFuzzer is the industry standard for coverage-guided fuzzing in C and C++ projects [23]. It integrates directly with the LLVM toolchain, which means compilation and fuzzing use the same infrastructure. Google uses libFuzzer for OSS-Fuzz [8], so the documentation and community support are excellent.
+For the fuzzing engine itself, we chose libFuzzer combined with Clang sanitizers. This was not a controversial choice. libFuzzer is the industry standard for coverage-guided fuzzing in C and C++ projects [23], though alternatives like AFL++ [1] also have strong communities. LibFuzzer integrates directly with the LLVM toolchain, which means compilation and fuzzing use the same infrastructure. Google uses libFuzzer for OSS-Fuzz [8], so the documentation and community support are excellent.
 
 We compiled all targets with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled. ASan catches memory errors like buffer overflows, use-after-free, and memory leaks [23]. UBSan catches undefined behavior like signed integer overflow and null pointer dereferences. These sanitizers add runtime overhead, but for security testing the overhead is acceptable. Finding bugs is more important than running fast.
 
@@ -155,7 +155,7 @@ After the initial evaluation showed promising results from Qwen 2.5-Coder models
 
 ### 4.3.1 Training Data Preparation
 
-Most important for fine-tuning is the training data. High-quality examples of fuzz drivers paired with source code were essential.
+Most important for fine-tuning is the training data. High-quality examples of fuzz drivers paired with source code were essential. Previous work on LLM-based fuzzing like LLM4Fuzz [6] and TitanFuzz [7] has demonstrated that quality training data significantly impacts generation success.
 
 To build our dataset, we extracted training examples from OSS-Fuzz [8]. Google has fuzz-tested hundreds of open-source projects through OSS-Fuzz, and the fuzz drivers are publicly available. We focused on C and C++ drivers because those matched our target domain.
 
@@ -219,7 +219,7 @@ We also tested the fine-tuned models on RapidJSON and pugixml to check generaliz
 
 ## 4.4 Phase 3: Enterprise CI/CD Integration
 
-Phase 3 focused on deploying the validated approach from Phases 1 and 2 into CARIAD's production CI/CD infrastructure. This phase directly addressed **RQ3**: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? The transition from controlled local experiments to enterprise deployment revealed unexpected infrastructure challenges that became the dominant technical hurdle of this phase.
+Phase 3 focused on deploying the validated approach from Phases 1 and 2 into CARIAD's production CI/CD infrastructure using Azure OpenAI [17] as the LLM backend. This phase directly addressed **RQ3**: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? The transition from controlled local experiments with Ollama [19] to enterprise deployment revealed unexpected infrastructure challenges that became the dominant technical hurdle of this phase.
 
 ### 4.4.1 Architectural Challenges
 
