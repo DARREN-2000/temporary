@@ -96,17 +96,17 @@ We evaluated 14 models spanning a wide range of sizes and architectures. The sel
 **Extra Large Models (above 40 billion parameters):**
 - Mixtral 46.7B
 
-**Medium Models (7-14 billion parameters):**
+- **Medium Models (7-14 billion parameters):**
 - Qwen 2.5-Coder 7B and 14B
 - DeepSeek Coder V2 Lite 16B
-- Gemma 3 9B
+- Gemma 3 9B and 27B
 
 **Small Models (below 7 billion parameters):**
 - Qwen 2.5-Coder 1.5B
 - Gemma 3 4B
 - Phi 4 3.8B
 
-Code-specialized models like Qwen Coder and DeepSeek Coder were trained specifically on programming tasks. General-purpose models like Mixtral were included to test whether raw scale could compensate for lack of specialization. We wanted to know: does a 46B general model outperform a 7B code-specialized model? Results, discussed in Chapter 5, were surprising: general-purpose models like Mixtral (46.7B) and CodeLlama (34B) achieved 0% code coverage, while the smaller specialized Qwen 2.5-Coder (32B) consistently achieved 45% line coverage.
+Code-specialized models like Qwen Coder and DeepSeek Coder were trained specifically on programming tasks. General-purpose models like Mixtral were included to test whether raw scale could compensate for lack of specialization. We wanted to know: does a 46B general model outperform a 7B code-specialized model? Results, discussed in Chapter 5, were surprising: general-purpose models like Mixtral (46.7B) and CodeLlama (34B) achieved 0% code coverage, while the specialized Qwen 2.5-Coder (32B) and Gemma 3 (27B) consistently achieved over 43% line coverage.
 
 Installing these models required significant disk space. The larger models exceeded 20GB each in their quantized forms. We used 4-bit and 5-bit quantization to fit models into available VRAM while maintaining reasonable output quality.
 
@@ -207,7 +207,7 @@ After training, we evaluated the fine-tuned models on the same yaml-cpp benchmar
 
 - **Generation time reduced by 33%** compared to the base model
 - **Token usage reduced by 55%** compared to the base model
-- Coverage remained comparable to the larger Qwen 2.5-Coder 32B model, which achieved 45% line coverage
+- Coverage remained comparable to the larger Qwen 2.5-Coder 32B model, which achieved 43% line coverage (see Chapter 5 for detailed results)
 
 Fine-tuned models generated more concise code. They learned the structure of fuzz drivers and did not waste tokens on unnecessary explanations or boilerplate. These efficiency gains meant that generating each driver took substantially less time and fewer API tokens, which directly impacts operational costs.
 

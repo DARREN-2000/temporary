@@ -213,7 +213,7 @@ The practical impact extends beyond academic contribution. CARIAD can deploy the
 
 ## 6.7 Conclusion
 
-This work began with a straightforward question: can Large Language Models automate fuzz driver generation for automotive software? After five months of research, implementation, and deployment effort at CARIAD (May to September 2025), the answer is a qualified yes.
+This work began with a straightforward question: can Large Language Models automate fuzz driver generation for automotive software? After four months of research, implementation, and deployment effort at CARIAD (May to September 2025), the answer is a qualified yes.
 
 The qualification matters. Not all models work. General-purpose models, even large ones, frequently failed at this task. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is not an afterthought—it is a critical design decision.
 
