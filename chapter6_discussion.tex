@@ -12,7 +12,7 @@ This chapter interprets the experimental results from Chapter 5, connects them t
 \subsection{What the Data Reveals}
 \label{sec:discussion_data}
 
-Our experimental results told a story we did not expect when we started this work.
+Our experimental results told a story we didn't expect when we started this work.
 
 Most surprising was the inverse relationship between model size and performance. Conventional wisdom in machine learning suggests larger models perform better. Our fuzz driver experiments showed something different.
 
@@ -36,7 +36,7 @@ We anticipated the core technical challenge would be generating high-quality fuz
 
 The actual bottleneck was infrastructure.
 
-When we moved from local experiments to CARIAD's production environment, we discovered that corporate network policies created barriers we had not considered. The CI/CD runners operated in isolated network segments. They could not reach external API endpoints. Our entire architecture assumed we could call LLM services from build processes. The corporate firewall said no.
+When we moved from local experiments to CARIAD's production environment, we discovered that corporate network policies created barriers we hadn't considered. The CI/CD runners operated in isolated network segments. They couldn't reach external API endpoints. Our entire architecture assumed we could call LLM services from build processes. The corporate firewall said no.
 
 This problem consumed significant effort. We explored multiple workarounds. Tunnel through existing proxy infrastructure? No---the proxies were configured for HTTP traffic to approved destinations only. VPN connections from runners? No---the runner infrastructure did not support VPN client configuration. Cache model responses? Partially, but caching defeats the purpose for dynamic code generation.
 
@@ -59,7 +59,7 @@ The architecture of this solution is illustrated in Figure \ref{fig:enterprise_n
 
 Setting up Private Link required organizational coordination. Approval processes, security reviews, configuration testing, and documentation all added time. The technical configuration itself was straightforward once approvals were obtained, requiring approximately one month from initial request to operational deployment.
 
-This experience taught us something important about AI deployment in enterprise environments. The machine learning challenges are often the easy part. Corporate IT infrastructure, security policies, and approval processes create friction that academic research rarely addresses. Anyone planning to deploy LLM-based tools in large organizations should budget significant time for infrastructure integration beyond the technical implementation. Based on our experience, organizations should allocate 2-3 months for enterprise integration even when the core technology is proven.
+This experience taught us something important about AI deployment in enterprise environments. The machine learning challenges are often the easy part. Corporate IT infrastructure, security policies, and approval processes create friction that academic research rarely addresses. Anyone planning to deploy LLM-based tools in large organizations should budget significant time for infrastructure integration beyond the technical implementation. Based on our experience, organizations should allocate 2--3 months for enterprise integration even when the core technology is proven.
 
 
 \section{Addressing Research Questions}
@@ -76,7 +76,7 @@ Our experiments demonstrated that specialized code models can generate fuzz driv
 
 However, the qualifications matter. Not all models succeed. General-purpose models, even large ones, frequently failed. Model selection is critical. In practice, the question ``can LLMs do this'' should really be ``which LLMs can do this, and under what conditions.''
 
-While respectable, these coverage numbers likely trail expert human performance. LLM-generated drivers are useful for initial security testing but should not be considered equivalent to carefully crafted manual drivers for critical applications. Their advantage lies in automation speed, not coverage depth.
+While respectable, these coverage numbers likely trail expert human performance. LLM-generated drivers are useful for initial security testing but shouldn't be considered equivalent to carefully crafted manual drivers for critical applications. Their advantage lies in automation speed, not coverage depth.
 
 \textbf{RQ2: Does model size determine fuzz driver quality, or can smaller models with domain-specific training match or exceed larger general-purpose models?}
 
@@ -84,7 +84,7 @@ Our data strongly supports the second hypothesis. Domain-specific training matte
 
 Evidence from Chapter 5 Section 5.2 is clear: code-specialized models succeeded where larger general-purpose models failed completely. Our LoRA fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens while producing usable fuzz drivers (see Section 5.3). These specialized models understood what a fuzz driver should look like because they had seen relevant examples during training.
 
-This finding has practical implications. Organizations deploying LLM-based fuzzing do not need expensive API access to the largest available models. A well-chosen mid-sized model, or a fine-tuned smaller model, provides better results at lower cost.
+This finding has practical implications. Organizations deploying LLM-based fuzzing don't need expensive API access to the largest available models. A well-chosen mid-sized model, or a fine-tuned smaller model, provides better results at lower cost.
 
 \textbf{RQ3: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements?}
 
@@ -138,7 +138,7 @@ The structural errors were often recoverable through prompt refinement. Adding e
 
 Our work has several technical limitations that affect how the results should be interpreted.
 
-\textbf{Model selection scope.} We evaluated 15 publicly available LLMs, but this represents a small fraction of available models. New models appear monthly, including more advanced versions of GPT-4 \cite{gpt4} and other commercial offerings we could not test due to cost or access restrictions. Some models we did not test might perform better or worse than our selections. We chose models based on availability, documentation, and community adoption rather than exhaustive search.
+\textbf{Model selection scope.} We evaluated 14 publicly available LLMs (plus one additional reasoning-focused model, DeepSeek R1, outside the main benchmark), but this represents a small fraction of available models. New models appear monthly, including more advanced versions of GPT-4 \cite{gpt4} and other commercial offerings we could not test due to cost or access restrictions. Some models we did not test might perform better or worse than our selections. We chose models based on availability, documentation, and community adoption rather than exhaustive search.
 
 \textbf{Single target language.} All experiments focused on C++ libraries. Results might differ for other languages. C has similar challenges, but Python or Rust might show different patterns due to different memory safety characteristics and training data distribution.
 
@@ -158,11 +158,11 @@ Beyond technical limitations, our methodology has boundaries that constrain gene
 
 \textbf{Limited manual driver comparison.} We compared against OSS-Fuzz drivers where available, but did not commission expert written drivers specifically for comparison. Recent research on LLM-assisted fuzzing \cite{efficient_finetuning} suggests that efficient fine-tuning can improve parameter efficiency substantially. The human baseline is somewhat indirect.
 
-\textbf{No user study.} We did not evaluate how developers interact with generated drivers in practice. Do they trust the output? Do they modify it before use? These human factors affect practical deployment but were outside our scope.
+\textbf{No user study.} We didn't evaluate how developers interact with generated drivers in practice. Do they trust the output? Do they modify it before use? These human factors affect practical deployment but were outside our scope.
 
 \textbf{Reproducibility challenges.} LLM outputs are stochastic. Running the same prompt multiple times produces different code. We report averages across multiple generations (typically 5 runs per configuration as described in Chapter 5), but exact reproduction of our results requires matching random seeds and model versions.
 
-These limitations do not invalidate our findings, but they define the scope within which the results apply. Organizations considering similar deployments should evaluate their specific context rather than assuming identical outcomes.
+These limitations don't invalidate our findings, but they define the scope within which the results apply. Organizations considering similar deployments should evaluate their specific context rather than assuming identical outcomes.
 
 
 \section{Implications for Practice}
@@ -241,7 +241,7 @@ Our work opens several directions for future research.
 
 This thesis makes several contributions to the understanding of LLM-assisted security testing in automotive contexts.
 
-\textbf{Empirical evaluation of model capabilities.} We systematically evaluated 15 LLMs for fuzz driver generation, establishing that specialized code models outperform larger general-purpose models for this task. This finding challenges common assumptions about model scaling.
+\textbf{Empirical evaluation of model capabilities.} We systematically evaluated 14 LLMs for fuzz driver generation, establishing that specialized code models outperform larger general-purpose models for this task. This finding challenges common assumptions about model scaling.
 
 \textbf{Demonstration of fine-tuning effectiveness.} Our LoRA experiments showed that small models adapted to the fuzzing domain can match larger models at reduced cost. This provides a practical path for resource-constrained deployments.
 
@@ -261,7 +261,7 @@ The practical impact extends beyond academic contribution. CARIAD can deploy the
 
 This work began with a straightforward question: can Large Language Models automate fuzz driver generation for automotive software? After five months of research, implementation, and deployment effort at CARIAD (May to September 2025), the answer is a qualified yes.
 
-The qualification matters. Not all models work. General-purpose models, even large ones, frequently failed at this task. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is not an afterthought---it is a critical design decision.
+The qualification matters. Not all models work. General-purpose models, even large ones, frequently failed at this task. Specialized code models like Qwen 2.5-Coder succeeded where others didn't. Model selection isn't an afterthought---it is a critical design decision.
 
 Fine-tuning small models proved surprisingly effective. Our LoRA adapted 1.5B model achieved measurable efficiency gains (detailed in Chapter 5) while producing usable fuzz drivers. For organizations with compute constraints or cost sensitivity, this approach deserves consideration.
 
@@ -276,5 +276,3 @@ For CARIAD specifically, this work establishes a foundation for expanded deploym
 The broader lesson extends beyond fuzzing. Automotive software development faces a fundamental scaling problem. Code complexity grows faster than team sizes. AI-assisted tools offer a path to maintain quality at scale. Fuzz driver generation is one application of this principle. Others will follow.
 
 A critical insight from this research is that infrastructure integration complexity often exceeds the technical challenges of the core technology. Initial assumptions underestimated the effort required for enterprise deployment, particularly network security compliance. While specific components like Azure Private Link took approximately one month to deploy, the complete enterprise integration---including evaluation, approval processes, infrastructure provisioning, testing, and documentation---required substantially more time. Organizations planning similar deployments should allocate 2--3 months for the full integration process and budget time commensurate with their security policy complexity.
-
----

@@ -8,11 +8,11 @@ This chapter describes how we turned the methodology from Chapter 3 into working
 \section{Toolchain Selection and Rationale}
 \label{sec:impl_toolchain}
 
-Before writing any code, we needed to select the right tools. This decision was not straightforward because several factors influenced the selection. Research reproducibility required tools with stable APIs and clear documentation. Industrial deployment demanded compatibility with CARIAD's existing infrastructure. Hardware availability constrained which models could run locally with acceptable performance.
+Before writing any code, we needed to select the right tools. This decision wasn't straightforward because several factors influenced the selection. Research reproducibility required tools with stable APIs and clear documentation. Industrial deployment demanded compatibility with CARIAD's existing infrastructure. Hardware availability constrained which models could run locally with acceptable performance.
 
 \subsection{Fuzzing Infrastructure}
 
-For the fuzzing engine itself, we chose libFuzzer combined with Clang sanitizers. This was not a controversial choice. libFuzzer is the industry standard for coverage-guided fuzzing in C and C++ projects \cite{LibFuzzer2015}, though alternatives like AFL++ \cite{AFLPlusPlus} also have strong communities. LibFuzzer integrates directly with the LLVM toolchain, which means compilation and fuzzing use the same infrastructure. Google uses libFuzzer for OSS-Fuzz \cite{OSSFuzzBugs2021}, so the documentation and community support are excellent.
+For the fuzzing engine itself, we chose libFuzzer combined with Clang sanitizers. This wasn't a controversial choice. libFuzzer is the industry standard for coverage-guided fuzzing in C and C++ projects \cite{LibFuzzer2015}, though alternatives like AFL++ \cite{AFLPlusPlus} also have strong communities. LibFuzzer integrates directly with the LLVM toolchain, which means compilation and fuzzing use the same infrastructure. Google uses libFuzzer for OSS-Fuzz \cite{OSSFuzzBugs2021}, so the documentation and community support are excellent.
 
 We compiled all targets with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled. ASan catches memory errors like buffer overflows, use-after-free, and memory leaks \cite{LibFuzzer2015}. UBSan catches undefined behavior like signed integer overflow and null pointer dereferences. These sanitizers add runtime overhead, but for security testing the overhead is acceptable. Finding bugs is more important than running fast.
 
@@ -56,7 +56,7 @@ podman machine init --cpus 4 --memory 8192
 podman machine start
 \end{lstlisting}
 
-Transitioning from Docker to Podman was not entirely smooth. Some scripts assumed Docker-specific behavior, requiring approximately one week to debug container networking issues before achieving reliable operation.
+Transitioning from Docker to Podman wasn't entirely smooth. Some scripts assumed Docker-specific behavior, requiring approximately one week to debug container networking issues before achieving reliable operation.
 
 For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah instead of Docker for container operations. Buildah is daemonless, which fits better with security policies that restrict long-running processes.
 
@@ -89,13 +89,12 @@ Phase 1 focused on understanding which models could actually generate useful fuz
 
 \subsection{Benchmarked Models}
 
-We evaluated 15 models spanning a wide range of sizes and architectures. The selection included both general-purpose models, code-specialized variants, and one reasoning-focused model. Our goal was to understand whether model size, training data, or architecture had the biggest impact on fuzz driver quality.
+We evaluated 14 models spanning a wide range of sizes and architectures. The selection included both general-purpose models and code-specialized variants. Our goal was to understand whether model size, training data, or architecture had the biggest impact on fuzz driver quality.
 
-\textbf{Large Models (25-35 billion parameters):}
+\textbf{Large Models (25--35 billion parameters):}
 \begin{itemize}
     \item Qwen 2.5-Coder 32B
     \item DeepSeek Coder 33B
-    \item DeepSeek R1 (reasoning-focused model)
     \item CodeLlama 34B Instruct
     \item WizardCoder 34B
     \item Yi 34B
@@ -107,7 +106,7 @@ We evaluated 15 models spanning a wide range of sizes and architectures. The sel
     \item Mixtral 46.7B (Mixture-of-Experts architecture, approximately 12.9B active parameters per inference)
 \end{itemize}
 
-\textbf{Medium Models (7-16 billion parameters):}
+\textbf{Medium Models (7--16 billion parameters):}
 \begin{itemize}
     \item Qwen 2.5-Coder 7B and 14B
     \item Phi-4 14B
@@ -144,7 +143,7 @@ yaml-cpp is a YAML parsing library with approximately 35 source files and over 1
 
 These libraries cover different domains but share the characteristic of being C++ with clean public APIs. They all have existing fuzz targets in OSS-Fuzz, which gave us baselines for comparison.
 
-We also tested on several CARIAD internal libraries, though we cannot report those results in detail due to confidentiality constraints. The patterns we observed on open-source libraries generally held for the internal ones as well.
+We also tested on several CARIAD internal libraries, though we can't report those results in detail due to confidentiality constraints. The patterns we observed on open-source libraries generally held for the internal ones as well.
 
 \subsection{Evaluation Environment}
 
@@ -163,7 +162,7 @@ Each model's evaluation followed these steps:
 
 We ran each model five times on yaml-cpp to ensure consistency and account for stochastic output variation. Some models produced different outputs on identical prompts, making multiple runs necessary for reliable statistical analysis. This variability was itself an interesting finding that we discuss further in Chapter 5.
 
-A full evaluation cycle for one model on one target took approximately 10-15 minutes. With 15 models and 6 primary targets, plus five runs per configuration for consistency checking, the complete Phase 1 evaluation required approximately two weeks of continuous testing.
+A full evaluation cycle for one model on one target took approximately 10--15 minutes. With 14 models and 6 primary targets, plus five runs per configuration for consistency checking, the complete Phase 1 evaluation required approximately two weeks of continuous testing.
 
 The general fuzzing workflow (as introduced in earlier chapters) forms the foundation of our evaluation methodology: defining targets from source code, generating fuzz tests via LLM, executing them through the fuzzing engine (libFuzzer with sanitizers), detecting crashes, and either reporting findings or mutating inputs for continued testing. Each evaluation cycle involved generating a driver, checking compilation, running the fuzzer for 60 seconds, measuring coverage with llvm-cov, and storing results.
 
@@ -236,9 +235,9 @@ After training, we evaluated the fine-tuned models on the same yaml-cpp benchmar
     \item Coverage remained comparable to the larger Qwen 2.5-Coder 32B model, which achieved 43\% line coverage (see Chapter 5 for detailed results)
 \end{itemize}
 
-Fine-tuned models generated more concise code. They learned the structure of fuzz drivers and did not waste tokens on unnecessary explanations or boilerplate. These efficiency gains meant that generating each driver took substantially less time and fewer API tokens, which directly impacts operational costs.
+Fine-tuned models generated more concise code. They learned the structure of fuzz drivers and didn't waste tokens on unnecessary explanations or boilerplate. These efficiency gains meant that generating each driver took substantially less time and fewer API tokens, which directly impacts operational costs.
 
-Interestingly, more training data did not always produce proportionally better results. The 709-example dataset achieved the best efficiency improvements (see Chapter 5 for detailed metrics), but it included some lower-quality drivers that may have introduced noise. While the extended dataset reduced generation time and token usage, the coverage quality did not improve proportionally. Quality matters more than quantity for fine-tuning specialized tasks.
+Interestingly, more training data didn't always produce proportionally better results. The 709-example dataset achieved the best efficiency improvements (see Chapter 5 for detailed metrics), but it included some lower-quality drivers that may have introduced noise. While the extended dataset reduced generation time and token usage, the coverage quality didn't improve proportionally. Quality matters more than quantity for fine-tuning specialized tasks.
 
 We also tested the fine-tuned models on RapidJSON and pugixml to check generalization. Performance was similar to yaml-cpp, suggesting the fine-tuning improved general fuzz driver generation rather than overfitting to specific libraries.
 
@@ -253,7 +252,7 @@ Our initial integration strategy appeared straightforward. The working local pip
 
 \textbf{Challenge 1: Network Isolation}
 
-CARIAD operates with a zero-trust security model. CI/CD runners cannot access the public internet by default. Every external connection requires explicit approval. This makes sense for security, but it creates problems for AI integration.
+CARIAD operates with a zero-trust security model. CI/CD runners can't access the public internet by default. Every external connection requires explicit approval. This makes sense for security, but it creates problems for AI integration.
 
 Our initial pipeline tried to call Azure OpenAI during the build. The request never reached the Azure endpoint. It was blocked by the firewall before leaving the network.
 
@@ -263,7 +262,7 @@ Error: fatal: unable to access 'https://git.hub.vwgroup.com/...':
 Failed to connect to 127.0.0.1 port 9000 after 0 ms: Couldn't connect to server
 \end{lstlisting}
 
-We spent considerable time debugging this. The proxy configuration we set for Azure was interfering with internal Git operations. The runner was trying to send Git traffic through a proxy that did not exist.
+We spent considerable time debugging this. The proxy configuration we set for Azure was interfering with internal Git operations. The runner was trying to send Git traffic through a proxy that didn't exist.
 
 \textbf{Challenge 2: Container Networking}
 
@@ -297,11 +296,11 @@ buildah run \
   /usr/bin/bash -c "cd /project/build && cifuzz spark target_name"
 \end{lstlisting}
 
-Each environment variable had to be passed explicitly. Missing one caused silent failures where the LLM call would not work but the pipeline continued without clear error messages.
+Each environment variable had to be passed explicitly. Missing one caused silent failures where the LLM call wouldn't work but the pipeline continued without clear error messages.
 
 \subsection{Self-Hosted Runner Solution}
 
-After weeks of debugging network issues, we concluded that the standard enterprise firewall would not allow direct Azure OpenAI access. The solution required infrastructure changes beyond what we could do ourselves.
+After weeks of debugging network issues, we concluded that the standard enterprise firewall wouldn't allow direct Azure OpenAI access. The solution required infrastructure changes beyond what we could do ourselves.
 
 \textbf{Azure Private Link Architecture}
 
@@ -428,9 +427,9 @@ These costs are low in absolute terms. For context, the heavy usage scenario cos
 
 \textbf{Failure Handling}
 
-LLM outputs are not deterministic. Sometimes the generated driver does not compile. Sometimes it compiles but crashes immediately. The pipeline was designed to handle these cases gracefully.
+LLM outputs aren't deterministic. Sometimes the generated driver doesn't compile. Sometimes it compiles but crashes immediately. The pipeline was designed to handle these cases gracefully.
 
-We added fallback logic: if the LLM-generated driver fails, the pipeline falls back to any existing manually-written drivers. The build does not fail due to unsuccessful AI generation. Generated drivers that work are kept. Those that fail are logged for review but do not block the pipeline.
+We added fallback logic: if the LLM-generated driver fails, the pipeline falls back to any existing manually-written drivers. The build doesn't fail due to unsuccessful AI generation. Generated drivers that work are kept. Those that fail are logged for review but don't block the pipeline.
 
 \textbf{Security Review}
 
