@@ -24,7 +24,7 @@ The LoRA fine-tuning results reinforced this insight. A small 1.5 billion parame
 
 These findings challenge a common assumption in AI deployment. Organizations often reach for the biggest model available, assuming more parameters means better results. Our data suggests this is wrong for specialized code generation tasks. A well-chosen smaller model, possibly with domain-specific fine-tuning, can match or exceed larger alternatives at a fraction of the cost.
 
-What about the coverage numbers? The original thesis proposal considered that achieving even 40\% coverage while saving hours of expert time would constitute meaningful progress. By this standard, the automated approach succeeded. However, manually written fuzz drivers by security experts typically achieve higher coverage because they incorporate domain knowledge about edge cases that LLMs may miss.
+What about the coverage numbers? The original thesis proposal considered that achieving even 40\% coverage while saving hours of expert time would constitute meaningful progress. By this standard, the automated approach succeeded. However, as discussed in Chapter 5, our examination of comparable manually-written fuzz drivers in OSS-Fuzz projects suggests expert-crafted drivers typically achieve 60--80\% line coverage for similar libraries, because they incorporate domain knowledge about edge cases that LLMs may miss.
 
 This gap matters, but so does the time investment. A skilled security engineer might spend 2 to 8 hours writing and debugging a fuzz driver for a new library. Our automated pipeline generates a usable driver in approximately 30 minutes. Even if the automated driver achieves lower coverage, the time savings are substantial.
 
@@ -72,7 +72,7 @@ This experience taught us something important about AI deployment in enterprise 
 
 Yes, with qualifications.
 
-Our experiments demonstrated that specialized code models can generate fuzz drivers meeting these criteria. Results from Chapter 5 Section 5.2 show that the best performing models achieved over 40\% line coverage on yaml-cpp.
+Our experiments demonstrated that specialized code models can generate fuzz drivers meeting these criteria. Results from Chapter 5 Section 5.2 show that the best performing models achieved 43--45\% line coverage on yaml-cpp.
 
 However, the qualifications matter. Not all models succeed. General-purpose models, even large ones, frequently failed. Model selection is critical. In practice, the question ``can LLMs do this'' should really be ``which LLMs can do this, and under what conditions.''
 
@@ -138,7 +138,7 @@ The structural errors were often recoverable through prompt refinement. Adding e
 
 Our work has several technical limitations that affect how the results should be interpreted.
 
-\textbf{Model selection scope.} We evaluated 15 open-source LLMs, but this represents a small fraction of available models. New models appear monthly, including more advanced versions of GPT-4 \cite{gpt4} and other commercial offerings we could not test due to cost or access restrictions. Some models we did not test might perform better or worse than our selections. We chose models based on availability, documentation, and community adoption rather than exhaustive search.
+\textbf{Model selection scope.} We evaluated 15 publicly available LLMs, but this represents a small fraction of available models. New models appear monthly, including more advanced versions of GPT-4 \cite{gpt4} and other commercial offerings we could not test due to cost or access restrictions. Some models we did not test might perform better or worse than our selections. We chose models based on availability, documentation, and community adoption rather than exhaustive search.
 
 \textbf{Single target language.} All experiments focused on C++ libraries. Results might differ for other languages. C has similar challenges, but Python or Rust might show different patterns due to different memory safety characteristics and training data distribution.
 
@@ -275,6 +275,6 @@ For CARIAD specifically, this work establishes a foundation for expanded deploym
 
 The broader lesson extends beyond fuzzing. Automotive software development faces a fundamental scaling problem. Code complexity grows faster than team sizes. AI-assisted tools offer a path to maintain quality at scale. Fuzz driver generation is one application of this principle. Others will follow.
 
-A critical insight from this research is that infrastructure integration complexity often exceeds the technical challenges of the core technology. Initial assumptions underestimated the effort required for enterprise deployment, particularly network security compliance. Organizations planning similar deployments should allocate 2-3 months for infrastructure integration and budget time commensurate with their security policy complexity.
+A critical insight from this research is that infrastructure integration complexity often exceeds the technical challenges of the core technology. Initial assumptions underestimated the effort required for enterprise deployment, particularly network security compliance. While specific components like Azure Private Link took approximately one month to deploy, the complete enterprise integration---including evaluation, approval processes, infrastructure provisioning, testing, and documentation---required substantially more time. Organizations planning similar deployments should allocate 2--3 months for the full integration process and budget time commensurate with their security policy complexity.
 
 ---
