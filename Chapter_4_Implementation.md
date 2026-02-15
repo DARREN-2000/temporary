@@ -76,27 +76,7 @@ cmake_minimum_required(VERSION 3.10...3.22)
 cmake_policy(VERSION 3.10...3.22)
 ```
 
-The LLM-assisted fuzzing workflow is illustrated in Figure 4.1, showing the complete process from source code analysis through LLM-based test generation to crash detection and reporting. This conceptual workflow, introduced in Chapter 3, demonstrates how LLMs integrate into the fuzzing pipeline to automatically generate test cases from source code.
-
-**Figure 4.1: LLM-Assisted Fuzzing Workflow**
-
-```mermaid
-flowchart LR
-    SourceCode[Source Code] --> DefineTarget[Define Target]
-    DefineTarget --> LLM[LLM<br/>Fuzz Test Generation]
-    SeedInputs[Seed Inputs] --> ExecuteTests[Execute Tests]
-    LLM --> ExecuteTests
-    ExecuteTests --> FuzzEngine[Fuzzing Engine]
-    FuzzEngine --> CrashDetected{Crash<br/>Detected?}
-    CrashDetected -->|Yes| Reports[Reports]
-    CrashDetected -->|No| MutateInputs[Mutate Inputs]
-    MutateInputs --> FuzzEngine
-    
-    style LLM fill:#E6F3FF
-    style Reports fill:#90EE90
-    style CrashDetected fill:#FFE6CC
-    style FuzzEngine fill:#FFFFCC
-```
+The LLM-assisted fuzzing workflow, conceptually introduced in Chapter 3, demonstrates how LLMs integrate into the fuzzing pipeline to automatically generate test cases from source code. Our implementation uses cifuzz spark to handle the integration between the LLM backends (either local models via Ollama or Azure OpenAI) and the libFuzzer execution environment.
 
 ## 4.2 Phase 1: Local LLM Evaluation Setup
 
@@ -167,26 +147,7 @@ We ran each model five times on yaml-cpp to ensure consistency and account for s
 
 A full evaluation cycle for one model on one target took approximately 10-15 minutes. With 14 models and 6 primary targets, plus five runs per configuration for consistency checking, the complete Phase 1 evaluation required approximately two weeks of continuous testing.
 
-The general fuzzing workflow is shown in Figure 4.2, illustrating the standard fuzzing cycle: defining targets from source code, generating fuzz tests, executing them through the fuzzing engine, detecting crashes, and either reporting findings or mutating inputs for continued testing. This workflow forms the foundation of our evaluation methodology.
-
-**Figure 4.2: Fuzzing Workflow**
-
-```mermaid
-flowchart LR
-    SourceCode[Source Code] --> DefineTarget[Define Target]
-    DefineTarget --> FuzzTestGen[Fuzz Test<br/>Generation]
-    FuzzTestGen --> ExecuteTests[Execute Tests]
-    ExecuteTests --> FuzzEngine[Fuzzing Engine]
-    FuzzEngine --> CrashDetected{Crash<br/>Detected?}
-    CrashDetected -->|Yes| Developer[Developer<br/>Reports]
-    CrashDetected -->|No| MutateInputs[Mutate Inputs]
-    MutateInputs --> FuzzEngine
-    
-    style FuzzEngine fill:#FFFFCC
-    style CrashDetected fill:#FFE6CC
-    style Developer fill:#90EE90
-    style MutateInputs fill:#E6FFE6
-```
+The general fuzzing workflow (as introduced in earlier chapters) forms the foundation of our evaluation methodology: defining targets from source code, generating fuzz tests via LLM, executing them through the fuzzing engine (libFuzzer with sanitizers), detecting crashes, and either reporting findings or mutating inputs for continued testing. Each evaluation cycle involved generating a driver, checking compilation, running the fuzzer for 60 seconds, measuring coverage with llvm-cov, and storing results.
 
 ## 4.3 Phase 2: Model Optimization with LoRA Fine-Tuning
 
