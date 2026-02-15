@@ -48,7 +48,7 @@ A token limit of 40,000 was necessary because fuzz driver generation requires su
 
 \subsection{Development Environment}
 
-Local development happened on a MacBook Pro with an M1 Pro chip. This created some challenges. Docker Desktop had performance issues on Apple Silicon, so we switched to Podman. Podman provided better Linux container compatibility, which mattered because the enterprise CI/CD runners used Linux.
+Local development happened on a MacBook Pro with an M1 Pro chip. This created some challenges. Docker Desktop had performance issues on Apple Silicon, so we switched to Podman. Podman provided better Linux container compatibility---which mattered because the enterprise CI/CD runners used Linux.
 
 \begin{lstlisting}[language=bash, caption={Podman Setup on macOS}]
 brew install podman
@@ -58,7 +58,7 @@ podman machine start
 
 Transitioning from Docker to Podman wasn't entirely smooth. Some scripts assumed Docker-specific behavior, requiring approximately one week to debug container networking issues before achieving reliable operation.
 
-For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah instead of Docker for container operations. Buildah is daemonless, which fits better with security policies that restrict long-running processes.
+For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah instead of Docker for container operations. Buildah is daemonless---which fits better with security policies that restrict long-running processes.
 
 Our build toolchain used CMake for project configuration and Clang for compilation. We required CMake version 3.5 or higher because cifuzz integration depends on features from that version. CMake configuration for enabling fuzzing was straightforward:
 
@@ -198,7 +198,7 @@ Quality control was important. We manually reviewed a sample of the extracted dr
 
 \subsection{LoRA Configuration and Training}
 
-We used Low-Rank Adaptation (LoRA) \cite{Hu2021} rather than full fine-tuning. Full fine-tuning updates all model weights, which requires enormous compute resources. LoRA adds small trainable matrices alongside the frozen base model. This reduces memory requirements by a large margin while achieving similar results on specialized tasks.
+We used Low-Rank Adaptation (LoRA) \cite{Hu2021} rather than full fine-tuning. Full fine-tuning updates all model weights---which requires enormous compute resources. LoRA adds small trainable matrices alongside the frozen base model. This reduces memory requirements by a large margin while achieving similar results on specialized tasks.
 
 Our LoRA configuration:
 
