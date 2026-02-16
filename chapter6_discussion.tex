@@ -42,7 +42,7 @@ This problem consumed significant effort. We explored multiple workarounds. Tunn
 
 The solution required involving CARIAD's infrastructure team. We worked with them to provision Azure Private Link endpoints. This technology creates a private connection between the corporate network and Azure services, appearing as an internal address rather than external internet. The LLM API becomes reachable without traversing the public internet.
 
-The architecture of this solution is illustrated in Figure \ref{fig:enterprise_network}, which shows how the Azure Private Link creates a secure tunnel between the CARIAD internal network and Azure OpenAI services, bypassing the corporate firewall's restrictions on public internet access while maintaining security compliance.
+The architecture of this solution is illustrated in Figure~\ref{fig:enterprise_network}, which shows how the Azure Private Link creates a secure tunnel between the CARIAD internal network and Azure OpenAI services, bypassing the corporate firewall's restrictions on public internet access while maintaining security compliance.
 
 \begin{figure}[htbp]
 \centering
