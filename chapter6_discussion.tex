@@ -82,7 +82,7 @@ While respectable, these coverage numbers likely trail expert human performance.
 
 Our data strongly supports the second hypothesis. Domain-specific training matters more than raw parameter count for this task.
 
-Evidence from Chapter 5 Section 5.2 is clear: code-specialized models succeeded where larger general-purpose models failed completely. Our LoRA fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens while producing usable fuzz drivers (see Section 5.3). These specialized models understood what a fuzz driver should look like because they had seen relevant examples during training.
+Evidence from Chapter 5 Section 5.2 is clear, code-specialized models succeeded where larger general-purpose models failed completely. Our LoRA fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens while producing usable fuzz drivers (see Section 5.3). These specialized models understood what a fuzz driver should look like because they had seen relevant examples during training.
 
 This finding has practical implications. Organizations deploying LLM-based fuzzing do not need expensive API access to the largest available models. A well-chosen mid-sized model, or a fine-tuned smaller model, provides better results at lower cost.
 
@@ -106,7 +106,7 @@ Beyond the primary questions, our work revealed answers to questions we did not 
 
 Our experiments across multiple repositories showed that parsing libraries with clear documentation produced better drivers. Libraries with extensive header comments, consistent function signatures, and simple data types yielded higher success rates. Complex APIs with heavy template usage, deeply nested callback patterns, or implicit preconditions produced more failures.
 
-yaml-cpp fell in the middle range. Its parsing APIs are reasonably well documented, but the YAML specification itself introduces complexity. The cross-library results from Chapter 5 Section~\ref{sec:results_cross_library} revealed additional patterns: jsoncons achieved the highest coverage (45.64\%), while the fmt library showed that smaller models can outperform larger ones when the API surface is simpler. Libraries with mathematical interfaces (glm) or configuration-heavy APIs (spdlog) consistently produced 0\% coverage, suggesting these patterns remain challenging for current LLMs.
+yaml-cpp fell in the middle range. Its parsing APIs are reasonably well documented, but the YAML specification itself introduces complexity. The cross-library results from Chapter 5 Section~\ref{sec:results_cross_library} revealed additional patterns, jsoncons achieved the highest coverage (45.64\%), while the fmt library showed that smaller models can outperform larger ones when the API surface is simpler. Libraries with mathematical interfaces (glm) or configuration-heavy APIs (spdlog) consistently produced 0\% coverage, suggesting these patterns remain challenging for current LLMs.
 
 \textbf{How do generated drivers compare to manually written ones in bug finding capability?}
 
@@ -259,9 +259,9 @@ The practical impact extends beyond academic contribution. CARIAD can deploy the
 \section{Conclusion}
 \label{sec:discussion_conclusion}
 
-This work began with a direct question: can Large Language Models automate fuzz driver generation for automotive software? After five months of research, implementation, and deployment effort at CARIAD (May to September 2025), the answer is a qualified yes.
+This work began with a direct question, can Large Language Models automate fuzz driver generation for automotive software? After five months of research, implementation, and deployment effort at CARIAD (May to September 2025), the answer is a qualified yes.
 
-The qualification matters. Not all models work. General-purpose models, even large ones, frequently failed at this task. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is not a secondary consideration; it is a critical design decision.
+The qualification matters. Not all models work. General-purpose models, even large ones, frequently failed at this task. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is not a secondary consideration, it is a critical design decision.
 
 Fine-tuning small models proved more effective than expected. Our LoRA adapted 1.5B model achieved measurable efficiency gains (detailed in Chapter 5) while producing usable fuzz drivers. For organizations with compute constraints or cost sensitivity, this approach deserves consideration.
 
