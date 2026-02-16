@@ -8,17 +8,17 @@ This chapter describes how we turned the methodology from Chapter 3 into working
 \section{Toolchain Selection and Rationale}
 \label{sec:impl_toolchain}
 
-Before writing any code, we needed to select the right tools. This decision wasn't straightforward because several factors influenced the selection. Research reproducibility required tools with stable APIs and clear documentation. Industrial deployment demanded compatibility with CARIAD's existing infrastructure. Hardware availability constrained which models could run locally with acceptable performance.
+Before writing any code, we needed to select the appropriate tools. The selection involved balancing multiple requirements. Research reproducibility required tools with stable APIs and clear documentation. Industrial deployment required compatibility with CARIAD's existing infrastructure. Hardware availability constrained which models could run locally with acceptable performance.
 
 \subsection{Fuzzing Infrastructure}
 
-For the fuzzing engine itself, we chose libFuzzer combined with Clang sanitizers. This wasn't a controversial choice. libFuzzer is the industry standard for coverage-guided fuzzing in C and C++ projects \cite{LibFuzzer2015}, though alternatives like AFL++ \cite{AFLPlusPlus} also have strong communities. LibFuzzer integrates directly with the LLVM toolchain, which means compilation and fuzzing use the same infrastructure. Google uses libFuzzer for OSS-Fuzz \cite{OSSFuzzBugs2021}, so the documentation and community support are excellent.
+For the fuzzing engine itself, we chose libFuzzer combined with Clang sanitizers. libFuzzer is the industry standard for coverage-guided fuzzing in C and C++ projects \cite{LibFuzzer2015}, though alternatives like AFL++ \cite{AFLPlusPlus} also have strong communities. LibFuzzer integrates directly with the LLVM toolchain, which means compilation and fuzzing use the same infrastructure. Google uses libFuzzer for OSS-Fuzz \cite{OSSFuzzBugs2021}, so the documentation and community support are excellent.
 
-We compiled all targets with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled. ASan catches memory errors like buffer overflows, use-after-free, and memory leaks \cite{LibFuzzer2015}. UBSan catches undefined behavior like signed integer overflow and null pointer dereferences. These sanitizers add runtime overhead, but for security testing the overhead is acceptable. Finding bugs is more important than running fast.
+We compiled all targets with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled. ASan catches memory errors like buffer overflows, use-after-free, and memory leaks \cite{LibFuzzer2015}. UBSan catches undefined behavior like signed integer overflow and null pointer dereferences. These sanitizers add runtime overhead, but for security testing the tradeoff is acceptable, since detecting vulnerabilities takes priority over execution speed.
 
 For integration with our build systems, we used cifuzz from Code Intelligence. Cifuzz wraps libFuzzer and provides additional functionality like corpus management, coverage reporting, and build system integration. The critical feature for our work was cifuzz spark, which handles the LLM integration. Spark takes a CMake target as input, extracts API information automatically, sends it to the configured LLM, and produces a fuzz driver ready for execution.
 
-Our choice of cifuzz was deliberate. We evaluated several alternatives including Google's ClusterFuzz \cite{OSSFuzzBugs2021} and standalone libFuzzer setups. Cifuzz offered the best balance between ease of use and enterprise features. Its spark module specifically addressed our core research question by providing a clean interface between the fuzzing infrastructure and LLM backends.
+Our choice of cifuzz was based on a systematic evaluation. We compared several alternatives including Google's ClusterFuzz \cite{OSSFuzzBugs2021} and standalone libFuzzer setups. Cifuzz offered a good balance between ease of use and enterprise features. Its spark module specifically addressed our core research question by providing a clean interface between the fuzzing infrastructure and LLM backends.
 
 \subsection{LLM Infrastructure}
 
@@ -56,7 +56,7 @@ podman machine init --cpus 4 --memory 8192
 podman machine start
 \end{lstlisting}
 
-Transitioning from Docker to Podman wasn't entirely smooth. Some scripts assumed Docker-specific behavior, requiring approximately one week to debug container networking issues before achieving reliable operation.
+Transitioning from Docker to Podman required some adaptation. Several scripts assumed Docker-specific behavior, requiring approximately one week to debug container networking issues before achieving reliable operation.
 
 For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah instead of Docker for container operations. Buildah is daemonless, which fits better with security policies that restrict long-running processes.
 
@@ -89,7 +89,7 @@ Phase 1 focused on understanding which models could actually generate useful fuz
 
 \subsection{Benchmarked Models}
 
-We evaluated 14 models spanning a wide range of sizes and architectures. The selection included both general-purpose models and code-specialized variants. Our goal was to understand whether model size, training data, or architecture had the biggest impact on fuzz driver quality.
+We evaluated 14 models spanning a wide range of sizes and architectures. The selection included both general-purpose models and code-specialized variants. Our goal was to understand whether model size, training data, or architecture had the most significant impact on fuzz driver quality.
 
 \textbf{Large Models (25 to 35 billion parameters):}
 \begin{itemize}
@@ -252,7 +252,7 @@ Our initial integration strategy appeared straightforward. The working local pip
 
 \textbf{Challenge 1: Network Isolation}
 
-CARIAD operates with a zero-trust security model. CI/CD runners can't access the public internet by default. Every external connection requires explicit approval. This makes sense for security, but it creates problems for AI integration.
+CARIAD operates with a zero-trust security model. CI/CD runners can't access the public internet by default. Every external connection requires explicit approval. While this is appropriate for security, it creates challenges for AI integration.
 
 Our initial pipeline tried to call Azure OpenAI during the build. The request never reached the Azure endpoint. It was blocked by the firewall before leaving the network.
 
@@ -412,6 +412,7 @@ Azure OpenAI charges per token. Each fuzz driver generation uses approximately 3
 \centering
 \caption{Azure OpenAI Cost Projections for Different Usage Scenarios}
 \label{tab:cost_scenarios_impl}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
 Scenario & Targets & Builds/Day & Annual Tokens & Annual Cost \\
@@ -420,14 +421,15 @@ Light & 5 & 1 & 3.1M & \texteuro{}73 \\
 Medium & 10 & 2 & 12.5M & \texteuro{}400 \\
 Heavy & 25 & 5 & 78M & \texteuro{}1,452 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 These costs are low in absolute terms. For context, the heavy usage scenario costs less than two days of consultant time annually. However, the LLM-generated drivers supplement rather than replace expert security engineering work, so this comparison captures only the infrastructure cost component. A detailed economic analysis including human oversight costs appears in Chapter 5.
 
 \textbf{Failure Handling}
 
-LLM outputs aren't deterministic. Sometimes the generated driver doesn't compile. Sometimes it compiles but crashes immediately. The pipeline was designed to handle these cases gracefully.
+LLM outputs are non-deterministic. Sometimes the generated driver doesn't compile. Sometimes it compiles but crashes immediately. The pipeline was designed to handle these cases gracefully.
 
 We added fallback logic: if the LLM-generated driver fails, the pipeline falls back to any existing manually-written drivers. The build doesn't fail due to unsuccessful AI generation. Generated drivers that work are kept. Those that fail are logged for review but don't block the pipeline.
 

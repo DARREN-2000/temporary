@@ -3,7 +3,7 @@
 \chapter{Experimental Results}
 \label{chap:results}
 
-In this chapter, we present the experimental findings from our three-phase research conducted between May and September 2025. The goal was straightforward: determine whether LLMs can generate useful fuzz drivers, and if so, under what conditions. The results were mixed, some genuinely surprising, others confirming what we suspected from the start. These findings directly address the research questions defined in Chapter 1.
+In this chapter, we present the experimental findings from our three-phase research conducted between May and September 2025. The goal was to determine whether LLMs can generate useful fuzz drivers, and if so, under what conditions. The results were mixed, with some outcomes differing from initial expectations and others confirming our hypotheses. These findings directly address the research questions defined in Chapter 1.
 
 
 \section{Experimental Setup}
@@ -24,7 +24,7 @@ Additional targets included pugixml, jsoncons, fmt, spdlog, and glm. These provi
 
 All local experiments ran on macOS with an Apple M1 Pro processor. The container runtime used Podman with 4 CPUs and 8 GB memory allocated. This choice was deliberate, we wanted hardware that typical automotive development teams have access to. If our approach required expensive GPU clusters, adoption would be severely limited in practice.
 
-Our software stack consisted of Podman for containers (chosen over Docker for enterprise compatibility reasons that became painfully clear during CI/CD integration), CMake with Clang for building, libFuzzer via cifuzz for fuzzing, and Ollama for local model inference. For enterprise deployment testing, we used Azure OpenAI with GPT-4o connected via Azure Private Link, a configuration that took weeks to properly establish, as detailed in Chapter 4.
+Our software stack consisted of Podman for containers (chosen over Docker for enterprise compatibility reasons that became apparent during CI/CD integration), CMake with Clang for building, libFuzzer via cifuzz for fuzzing, and Ollama for local model inference. For enterprise deployment testing, we used Azure OpenAI with GPT-4o connected via Azure Private Link, a configuration that took weeks to properly establish, as detailed in Chapter 4.
 
 
 \section{LLM Fuzz Driver Generation Results}
@@ -33,12 +33,13 @@ Our software stack consisted of Podman for containers (chosen over Docker for en
 \subsection{Successful Models: Performance Data}
 \label{sec:results_successful}
 
-We evaluated models across different size categories on the yaml-cpp repository. The results surprised us in several ways.
+We evaluated models across different size categories on the yaml-cpp repository. The results revealed several notable patterns.
 
 \begin{table}[htbp]
 \centering
 \caption{Model Performance Metrics on yaml-cpp Repository}
 \label{tab:model_performance}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccc}
 \toprule
 Model & Code Coverage & Time Taken & Tokens Used & Unique Test Cases & Successful Tests \\
@@ -47,7 +48,8 @@ Qwen 2.5-Coder 32B & 43.08\% & 32m 57s & 45.1k & 2,040 & 2 \\
 Gemma 3 27B & 45.06\% & 33m 33s & 40.2k & 2,050 & 2 \\
 Phi-4 14B & 34.26\% & 36m 36s & 71.5k & 2,220 & 1 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 The ``Successful Tests'' column requires explanation: this metric counts tests that discovered actual bugs or edge cases, not tests that simply compiled and ran. Most generated tests exercised valid code paths without finding vulnerabilities, which is expected behavior, not failure. The high number of unique test cases with few ``successful'' findings reflects that fuzzing is a numbers game: you generate many tests hoping a few will discover issues.
@@ -71,12 +73,13 @@ The comparative performance of these models is visualized in Figure \ref{fig:mod
 \subsection{Unsuccessful Models: Critical Findings}
 \label{sec:results_unsuccessful}
 
-Several models failed completely. This was the biggest surprise of the research.
+Several models failed completely. This was among the most notable findings of the research.
 
 \begin{table}[htbp]
 \centering
 \caption{Unsuccessful Models and Failure Analysis}
 \label{tab:unsuccessful_models}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lll}
 \toprule
 Model & Failure Reason & Lessons Learned \\
@@ -85,7 +88,8 @@ Yi 34B & Generation hallucinations, 0\% coverage & General-purpose models inadeq
 DeepSeek R1 & Poor fuzzing context understanding & Reasoning-focused training alone does not guarantee code generation ability \\
 Mixtral 46.7B & Resource constraints due to size & Hardware limitations require model size consideration \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 Yi 34B demonstrated a fundamental limitation of general-purpose models for specialized code tasks. Despite having 34 billion parameters, it produced hallucinated outputs that achieved zero percent coverage. The generated drivers compiled successfully in some cases, they were not syntactically broken, but they did nothing useful. Functions were called with nonsensical parameter combinations, or the driver simply returned immediately without exercising any library functionality. We spent considerable time verifying this wasn't a prompt engineering problem. It was not.
@@ -122,6 +126,7 @@ Results showed measurable efficiency improvements:
 \centering
 \caption{LoRA Fine-Tuning Efficiency Improvements}
 \label{tab:lora_efficiency}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lccc}
 \toprule
 Model Version & Time Taken & Tokens Used & Efficiency Improvement \\
@@ -130,10 +135,11 @@ Base 1.5B & 15 min & 112k & Baseline \\
 172 examples & 12 min & 65k & 20\% faster, 42\% fewer tokens \\
 709 examples & 10 min & 50k & 33\% faster, 55\% fewer tokens \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
-With 709 examples, the extended dataset achieved the best results: 33\% faster generation and 55\% fewer tokens compared to the base model. Domain-specific fine-tuning works, the model learned to generate more concise, targeted code rather than verbose outputs padded with unnecessary boilerplate.
+With 709 examples, the extended dataset achieved the best results: 33\% faster generation and 55\% fewer tokens compared to the base model. The fine-tuned model learned to generate more concise, targeted code rather than verbose outputs padded with unnecessary boilerplate.
 
 
 \subsection{Comparative Analysis}
@@ -164,6 +170,7 @@ Based on Azure OpenAI pricing at the time of our experiments:
 \centering
 \caption{Azure OpenAI Cost Projections for Different Usage Levels}
 \label{tab:cost_scenarios}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
 Usage Level & Daily Cost & Monthly Cost & Annual Cost & Use Case \\
@@ -173,7 +180,8 @@ Moderate & \texteuro{}0.83 & \texteuro{}18.26 & \texteuro{}219.12 & Small team p
 Heavy & \texteuro{}2.75 & \texteuro{}60.50 & \texteuro{}726.00 & Full enterprise deployment \\
 Enterprise & \texteuro{}5.50 & \texteuro{}121.00 & \texteuro{}1,452.00 & Complete automation \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 Even at the enterprise level with complete automation, annual costs stay under \texteuro{}1,500. This is minimal compared to alternatives, but it only tells part of the story.

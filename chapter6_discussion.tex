@@ -12,7 +12,7 @@ This chapter interprets the experimental results from Chapter 5, connects them t
 \subsection{What the Data Reveals}
 \label{sec:discussion_data}
 
-Our experimental results told a story we didn't expect when we started this work.
+Our experimental results revealed patterns we did not anticipate at the outset of this work.
 
 Most surprising was the inverse relationship between model size and performance. Conventional wisdom in machine learning suggests larger models perform better. Our fuzz driver experiments showed something different.
 
@@ -22,7 +22,7 @@ Qwen 2.5-Coder succeeded because it was trained specifically on code generation 
 
 The LoRA fine-tuning results reinforced this insight. A small 1.5 billion parameter model, after adaptation on high-quality OSS-Fuzz drivers, produced outputs matching the quality of much larger models while using far fewer resources. Specialized knowledge compensated for reduced parameter count.
 
-These findings challenge a common assumption in AI deployment. Organizations often reach for the biggest model available, assuming more parameters means better results. Our data suggests this is wrong for specialized code generation tasks. A well-chosen smaller model, possibly with domain-specific fine-tuning, can match or exceed larger alternatives at a fraction of the cost.
+These findings challenge a common assumption in AI deployment. Organizations often select the largest model available, assuming more parameters means better results. Our data suggests this does not hold for specialized code generation tasks. A well-chosen smaller model, possibly with domain-specific fine-tuning, can match or exceed larger alternatives at a fraction of the cost.
 
 What about the coverage numbers? The original thesis proposal considered that achieving even 40\% coverage while saving hours of expert time would constitute meaningful progress. By this standard, the automated approach succeeded. However, as discussed in Chapter 5, our examination of comparable manually-written fuzz drivers in OSS-Fuzz projects suggests expert-crafted drivers typically achieve 60 to 80\% line coverage for similar libraries, because they incorporate domain knowledge about edge cases that LLMs may miss.
 
@@ -34,7 +34,7 @@ This gap matters, but so does the time investment. A skilled security engineer m
 
 We anticipated the core technical challenge would be generating high-quality fuzz drivers. The models would struggle with C++ complexity, API understanding, or coverage optimization. We planned our research around these expected difficulties.
 
-The actual bottleneck was infrastructure.
+The actual bottleneck turned out to be infrastructure.
 
 When we moved from local experiments to CARIAD's production environment, we discovered that corporate network policies created barriers we hadn't considered. The CI/CD runners operated in isolated network segments. They couldn't reach external API endpoints. Our entire architecture assumed we could call LLM services from build processes. The corporate firewall said no.
 
@@ -59,7 +59,7 @@ The architecture of this solution is illustrated in Figure \ref{fig:enterprise_n
 
 Setting up Private Link required organizational coordination. Approval processes, security reviews, configuration testing, and documentation all added time. The technical configuration itself was straightforward once approvals were obtained, requiring approximately one month from initial request to operational deployment.
 
-This experience taught us something important about AI deployment in enterprise environments. The machine learning challenges are often the easy part. Corporate IT infrastructure, security policies, and approval processes create friction that academic research rarely addresses. Anyone planning to deploy LLM-based tools in large organizations should budget significant time for infrastructure integration beyond the technical implementation. Based on our experience, organizations should allocate 2 to 3 months for enterprise integration even when the core technology is proven.
+This experience provided an important insight about AI deployment in enterprise environments. The machine learning challenges are often less complex than the infrastructure requirements. Corporate IT infrastructure, security policies, and approval processes create friction that academic research rarely addresses. Anyone planning to deploy LLM-based tools in large organizations should budget significant time for infrastructure integration beyond the technical implementation. Based on our experience, organizations should allocate 2 to 3 months for enterprise integration even when the core technology is proven.
 
 
 \section{Addressing Research Questions}
@@ -177,7 +177,7 @@ Regulatory requirements are tightening. UNECE Regulation 155 \cite{UNECER155} (U
 
 Software complexity continues to grow. Modern vehicles contain millions of lines of code across networked ECUs. Manual security review cannot scale to this volume. Automated approaches are necessary just to maintain coverage.
 
-Skilled security engineers are scarce. The automotive industry competes with technology companies for talent. Salaries in Silicon Valley exceed what traditional automakers can offer. Tools that multiply the effectiveness of available engineers provide competitive advantage.
+Skilled security engineers are scarce. The automotive industry competes with technology companies for talent, and compensation differences can make recruitment challenging. Tools that multiply the effectiveness of available engineers provide competitive advantage.
 
 LLM-assisted fuzzing addresses all three pressures. It provides documented security testing for compliance. It scales to large codebases. It reduces demands on specialized personnel.
 
@@ -261,11 +261,11 @@ The practical impact extends beyond academic contribution. CARIAD can deploy the
 
 This work began with a straightforward question: can Large Language Models automate fuzz driver generation for automotive software? After five months of research, implementation, and deployment effort at CARIAD (May to September 2025), the answer is a qualified yes.
 
-The qualification matters. Not all models work. General-purpose models, even large ones, frequently failed at this task. Specialized code models like Qwen 2.5-Coder succeeded where others didn't. Model selection isn't an afterthought, it is a critical design decision.
+The qualification matters. Not all models work. General-purpose models, even large ones, frequently failed at this task. Specialized code models like Qwen 2.5-Coder succeeded where others didn't. Model selection is not a secondary consideration, it is a critical design decision.
 
 Fine-tuning small models proved surprisingly effective. Our LoRA adapted 1.5B model achieved measurable efficiency gains (detailed in Chapter 5) while producing usable fuzz drivers. For organizations with compute constraints or cost sensitivity, this approach deserves consideration.
 
-The biggest surprise was infrastructure. We expected the hard problem to be generating good code. The actual bottleneck was deploying our solution within corporate network policies. Proxy configurations failed. Boundary client integration failed. Container networking failed. All blocked by fundamental firewall policies. The solution ultimately required organizational support for Azure Private Link architecture.
+The most notable finding was the role of infrastructure. We expected the primary challenge to be generating good code. The actual bottleneck was deploying our solution within corporate network policies. Proxy configurations failed. Boundary client integration failed. Container networking failed. All blocked by fundamental firewall policies. The solution ultimately required organizational support for Azure Private Link architecture.
 
 The economics strongly favor adoption. As shown in Chapter 5, LLM-assisted fuzzing costs less than trivial line items in automotive development budgets. The value comes from scaling security testing to match code production rates that manual approaches cannot achieve.
 
