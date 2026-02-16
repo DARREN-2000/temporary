@@ -36,7 +36,7 @@ We anticipated the core technical challenge would be generating high-quality fuz
 
 The actual bottleneck turned out to be infrastructure.
 
-When we moved from local experiments to CARIAD's production environment, we discovered that corporate network policies created barriers we hadn't considered. The CI/CD runners operated in isolated network segments. They couldn't reach external API endpoints. Our entire architecture assumed we could call LLM services from build processes. The corporate firewall said no.
+When we moved from local experiments to CARIAD's production environment, we discovered that corporate network policies created additional requirements we had not initially accounted for. The CI/CD runners operated in isolated network segments. They could not reach external API endpoints. Our architecture assumed we could call LLM services from build processes, but the corporate network security policies required a different approach.
 
 This problem consumed significant effort. We explored multiple workarounds. Tunnel through existing proxy infrastructure? No, the proxies were configured for HTTP traffic to approved destinations only. VPN connections from runners? No, the runner infrastructure did not support VPN client configuration. Cache model responses? Partially, but caching defeats the purpose for dynamic code generation.
 
@@ -76,7 +76,7 @@ Our experiments demonstrated that specialized code models can generate fuzz driv
 
 However, the qualifications matter. Not all models succeed. General-purpose models, even large ones, frequently failed. Model selection is critical. In practice, the question ``can LLMs do this'' should really be ``which LLMs can do this, and under what conditions.''
 
-While respectable, these coverage numbers likely trail expert human performance. LLM-generated drivers are useful for initial security testing but shouldn't be considered equivalent to carefully crafted manual drivers for critical applications. Their advantage lies in automation speed, not coverage depth.
+While respectable, these coverage numbers likely trail expert human performance. LLM-generated drivers are useful for initial security testing but should not be considered equivalent to carefully crafted manual drivers for critical applications. Their advantage lies in automation speed, not coverage depth.
 
 \textbf{RQ2: Does model size determine fuzz driver quality, or can smaller models with domain-specific training match or exceed larger general-purpose models?}
 
@@ -84,7 +84,7 @@ Our data strongly supports the second hypothesis. Domain-specific training matte
 
 Evidence from Chapter 5 Section 5.2 is clear: code-specialized models succeeded where larger general-purpose models failed completely. Our LoRA fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens while producing usable fuzz drivers (see Section 5.3). These specialized models understood what a fuzz driver should look like because they had seen relevant examples during training.
 
-This finding has practical implications. Organizations deploying LLM-based fuzzing don't need expensive API access to the largest available models. A well-chosen mid-sized model, or a fine-tuned smaller model, provides better results at lower cost.
+This finding has practical implications. Organizations deploying LLM-based fuzzing do not need expensive API access to the largest available models. A well-chosen mid-sized model, or a fine-tuned smaller model, provides better results at lower cost.
 
 \textbf{RQ3: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements?}
 
@@ -106,7 +106,7 @@ Beyond the primary questions, our work revealed answers to questions we did not 
 
 Our experiments across multiple repositories showed that simpler APIs with clear documentation produced better drivers. Libraries with extensive header comments, consistent function signatures, and straightforward data types yielded higher success rates. Complex APIs with heavy template usage, intricate callback patterns, or implicit preconditions produced more failures.
 
-yaml-cpp fell in the middle range. Its parsing APIs are reasonably well documented, but the YAML specification itself introduces complexity. Libraries like RapidJSON, with more straightforward JSON parsing interfaces, showed slightly better results in our limited testing.
+yaml-cpp fell in the middle range. Its parsing APIs are reasonably well documented, but the YAML specification itself introduces complexity. Libraries like RapidJSON, with simpler JSON parsing interfaces, showed slightly better results in our limited testing.
 
 \textbf{How do generated drivers compare to manually written ones in bug finding capability?}
 
@@ -158,11 +158,11 @@ Beyond technical limitations, our methodology has boundaries that constrain gene
 
 \textbf{Limited manual driver comparison.} We compared against OSS-Fuzz drivers where available, but did not commission expert written drivers specifically for comparison. Recent research on LLM-assisted fuzzing \cite{efficient_finetuning} suggests that efficient fine-tuning can improve parameter efficiency substantially. The human baseline is somewhat indirect.
 
-\textbf{No user study.} We didn't evaluate how developers interact with generated drivers in practice. Do they trust the output? Do they modify it before use? These human factors affect practical deployment but were outside our scope.
+\textbf{No user study.} We did not evaluate how developers interact with generated drivers in practice. Do they trust the output? Do they modify it before use? These human factors affect practical deployment but were outside our scope.
 
 \textbf{Reproducibility challenges.} LLM outputs are stochastic. Running the same prompt multiple times produces different code. We report averages across multiple generations (typically 5 runs per configuration as described in Chapter 5), but exact reproduction of our results requires matching random seeds and model versions.
 
-These limitations don't invalidate our findings, but they define the scope within which the results apply. Organizations considering similar deployments should evaluate their specific context rather than assuming identical outcomes.
+These limitations do not invalidate our findings, but they define the scope within which the results apply. Organizations considering similar deployments should evaluate their specific context rather than assuming identical outcomes.
 
 
 \section{Implications for Practice}
@@ -219,7 +219,7 @@ Our work opens several directions for future research.
 
 \textbf{Extended fuzzing campaigns.} We measured initial code coverage but did not run campaigns long enough to measure vulnerability discovery. Future work should execute fuzzing for hours or days, tracking crash discovery over time. This would establish whether LLM-generated drivers find bugs at rates comparable to manual drivers.
 
-\textbf{Multi-model ensembles.} Our experiments evaluated models individually. Combining outputs from multiple models might improve quality. One model could generate initial code while another reviews and corrects it. The optimal combination strategy remains unexplored.
+\textbf{Multi-model ensembles.} Our experiments evaluated models individually. Combining outputs from multiple models might improve quality. One model could generate initial code while another reviews and corrects it. The best combination strategy remains unexplored.
 
 \textbf{Active learning for driver improvement.} When a generated driver fails to compile or crashes at runtime, the error messages contain useful information. Future systems could feed this information back to the LLM for iterative improvement. This closed-loop approach might achieve higher success rates than single-shot generation.
 
@@ -227,7 +227,7 @@ Our work opens several directions for future research.
 
 \textbf{Integration with other testing techniques.} LLM-generated fuzz drivers could complement symbolic execution, property-based testing, or formal verification. Understanding how to combine these approaches effectively deserves investigation.
 
-\textbf{Human-in-the-loop workflows.} Rather than fully automated generation, interactive systems could present generated drivers to developers for review and modification. Understanding the optimal balance between automation and human oversight would improve practical deployment.
+\textbf{Human-in-the-loop workflows.} Rather than fully automated generation, interactive systems could present generated drivers to developers for review and modification. Understanding the right balance between automation and human oversight would improve practical deployment.
 
 \textbf{Benchmark development.} The field lacks standardized benchmarks for evaluating LLM-based fuzz driver generation. Creating benchmark suites with known ground truth would enable more rigorous comparison across approaches.
 
@@ -259,13 +259,13 @@ The practical impact extends beyond academic contribution. CARIAD can deploy the
 \section{Conclusion}
 \label{sec:discussion_conclusion}
 
-This work began with a straightforward question: can Large Language Models automate fuzz driver generation for automotive software? After five months of research, implementation, and deployment effort at CARIAD (May to September 2025), the answer is a qualified yes.
+This work began with a direct question: can Large Language Models automate fuzz driver generation for automotive software? After five months of research, implementation, and deployment effort at CARIAD (May to September 2025), the answer is a qualified yes.
 
-The qualification matters. Not all models work. General-purpose models, even large ones, frequently failed at this task. Specialized code models like Qwen 2.5-Coder succeeded where others didn't. Model selection is not a secondary consideration, it is a critical design decision.
+The qualification matters. Not all models work. General-purpose models, even large ones, frequently failed at this task. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is not a secondary consideration, it is a critical design decision.
 
-Fine-tuning small models proved surprisingly effective. Our LoRA adapted 1.5B model achieved measurable efficiency gains (detailed in Chapter 5) while producing usable fuzz drivers. For organizations with compute constraints or cost sensitivity, this approach deserves consideration.
+Fine-tuning small models proved more effective than expected. Our LoRA adapted 1.5B model achieved measurable efficiency gains (detailed in Chapter 5) while producing usable fuzz drivers. For organizations with compute constraints or cost sensitivity, this approach deserves consideration.
 
-The most notable finding was the role of infrastructure. We expected the primary challenge to be generating good code. The actual bottleneck was deploying our solution within corporate network policies. Proxy configurations failed. Boundary client integration failed. Container networking failed. All blocked by fundamental firewall policies. The solution ultimately required organizational support for Azure Private Link architecture.
+An important finding was the role of infrastructure. We expected the primary challenge to be generating good code. The actual bottleneck was deploying our solution within corporate network policies. Proxy configurations failed. Boundary client integration failed. Container networking failed. All blocked by fundamental firewall policies. The solution ultimately required organizational support for Azure Private Link architecture.
 
 The economics strongly favor adoption. As shown in Chapter 5, LLM-assisted fuzzing costs less than trivial line items in automotive development budgets. The value comes from scaling security testing to match code production rates that manual approaches cannot achieve.
 
