@@ -186,7 +186,7 @@ xychart-beta
 ### Figure 5.4: Cost Comparison (Manual vs LLM)
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4472C4', 'secondaryColor': '#90EE90'}}}%%
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4472C4'}}}%%
 pie showData
     title "Annual Cost Comparison (€)"
     "Manual Approach (min 50,000)" : 50000
