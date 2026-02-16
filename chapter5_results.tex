@@ -106,7 +106,7 @@ To validate whether the yaml-cpp findings generalize to other libraries, we test
 
 \textbf{fmt (formatting library):}
 
-The fmt library produced an unexpected result. Smaller models outperformed the larger ones that had succeeded on yaml-cpp.
+The fmt library produced an unexpected result. Smaller models outperformed the larger ones that had succeeded on yaml-cpp. In addition to the 14 models from our primary benchmark, we tested Llama 3 and Qwen 1.5 7B on fmt to broaden coverage across model families.
 
 \begin{table}[htbp]
 \centering
@@ -291,7 +291,7 @@ Second, performance varies across library types. Parsing libraries (yaml-cpp, js
 
 Third, fine-tuning enables efficient deployment. The fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens compared to the base model, though it still did not match the coverage of larger specialized models.
 
-Fourth, the economics are favorable, at least on paper. Annual infrastructure costs range from \texteuro{}74 for light usage to \texteuro{}1,452 for full enterprise deployment. For comparison, a full-time security engineer costs \texteuro{}50,000+ annually, though the two are not directly substitutable, the LLM automates initial driver creation while human expertise remains necessary for review and refinement.
+Fourth, the economics are favorable, at least on paper. Annual infrastructure costs range from \texteuro{}74 for light usage to \texteuro{}1,452 for full enterprise deployment. For comparison, a full-time security engineer costs \texteuro{}50,000+ annually, though the two are not directly substitutable; the LLM automates initial driver creation while human expertise remains necessary for review and refinement.
 
 These findings directly address our research questions:
 

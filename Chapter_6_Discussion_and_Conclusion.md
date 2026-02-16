@@ -245,18 +245,7 @@ I should note that when we started this work, we underestimated how much infrast
 
 ## Mermaid Diagram Code for Chapter 6 Figures
 
-### Figure 6.1: Model Performance Comparison
-
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4472C4'}}}%%
-xychart-beta
-    title "Code Coverage by Model (yaml-cpp)"
-    x-axis ["Gemma 3 27B", "Qwen 2.5-Coder 32B", "Phi-4 14B", "Yi 34B", "DeepSeek R1", "Mixtral 46.7B"]
-    y-axis "Line Coverage (%)" 0 --> 50
-    bar [45.06, 43.08, 34.26, 0, 0, 0]
-```
-
-### Figure 6.2: Enterprise Network Architecture
+### Figure 6.1: Enterprise Network Architecture
 
 ```mermaid
 flowchart LR
@@ -291,7 +280,7 @@ flowchart LR
     style Azure fill:#FFF3E6
 ```
 
-### Figure 6.3: AI Deployment Options Comparison
+### Figure 6.2: AI Deployment Options Comparison
 
 ```mermaid
 quadrantChart
@@ -309,7 +298,7 @@ quadrantChart
     Cloud API Direct: [0.35, 0.25]
 ```
 
-Alternative table format for Figure 6.3:
+Alternative table format for Figure 6.2:
 
 ```mermaid
 flowchart TB
@@ -363,7 +352,7 @@ flowchart TB
     style R4C2 fill:#90EE90
 ```
 
-### Figure 6.4: Research Questions Summary
+### Figure 6.3: Research Questions Summary
 
 ```mermaid
 flowchart TB
