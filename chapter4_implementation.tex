@@ -58,7 +58,7 @@ podman machine start
 
 Transitioning from Docker to Podman required some adaptation. Several scripts assumed Docker-specific behavior, requiring approximately one week to debug container networking issues before achieving reliable operation.
 
-For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah instead of Docker for container operations. Buildah is daemonless, which fits better with security policies that restrict long-running processes.
+For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah \cite{buildah} instead of Docker for container operations. Buildah is daemonless, which fits better with security policies that restrict long-running processes.
 
 Our build toolchain used CMake for project configuration and Clang for compilation. We required CMake version 3.5 or higher because cifuzz integration depends on features from that version. The CMake configuration for enabling fuzzing required minimal setup:
 
@@ -412,7 +412,7 @@ Azure OpenAI charges per token. Each fuzz driver generation uses approximately 3
 \centering
 \caption{Azure OpenAI Cost Projections for Different Usage Scenarios}
 \label{tab:cost_scenarios_impl}
-\resizebox{\textwidth}{!}{%
+\small
 \begin{tabular}{lcccc}
 \toprule
 Scenario & Targets & Builds/Day & Annual Tokens & Annual Cost \\
@@ -421,8 +421,7 @@ Light & 5 & 1 & 3.1M & \texteuro{}73 \\
 Medium & 10 & 2 & 12.5M & \texteuro{}400 \\
 Heavy & 25 & 5 & 78M & \texteuro{}1,452 \\
 \bottomrule
-\end{tabular}%
-}
+\end{tabular}
 \end{table}
 
 These costs are low in absolute terms. For context, the heavy usage scenario represents a fraction of a security engineer's annual salary. However, the LLM-generated drivers supplement rather than replace expert security engineering work, so this comparison captures only the infrastructure cost component. A detailed economic analysis including human oversight costs appears in Chapter 5.

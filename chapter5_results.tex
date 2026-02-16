@@ -112,7 +112,7 @@ The fmt library produced an unexpected result. Smaller models outperformed the l
 \centering
 \caption{Model Performance on fmt Library}
 \label{tab:fmt_results}
-\resizebox{\textwidth}{!}{%
+\small
 \begin{tabular}{lcccc}
 \toprule
 Model & Code Coverage & Time Taken & Tokens Used & Result \\
@@ -123,8 +123,7 @@ Qwen 1.5 7B & 89.47\% & 6m 9s & 50k & Successful \\
 Qwen 2.5-Coder 32B & 0\% & 43m 20s & 59.8k & Failed \\
 Gemma 3 27B & 0\% & 41m 59s & 73.9k & Failed \\
 \bottomrule
-\end{tabular}%
-}
+\end{tabular}
 \end{table}
 
 This result was counterintuitive. The two best-performing models on yaml-cpp (Qwen 2.5-Coder 32B and Gemma 3 27B) both failed on fmt with 0\% coverage, while smaller models achieved near-perfect coverage. The fmt library has a simpler API surface than yaml-cpp, which may favor models that generate concise, targeted code rather than verbose outputs. This finding reinforces that no single model dominates across all library types.
@@ -135,7 +134,7 @@ This result was counterintuitive. The two best-performing models on yaml-cpp (Qw
 \centering
 \caption{Model Performance on pugixml Library}
 \label{tab:pugixml_results}
-\resizebox{\textwidth}{!}{%
+\small
 \begin{tabular}{lcccc}
 \toprule
 Model & Code Coverage & Time Taken & Tokens Used & Result \\
@@ -143,8 +142,7 @@ Model & Code Coverage & Time Taken & Tokens Used & Result \\
 Qwen 2.5-Coder 32B & 34.77\% & 37m 24s & 43.1k & Successful \\
 Gemma 3 27B & 0\% & 1h 12m 8s & 122k & Failed \\
 \bottomrule
-\end{tabular}%
-}
+\end{tabular}
 \end{table}
 
 On pugixml, Qwen 2.5-Coder 32B achieved 34.77\% coverage, comparable to its yaml-cpp performance (43.08\%). Gemma 3 27B failed entirely despite consuming significantly more tokens (122k vs 40.2k on yaml-cpp), suggesting the XML parsing API posed challenges that the model could not overcome.
@@ -200,7 +198,7 @@ Results showed measurable efficiency improvements:
 \centering
 \caption{LoRA Fine-Tuning Efficiency Improvements}
 \label{tab:lora_efficiency}
-\resizebox{\textwidth}{!}{%
+\small
 \begin{tabular}{lccc}
 \toprule
 Model Version & Time Taken & Tokens Used & Efficiency Improvement \\
@@ -209,8 +207,7 @@ Base 1.5B & 15 min & 112k & Baseline \\
 172 examples & 12 min & 65k & 20\% faster, 42\% fewer tokens \\
 709 examples & 10 min & 50k & 33\% faster, 55\% fewer tokens \\
 \bottomrule
-\end{tabular}%
-}
+\end{tabular}
 \end{table}
 
 With 709 examples, the extended dataset achieved the best results: 33\% faster generation and 55\% fewer tokens compared to the base model. The fine-tuned model learned to generate more concise, targeted code rather than verbose outputs padded with unnecessary boilerplate.
@@ -244,7 +241,7 @@ Based on Azure OpenAI pricing at the time of our experiments:
 \centering
 \caption{Azure OpenAI Cost Projections for Different Usage Levels}
 \label{tab:cost_scenarios}
-\resizebox{\textwidth}{!}{%
+\small
 \begin{tabular}{lcccc}
 \toprule
 Usage Level & Daily Cost & Monthly Cost & Annual Cost & Use Case \\
@@ -254,8 +251,7 @@ Moderate & \texteuro{}0.83 & \texteuro{}18.26 & \texteuro{}219.12 & Small team p
 Heavy & \texteuro{}2.75 & \texteuro{}60.50 & \texteuro{}726.00 & Full enterprise deployment \\
 Enterprise & \texteuro{}5.50 & \texteuro{}121.00 & \texteuro{}1,452.00 & Complete automation \\
 \bottomrule
-\end{tabular}%
-}
+\end{tabular}
 \end{table}
 
 Even at the enterprise level with complete automation, annual costs stay under \texteuro{}1,500. This is minimal compared to alternatives, however, this represents only the direct infrastructure costs.
