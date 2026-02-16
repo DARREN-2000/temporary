@@ -156,7 +156,7 @@ These findings directly address our research questions:
 %%{init: {'theme': 'neutral'}}%%
 xychart-beta
     title "Code Coverage by Model (yaml-cpp)"
-    x-axis ["Gemma 3 27B", "Qwen 32B", "Phi-4 14B", "Yi 34B", "DeepSeek R1", "Mixtral 46.7B"]
+    x-axis ["Gemma 3 27B", "Qwen 2.5-Coder 32B", "Phi-4 14B", "Yi 34B", "DeepSeek R1", "Mixtral 46.7B"]
     y-axis "Line Coverage (%)" 0 --> 50
     bar [45.06, 43.08, 34.26, 0, 0, 0]
 ```
