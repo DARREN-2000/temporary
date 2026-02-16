@@ -153,7 +153,7 @@ These findings directly address our research questions:
 ### Figure 5.1: Model Performance Comparison (yaml-cpp)
 
 ```mermaid
-%%{init: {'theme': 'neutral'}}%%
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4472C4'}}}%%
 xychart-beta
     title "Code Coverage by Model (yaml-cpp)"
     x-axis ["Gemma 3 27B", "Qwen 2.5-Coder 32B", "Phi-4 14B", "Yi 34B", "DeepSeek R1", "Mixtral 46.7B"]
@@ -164,7 +164,7 @@ xychart-beta
 ### Figure 5.2: LoRA Fine-Tuning Efficiency
 
 ```mermaid
-%%{init: {'theme': 'neutral'}}%%
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4472C4'}}}%%
 xychart-beta
     title "Fine-Tuning Impact on 1.5B Model"
     x-axis ["Base Model", "172 Examples", "709 Examples"]
@@ -175,7 +175,7 @@ xychart-beta
 ### Figure 5.3: Annual Cost by Usage Level
 
 ```mermaid
-%%{init: {'theme': 'neutral'}}%%
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4472C4'}}}%%
 xychart-beta
     title "Annual Cost by Usage Level (€)"
     x-axis ["Light", "Moderate", "Heavy", "Enterprise"]
@@ -186,7 +186,7 @@ xychart-beta
 ### Figure 5.4: Cost Comparison (Manual vs LLM)
 
 ```mermaid
-%%{init: {'theme': 'neutral'}}%%
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4472C4', 'secondaryColor': '#90EE90'}}}%%
 pie showData
     title "Annual Cost Comparison (€)"
     "Manual Approach (min 50,000)" : 50000
