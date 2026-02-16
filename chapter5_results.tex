@@ -16,7 +16,7 @@ Choosing appropriate target libraries required careful consideration. We needed 
 
 After evaluating several candidates, we selected yaml-cpp as our primary target. This library parses YAML configuration files, a common task in automotive software where configuration management matters significantly. The library contains 35 source files with 1,061 potential fuzzing candidates identified through cifuzz spark analysis. More importantly, it is well-documented and actively maintained. OSS-Fuzz \cite{OSSFuzzBugs2021} already covers it, which gave us a baseline for comparison. We could measure whether our AI-generated drivers matched, exceeded, or fell short of existing human-written ones.
 
-Additional targets included pugixml, jsoncons, fmt, spdlog, and glm. These provided broader validation, though the detailed analysis focuses on yaml-cpp where we collected the most complete data.
+Additional targets included pugixml, jsoncons, fmt, spdlog, and glm. These provided broader validation across different library types, and results for the top-performing models on these libraries are presented in Section~\ref{sec:results_cross_library}.
 
 
 \subsection{Hardware and Software Configuration}
@@ -97,6 +97,80 @@ Yi 34B demonstrated a fundamental limitation of general-purpose models for speci
 We also tested DeepSeek R1, a reasoning-focused model, outside the original 14-model benchmark. It was designed for reasoning tasks, but in our experiments, that capability did not translate to effective fuzz driver generation. Mixtral's 46.7 billion parameters simply exceeded available hardware resources, we could not even complete a full evaluation run.
 
 A clear pattern emerged: code-specialized models outperformed larger general-purpose models by substantial margins. Size alone does not determine quality for specialized tasks like fuzz driver generation.
+
+
+\subsection{Cross-Library Validation}
+\label{sec:results_cross_library}
+
+To validate whether the yaml-cpp findings generalize to other libraries, we tested the top-performing models on additional C++ targets. Not all models were evaluated on every library due to time constraints, so we focused on the models that showed the most promise.
+
+\textbf{fmt (formatting library):}
+
+The fmt library produced an unexpected result. Smaller models outperformed the larger ones that had succeeded on yaml-cpp.
+
+\begin{table}[htbp]
+\centering
+\caption{Model Performance on fmt Library}
+\label{tab:fmt_results}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+Model & Code Coverage & Time Taken & Tokens Used & Result \\
+\midrule
+Phi-4 14B & 100\% & 12m 8s & 59.8k & Successful \\
+Llama 3 & 100\% & 3m 41s & 27.6k & Successful \\
+Qwen 1.5 7B & 89.47\% & 6m 9s & 50k & Successful \\
+Qwen 2.5-Coder 32B & 0\% & 43m 20s & 59.8k & Failed \\
+Gemma 3 27B & 0\% & 41m 59s & 73.9k & Failed \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+This result was counterintuitive. The two best-performing models on yaml-cpp (Qwen 2.5-Coder 32B and Gemma 3 27B) both failed on fmt with 0\% coverage, while smaller models achieved near-perfect coverage. The fmt library has a simpler API surface than yaml-cpp, which may favor models that generate concise, targeted code rather than verbose outputs. This finding reinforces that no single model dominates across all library types.
+
+\textbf{pugixml (XML processing library):}
+
+\begin{table}[htbp]
+\centering
+\caption{Model Performance on pugixml Library}
+\label{tab:pugixml_results}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+Model & Code Coverage & Time Taken & Tokens Used & Result \\
+\midrule
+Qwen 2.5-Coder 32B & 34.77\% & 37m 24s & 43.1k & Successful \\
+Gemma 3 27B & 0\% & 1h 12m 8s & 122k & Failed \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+On pugixml, Qwen 2.5-Coder 32B achieved 34.77\% coverage, comparable to its yaml-cpp performance (43.08\%). Gemma 3 27B failed entirely despite consuming significantly more tokens (122k vs 40.2k on yaml-cpp), suggesting the XML parsing API posed challenges that the model could not overcome.
+
+\textbf{jsoncons, glm, and spdlog (Qwen 2.5-Coder 32B only):}
+
+\begin{table}[htbp]
+\centering
+\caption{Qwen 2.5-Coder 32B Performance Across Additional Libraries}
+\label{tab:additional_libraries}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+Library & Code Coverage & Time Taken & Tokens Used & Test Cases & Successful Tests \\
+\midrule
+jsoncons & 45.64\% & 37m 24s & 43.1k & 2,500 & 1 \\
+glm & 0\% & 42m 55s & 56.8k & 0 & 0 \\
+spdlog & 0\% & 49m 33s & 62.9k & 0 & 0 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+jsoncons showed the highest coverage of any library we tested (45.64\%), slightly exceeding even yaml-cpp. Both are parsing libraries with similar API patterns, which may explain the consistency. glm (a mathematics library for graphics) and spdlog (a logging library) both produced 0\% coverage, indicating that the models struggled with non-parsing API patterns. Libraries with mathematical or configuration-heavy interfaces appear more challenging for current LLMs.
+
+\textbf{Cross-library summary:} The results show that model performance varies substantially across libraries. Parsing libraries (yaml-cpp, jsoncons, pugixml) consistently produced the best results, while utility libraries (glm, spdlog) were more challenging. Interestingly, library complexity did not always predict difficulty, as fmt's simpler API yielded perfect coverage with smaller models. These findings suggest that API style and documentation quality matter more than library size or domain.
 
 
 \section{Model Optimization Results}
@@ -213,13 +287,15 @@ The experiments produced several clear findings, along with some important cavea
 
 First, model specialization matters more than size. Gemma 3 27B outperformed Yi 34B despite having fewer parameters. Code-specialized models beat larger general-purpose models consistently across our tests.
 
-Second, fine-tuning enables efficient deployment. The fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens compared to the base model, though it still did not match the coverage of larger specialized models.
+Second, performance varies across library types. Parsing libraries (yaml-cpp, jsoncons, pugixml) consistently produced the best coverage results, while utility libraries (glm, spdlog) proved more challenging. The fmt library revealed that smaller models can outperform larger ones on simpler APIs, with Phi-4 14B and Llama 3 achieving 100\% coverage where the larger Qwen 2.5-Coder 32B and Gemma 3 27B both failed.
 
-Third, the economics are favorable, at least on paper. Annual infrastructure costs range from \texteuro{}74 for light usage to \texteuro{}1,452 for full enterprise deployment. For comparison, a full-time security engineer costs \texteuro{}50,000+ annually, though the two are not directly substitutable, the LLM automates initial driver creation while human expertise remains necessary for review and refinement.
+Third, fine-tuning enables efficient deployment. The fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens compared to the base model, though it still did not match the coverage of larger specialized models.
+
+Fourth, the economics are favorable, at least on paper. Annual infrastructure costs range from \texteuro{}74 for light usage to \texteuro{}1,452 for full enterprise deployment. For comparison, a full-time security engineer costs \texteuro{}50,000+ annually, though the two are not directly substitutable, the LLM automates initial driver creation while human expertise remains necessary for review and refinement.
 
 These findings directly address our research questions:
 
-\textbf{RQ1 (Effectiveness)}: Can Large Language Models generate fuzz drivers for C++ code that compile successfully, execute without errors, and achieve meaningful code coverage? Yes, our best models achieved over 40\% coverage on yaml-cpp, with drivers that compiled and executed correctly. We consider 40\%+ coverage ``meaningful'' because it represents automated baseline coverage that would otherwise require 2 to 8 hours of manual engineering per target. While this falls short of expert human-written drivers (60 to 80\% coverage), the value lies in automation at scale, not matching human experts.
+\textbf{RQ1 (Effectiveness)}: Can Large Language Models generate fuzz drivers for C++ code that compile successfully, execute without errors, and achieve meaningful code coverage? Yes, our best models achieved over 40\% coverage on yaml-cpp and up to 100\% on fmt, with drivers that compiled and executed correctly. Cross-library testing (Section~\ref{sec:results_cross_library}) confirmed these results generalize to other parsing libraries like jsoncons (45.64\%) and pugixml (34.77\%), though performance on non-parsing libraries was more variable. We consider 34 to 45\% coverage ``meaningful'' because it represents automated baseline coverage that would otherwise require 2 to 8 hours of manual engineering per target. While this falls short of expert human-written drivers (60 to 80\% coverage), the value lies in automation at scale, not matching human experts.
 
 \textbf{RQ2 (Optimization)}: Does model size determine fuzz driver quality, or can smaller models with domain-specific training match or exceed larger general-purpose models? Smaller specialized models consistently outperformed larger general-purpose models. Fine-tuning further improved efficiency, though not coverage.
 

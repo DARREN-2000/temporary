@@ -80,14 +80,7 @@ cmake_minimum_required(VERSION 3.10...3.22)
 cmake_policy(VERSION 3.10...3.22)
 \end{lstlisting}
 
-The LLM-assisted fuzzing workflow, conceptually introduced in Chapter 3, is illustrated in Figure~\ref{fig:llm_fuzzing_workflow}. This workflow demonstrates how LLMs integrate into the fuzzing pipeline to automatically generate test cases from source code. Our implementation uses cifuzz spark to handle the integration between the LLM backends (either local models via Ollama or Azure OpenAI) and the libFuzzer execution environment.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{LLM_fuzzing_workflow.jpg}
-\caption{LLM-Assisted Fuzzing Workflow}
-\label{fig:llm_fuzzing_workflow}
-\end{figure}
+The LLM-assisted fuzzing workflow, conceptually introduced in Chapter 3, demonstrates how LLMs integrate into the fuzzing pipeline to automatically generate test cases from source code. Our implementation uses cifuzz spark to handle the integration between the LLM backends (either local models via Ollama or Azure OpenAI) and the libFuzzer execution environment.
 
 \section{Phase 1: Local LLM Evaluation Setup}
 \label{sec:impl_phase1}
@@ -403,14 +396,7 @@ jobs:
             -T ${PROJ_NAME}_corpus.gz "${ARTIFACTORY_CORPUS_URL}${PROJ_NAME}_corpus.gz"
 \end{lstlisting}
 
-Our pipeline includes corpus persistence through JFrog Artifactory. Each run downloads the previous corpus, runs fuzzing to extend it, and uploads the updated corpus. This way, coverage improvements accumulate over time rather than starting fresh each build. The overall CI/CD pipeline architecture is illustrated in Figure~\ref{fig:cicd_pipeline}.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{cicd.png}
-\caption{CI/CD Pipeline Architecture for LLM-Assisted Fuzzing}
-\label{fig:cicd_pipeline}
-\end{figure}
+Our pipeline includes corpus persistence through JFrog Artifactory. Each run downloads the previous corpus, runs fuzzing to extend it, and uploads the updated corpus. This way, coverage improvements accumulate over time rather than starting fresh each build.
 
 The network architecture required for this deployment is illustrated in Figure~\ref{fig:enterprise_network} (Chapter 6). As discussed in the subsequent Discussion chapter, the Azure Private Link setup enables secure communication between the CARIAD internal network and Azure OpenAI services, bypassing the restrictions of the corporate firewall while maintaining security compliance. This architectural solution became the critical enabler for enterprise deployment.
 
