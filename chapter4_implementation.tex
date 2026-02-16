@@ -194,7 +194,7 @@ We created two datasets:
 
 These examples included drivers for libraries like FreeType, LibPNG, SQLite, and zlib, covering a range of API styles from simple functions to complex object-oriented interfaces. We deliberately included diverse examples to help the model generalize rather than memorize specific patterns.
 
-Quality control was important. We manually reviewed a sample of the extracted drivers to ensure they were actually functional and not stub implementations. About 15\% of initially extracted drivers were discarded because they were incomplete or contained obvious errors.
+Quality control was important. We manually reviewed a sample of the extracted drivers to verify they were actually functional and not stub implementations. About 15\% of initially extracted drivers were discarded because they were incomplete or contained obvious errors.
 
 \subsection{LoRA Configuration and Training}
 
@@ -248,7 +248,7 @@ Phase 3 focused on deploying the validated approach from Phases 1 and 2 into CAR
 
 \subsection{Architectural Challenges}
 
-Our initial integration strategy appeared straightforward. The working local pipeline used standard Linux tools, and enterprise runners operated in similar environments. However, enterprise network security policies created barriers that required significant architectural redesign.
+Our initial integration strategy appeared simple in concept. The working local pipeline used standard Linux tools, and enterprise runners operated in similar environments. However, enterprise network security policies created barriers that required significant architectural redesign.
 
 \textbf{Challenge 1: Network Isolation}
 
@@ -396,7 +396,7 @@ jobs:
             -T ${PROJ_NAME}_corpus.gz "${ARTIFACTORY_CORPUS_URL}${PROJ_NAME}_corpus.gz"
 \end{lstlisting}
 
-Our pipeline includes corpus persistence through JFrog Artifactory. Each run downloads the previous corpus, runs fuzzing to extend it, and uploads the updated corpus. This ensures coverage improvements accumulate over time rather than starting fresh each build.
+Our pipeline includes corpus persistence through JFrog Artifactory. Each run downloads the previous corpus, runs fuzzing to extend it, and uploads the updated corpus. This way, coverage improvements accumulate over time rather than starting fresh each build.
 
 The network architecture required for this deployment is illustrated in Figure~\ref{fig:enterprise_network} (Chapter 6). As discussed in the subsequent Discussion chapter, the Azure Private Link setup enables secure communication between the CARIAD internal network and Azure OpenAI services, bypassing the restrictions of the corporate firewall while maintaining security compliance. This architectural solution became the critical enabler for enterprise deployment.
 

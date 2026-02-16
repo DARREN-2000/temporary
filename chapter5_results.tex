@@ -60,13 +60,13 @@ That said, these numbers require context. While 45\% coverage represents substan
 
 Phi-4 14B showed lower coverage at 34.26\% despite generating more unique test cases (2,220 vs 2,050). It required significantly more tokens, 71.5k compared to Gemma's 40.2k, making it far less efficient for production use. More test cases do not necessarily mean better coverage.
 
-The comparative performance of these models is visualized in Figure \ref{fig:model_comparison}, which clearly shows Gemma 3 27B and Qwen 2.5-Coder 32B achieving similar coverage levels (45\% and 43\% respectively), while Phi-4 14B achieved 34\% and general-purpose models like Yi 34B completely failed with 0\% coverage.
+The comparative performance of these models is visualized in Figure \ref{fig:model_comparison}, which shows code coverage results across the evaluated models, with Gemma 3 27B and Qwen 2.5-Coder 32B achieving the highest coverage levels (45\% and 43\% respectively), Phi-4 14B at 34\%, and general-purpose models like Yi 34B, DeepSeek R1, and Mixtral 46.7B failing to achieve any coverage.
 
 \begin{figure}[htbp]
 \centering
 \caption{Code Coverage by Model (yaml-cpp)}
 \label{fig:model_comparison}
-\fbox{\parbox{\linewidth}{\textit{Note: This diagram should be rendered from the Mermaid chart using Mermaid Live Editor (https://mermaid.live) and inserted as a PDF or PNG image. The chart shows a bar graph comparing code coverage percentages for Gemma 3 27B (45.06\%), Qwen 32B (43.08\%), Phi-4 14B (34.26\%), and Yi 34B (0\%).}}}
+\fbox{\parbox{\linewidth}{\textit{Note: This diagram should be rendered from the Mermaid chart using Mermaid Live Editor (https://mermaid.live) and inserted as a PDF or PNG image. The chart shows a bar graph comparing code coverage percentages for Gemma 3 27B (45.06\%), Qwen 2.5-Coder 32B (43.08\%), Phi-4 14B (34.26\%), Yi 34B (0\%), DeepSeek R1 (0\%), and Mixtral 46.7B (0\%). Only three of the fourteen evaluated models achieved measurable code coverage. The remaining models either produced non-functional drivers (Yi 34B, DeepSeek R1) or could not complete evaluation due to hardware constraints (Mixtral 46.7B). Additional unsuccessful models are discussed in Section~5.2.2 and Table~5.2.}}}
 \end{figure}
 
 

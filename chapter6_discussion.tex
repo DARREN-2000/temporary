@@ -57,7 +57,7 @@ The architecture of this solution is illustrated in Figure \ref{fig:enterprise_n
 \end{itemize}}}}
 \end{figure}
 
-Setting up Private Link required organizational coordination. Approval processes, security reviews, configuration testing, and documentation all added time. The technical configuration itself was straightforward once approvals were obtained, requiring approximately one month from initial request to operational deployment.
+Setting up Private Link required organizational coordination. Approval processes, security reviews, configuration testing, and documentation all added time. The technical configuration itself was not complex once approvals were obtained, requiring approximately one month from initial request to operational deployment.
 
 This experience provided an important insight about AI deployment in enterprise environments. The machine learning challenges are often less complex than the infrastructure requirements. Corporate IT infrastructure, security policies, and approval processes create friction that academic research rarely addresses. Anyone planning to deploy LLM-based tools in large organizations should budget significant time for infrastructure integration beyond the technical implementation. Based on our experience, organizations should allocate 2 to 3 months for enterprise integration even when the core technology is proven.
 
@@ -104,7 +104,7 @@ Beyond the primary questions, our work revealed answers to questions we did not 
 
 \textbf{What types of libraries are best suited for LLM-generated fuzz drivers?}
 
-Our experiments across multiple repositories showed that simpler APIs with clear documentation produced better drivers. Libraries with extensive header comments, consistent function signatures, and straightforward data types yielded higher success rates. Complex APIs with heavy template usage, intricate callback patterns, or implicit preconditions produced more failures.
+Our experiments across multiple repositories showed that simpler APIs with clear documentation produced better drivers. Libraries with extensive header comments, consistent function signatures, and simple data types yielded higher success rates. Complex APIs with heavy template usage, intricate callback patterns, or implicit preconditions produced more failures.
 
 yaml-cpp fell in the middle range. Its parsing APIs are reasonably well documented, but the YAML specification itself introduces complexity. Libraries like RapidJSON, with simpler JSON parsing interfaces, showed slightly better results in our limited testing.
 
