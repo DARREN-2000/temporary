@@ -417,14 +417,15 @@ Azure OpenAI charges per token. Each fuzz driver generation uses approximately 3
 \toprule
 Scenario & Targets & Builds/Day & Annual Tokens & Annual Cost \\
 \midrule
-Light & 5 & 1 & 3.1M & \texteuro{}73 \\
-Medium & 10 & 2 & 12.5M & \texteuro{}400 \\
-Heavy & 25 & 5 & 78M & \texteuro{}1,452 \\
+Light & 5 & 1 & 3.1M & \texteuro{}74 \\
+Moderate & 10 & 2 & 12.5M & \texteuro{}219 \\
+Heavy & 25 & 5 & 78M & \texteuro{}726 \\
+Enterprise & 50 & 10 & 156M & \texteuro{}1,452 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-These costs are low in absolute terms. For context, the heavy usage scenario represents a fraction of a security engineer's annual salary. However, the LLM-generated drivers supplement rather than replace expert security engineering work, so this comparison captures only the infrastructure cost component. A detailed economic analysis including human oversight costs appears in Chapter 5.
+These costs are low in absolute terms. For context, even the enterprise usage scenario represents a fraction of a security engineer's annual salary. However, the LLM-generated drivers supplement rather than replace expert security engineering work, so this comparison captures only the infrastructure cost component. A detailed economic analysis including human oversight costs appears in Chapter 5.
 
 \textbf{Failure Handling}
 
