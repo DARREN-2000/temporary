@@ -1,0 +1,343 @@
+% ============================================================================
+% CONSISTENCY GUIDE: Changes needed in Chapters 1-3
+% to match the conventions used in Chapters 4-6
+% ============================================================================
+%
+% This document lists every change needed in the initial draft (Chapters 1-3)
+% so that the full thesis reads as one continuous, consistent document.
+%
+% Priority levels:
+%   [MUST]   = Will cause confusion or inconsistency if not fixed
+%   [SHOULD] = Improves quality and consistency
+%   [NICE]   = Minor polish, optional
+%
+% ============================================================================
+
+% ============================================================================
+% 1. CONTRACTIONS — Remove ALL contractions
+% Priority: [MUST]
+% ============================================================================
+%
+% Ch4-6 use ZERO contractions. Ch1-3 uses many.
+% A professor will notice the sudden shift from informal to formal.
+%
+% Search and replace in Ch1-3:
+%   "isn't"     → "is not"
+%   "don't"     → "do not"
+%   "can't"     → "cannot"
+%   "won't"     → "will not"
+%   "didn't"    → "did not"
+%   "doesn't"   → "does not"
+%   "shouldn't" → "should not"
+%   "wouldn't"  → "would not"
+%   "it's"      → "it is" (when meaning "it is") or "its" (when possessive)
+%   "there's"   → "there is"
+%   "that's"    → "that is"
+%   "we've"     → "we have"
+%   "they're"   → "they are"
+%   "we're"     → "we are"
+%   "haven't"   → "have not"
+%   "wasn't"    → "was not"
+%   "weren't"   → "were not"
+%   "couldn't"  → "could not"
+%
+% Exception: Keep contractions inside code listings (lstlisting blocks)
+
+% ============================================================================
+% 2. DASHES — Remove ALL em-dashes and en-dashes from text
+% Priority: [MUST]
+% ============================================================================
+%
+% Ch4-6 use ZERO dashes in running text.
+% Ch1-3 may have em-dashes (---) or en-dashes (--) in prose.
+%
+% Replace:
+%   "word --- word" → "word, word" (use comma instead of em-dash)
+%   "word -- word"  → "word, word" (use comma instead of en-dash)
+%   "X--Y" (number ranges) → "X to Y" (write out "to")
+%
+% Keep dashes ONLY in:
+%   - Code listings (e.g., --flag, --option)
+%   - URLs
+%   - LaTeX commands
+
+% ============================================================================
+% 3. SEMICOLONS AND COLONS — Replace with commas
+% Priority: [MUST]
+% ============================================================================
+%
+% Ch4-6 use ZERO semicolons or mid-sentence colons in running text.
+% Ch1-3 likely uses some.
+%
+% Replace:
+%   "sentence; sentence" → "sentence, sentence" (or restructure)
+%   "concept: explanation" → "concept, explanation" (mid-sentence colons)
+%
+% Keep colons ONLY in:
+%   - Section/subsection titles (e.g., "Phase 1: Local Development")
+%   - Bold labels (e.g., \textbf{RQ1}: ...)
+%   - List item labels (e.g., \item \textbf{Tool}: Description)
+%   - Code listings
+%   - URLs
+
+% ============================================================================
+% 4. AI-FLAGGED WORDS — Remove or replace
+% Priority: [MUST]
+% ============================================================================
+%
+% Ch4-6 have ZERO instances of these words.
+% Search Ch1-3 and replace any found:
+%
+%   "straightforward" → "simple" or "direct" or remove
+%   "ensure"          → "verify" or "confirm" or "check"
+%   "significant"     → use sparingly (max 1-2 per chapter)
+%   "substantial"     → "large" or "extensive" or "wide"
+%   "comprehensive"   → "thorough" or "complete" or "full"
+%   "fundamental"     → "core" or "basic" or "central"
+%   "leverage"        → "use" or "apply"
+%   "utilize"         → "use"
+%   "robust"          → "reliable" or "strong"
+%   "paradigm"        → "approach" or "model"
+%   "delve"           → "examine" or "explore"
+%   "interestingly"   → remove or rephrase
+%   "notably"         → remove or rephrase
+%   "importantly"     → remove or rephrase
+%   "furthermore"     → remove or start new sentence
+%   "moreover"        → remove or start new sentence
+%   "additionally"    → remove or start new sentence
+%   "optimal"         → "best" or "right" or "suitable"
+%   "intricate"       → "complex" or "detailed"
+%
+% Also avoid:
+%   "it is worth noting that" → remove, state the fact directly
+%   "it is important to note" → remove, state the fact directly
+%   "in order to"             → "to"
+
+% ============================================================================
+% 5. MODEL NAMES — Use consistent naming
+% Priority: [MUST]
+% ============================================================================
+%
+% Ch4-6 use these exact model names. Update Ch1-3 to match:
+%
+%   Gemma 3 27B           (not "Gemma 27B" or "Gemma-3-27B")
+%   Qwen 2.5-Coder 32B   (not "Qwen 32B" or "Qwen2.5-Coder-32B")
+%   Phi-4 14B             (not "Phi 14B" or "Phi-4-14B" or "Phi 4 3.8B")
+%   DeepSeek-Coder-V2-Lite 16B
+%   DeepSeek-Coder 33B
+%   DeepSeek R1
+%   Yi 34B
+%   Mixtral 8x7B 46.7B   (mention "46.7B total, 12.9B active parameters")
+%   WizardCoder 34B
+%   CodeLlama 34B
+%   Qwen 2.5-Coder 14B
+%   Qwen 2.5-Coder 7B
+%   Qwen 2.5-Coder 1.5B
+%   Gemma 3 4B
+%   Gemma 3 9B
+%
+% If Ch1-3 mentions model counts, it should say "14 models"
+
+% ============================================================================
+% 6. TOOL NAMES — Use consistent naming with citations
+% Priority: [SHOULD]
+% ============================================================================
+%
+% Ch4-6 cite all tools on first mention. Ch1-3 should do the same:
+%
+%   AFL++ \cite{AFLPlusPlus}
+%   libFuzzer \cite{LibFuzzer2015}
+%   cifuzz \cite{cifuzz}
+%   Ollama \cite{ollama}
+%   Azure OpenAI \cite{azure_openai}
+%   Buildah \cite{buildah}
+%   AddressSanitizer (ASan)
+%   UndefinedBehaviorSanitizer (UBSan)
+%
+% Expand abbreviations on first use:
+%   "ASan" → "AddressSanitizer (ASan)" on first mention
+%   "UBSan" → "UndefinedBehaviorSanitizer (UBSan)" on first mention
+%   "AUTOSAR" → "AUTomotive Open System ARchitecture (AUTOSAR)" on first mention
+%   "MISRA" → "Motor Industry Software Reliability Association (MISRA)" on first mention
+
+% ============================================================================
+% 7. NUMBERS AND PERCENTAGES — Use consistent formatting
+% Priority: [SHOULD]
+% ============================================================================
+%
+% Ch4-6 conventions:
+%   - Coverage percentages: one decimal place (45.06\%, 43.08\%, 34.26\%)
+%   - Cost figures: Euro symbol with comma thousands (€1,452)
+%   - Token counts: comma-separated (43,100 tokens) or with "k" (43.1k)
+%   - Time: written out (37 minutes, 1 hour 12 minutes)
+%   - Model count: "14" (numeral, not "fourteen")
+%   - Small numbers in text: use numerals for technical values, words for general
+%   - Number ranges: "X to Y" (not "X-Y" or "X--Y")
+%
+% Update Ch1-3 to follow same conventions
+
+% ============================================================================
+% 8. LaTeX FORMATTING — Use consistent commands
+% Priority: [SHOULD]
+% ============================================================================
+%
+% Ch4-6 conventions:
+%   - Non-breaking spaces: Table~\ref{}, Figure~\ref{}, Section~\ref{}
+%     (never "Table \ref{}" with a regular space)
+%   - Memory sizes: 20~GB, 16~GB (tilde for non-breaking space)
+%   - Code inline: \texttt{code} for file names, commands, paths
+%   - Emphasis: \textbf{} for key terms on first introduction
+%   - Lists: \begin{itemize} with \item entries
+%   - Tables: \begin{table}[htbp] with \centering
+%   - All tables use either \small or \resizebox{\textwidth}{!}{}
+%     (use \small for tables with fewer than 6 columns,
+%      use \resizebox for tables with 6+ columns or long text)
+
+% ============================================================================
+% 9. CITATION KEYS — Use matching keys from literature.bib
+% Priority: [MUST]
+% ============================================================================
+%
+% If Ch1-3 has any \cite{} commands, verify the keys match literature.bib.
+% Current valid keys in literature.bib:
+%
+%   Miller1990, AFL, AFLPlusPlus, LibFuzzer2015, SAGE2008,
+%   DeepXplore2017, NeuFuzz2019, MLFuzzReview2020, FuzzSurvey2018,
+%   ChatAFL2024, HGFuzzer2024, TitanFuzz2023, FuzzGPT2024,
+%   LLM4Fuzz2024, CodaMosa2023, SBFT2024, PromptFuzz2024,
+%   ISO21434, ISO26262, UNECE_R155, AUTOSAR2022, FuzzBench2021,
+%   ContinuousDelivery2010, SandiaFuzzing2007, DevSecOps2020,
+%   Broy2006, DESTINA2024, cifuzz, autosar, azure_openai,
+%   azure_private_link, ollama, gpt4, llm4fuzz, efficient_finetuning,
+%   buildah
+%
+% Any citation key in Ch1-3 not in this list needs to be either:
+%   (a) added to literature.bib, or
+%   (b) changed to match an existing key
+
+% ============================================================================
+% 10. CONTROVERSIAL LANGUAGE — Check and neutralize
+% Priority: [MUST]
+% ============================================================================
+%
+% Ch4-6 follow strict rules about controversial content.
+% Apply same rules to Ch1-3:
+%
+% DO NOT use:
+%   - Language criticizing CARIAD (no "barriers", "obstacles", "limitations")
+%   - Language criticizing any tool (no "failed", "broken", "buggy")
+%   - Salary or compensation data
+%   - Comparisons that imply one company/tool is inferior
+%   - "conservative" when describing processes or cultures
+%   - "bureaucratic" or "slow" about approval processes
+%
+% DO use:
+%   - Neutral framing: "required additional configuration"
+%   - Factual descriptions: "the process took one month"
+%   - Positive framing: "security policies that govern..."
+%   - "did not produce" instead of "failed to produce"
+%   - "encountered" instead of "struggled with"
+
+% ============================================================================
+% 11. PHASE NAMES — Align with Ch4 implementation phases
+% Priority: [SHOULD]
+% ============================================================================
+%
+% Ch3 methodology defines phases as:
+%   "Phase 1: Baseline Assessment"
+%   "Phase 2: Model Evaluation"
+%   "Phase 3: Fine-tuning"
+%
+% Ch4 implements these as:
+%   "Phase 1: Local Development Environment"
+%   "Phase 2: Cloud Integration with Azure OpenAI"
+%   "Phase 3: LoRA Fine-tuning"
+%
+% Ch4 already has a bridging sentence explaining the mapping.
+% If Ch3 can be edited, consider adding a forward reference:
+%   "These methodology phases are implemented in Chapter 4 as
+%    local development, cloud integration, and LoRA fine-tuning."
+%
+% Alternatively, just make sure Ch3's phase descriptions are
+% compatible with what Ch4 actually describes.
+
+% ============================================================================
+% 12. LIBRARY NAMES — Use consistent naming
+% Priority: [SHOULD]
+% ============================================================================
+%
+% Ch4-6 use these exact library names:
+%   yaml-cpp (primary target)
+%   fmt
+%   pugixml
+%   jsoncons
+%   glm
+%   spdlog
+%
+% Ch3 mentions "25 open-source C/C++ libraries"
+% If Ch3 lists specific libraries, make sure names match exactly.
+
+% ============================================================================
+% 13. KEY NUMBERS TO KEEP CONSISTENT
+% Priority: [MUST]
+% ============================================================================
+%
+% These numbers appear in Ch4-6 and must match Ch1-3:
+%
+%   14 models evaluated
+%   6 target libraries (yaml-cpp, fmt, pugixml, jsoncons, glm, spdlog)
+%   25 open-source C/C++ repositories (initial corpus)
+%   709 prompt-response pairs (Qwen fine-tuning dataset)
+%   172 prompt-response pairs (Gemma fine-tuning dataset)
+%   45.06\% coverage (Gemma 3 27B on yaml-cpp)
+%   43.08\% coverage (Qwen 2.5-Coder 32B on yaml-cpp)
+%   34.26\% coverage (Phi-4 14B on yaml-cpp)
+%   33\% coverage improvement from fine-tuning (Qwen 32B)
+%   55\% coverage improvement from fine-tuning (Gemma 27B)
+%   5 months project duration (May to September)
+%   1 month for Azure Private Link setup
+%   Apple M1 Pro with 16 GB unified memory
+%   €0.20 per 1,000 tokens (Azure OpenAI pricing)
+%   Cost tiers: Light €74, Moderate €219, Heavy €726, Enterprise €1,452
+%
+% If Ch1 abstract mentions any of these numbers, they must match exactly.
+
+% ============================================================================
+% 14. SENTENCE PATTERNS TO AVOID
+% Priority: [NICE]
+% ============================================================================
+%
+% Ch4-6 avoid these patterns. Apply to Ch1-3 as well:
+%
+%   - Sentences starting with "It is" (passive, AI-like)
+%   - Multiple consecutive sentences starting with "The"
+%   - Sentences starting with "This is" without a clear referent
+%   - Overly long sentences (break at 40+ words)
+%   - One-sentence paragraphs (combine with neighbors or expand)
+%
+% Preferred patterns (matching Ch4-6 style):
+%   - Start with subject: "We evaluated...", "The model produced..."
+%   - Vary sentence openers: "After...", "During...", "To achieve..."
+%   - Use first person plural: "We found...", "Our results show..."
+
+% ============================================================================
+% SUMMARY CHECKLIST
+% ============================================================================
+%
+% Before submitting Ch1-3, verify:
+%
+% [ ] Zero contractions in running text
+% [ ] Zero em-dashes (---) or en-dashes (--) in running text
+% [ ] Zero semicolons in running text
+% [ ] Zero mid-sentence colons (keep only in labels/titles)
+% [ ] Zero AI-flagged words (straightforward, ensure, leverage, etc.)
+% [ ] All model names match Ch4-6 naming exactly
+% [ ] All tool names cited on first mention
+% [ ] All citation keys present in literature.bib
+% [ ] All numbers match Ch4-6 exactly (14 models, 45.06\%, etc.)
+% [ ] No controversial language about CARIAD or any tools
+% [ ] Phase names compatible with Ch4 implementation
+% [ ] Figure/Table references use non-breaking space (~)
+% [ ] Consistent "we" usage throughout
+
+\endinput
