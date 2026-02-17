@@ -197,9 +197,9 @@ Modern AI services typically operate as cloud APIs. Organizations call external 
 
 Large enterprises, particularly in regulated industries, operate on the assumption that internal networks are isolated from the internet. Data stays inside the perimeter. External services are accessed through carefully controlled gateways. This security model continues to evolve as cloud computing and AI services become integral to enterprise operations.
 
-Aligning AI deployment requirements with enterprise security models requires thoughtful architecture. Teams adopting AI tools must work with infrastructure teams to establish compliant access paths, which involves standard enterprise provisioning timelines.
+We found that aligning AI deployment requirements with enterprise security models requires thoughtful architecture. Teams adopting AI tools must work with infrastructure teams to establish compliant access paths, which involves standard enterprise provisioning timelines.
 
-We see several responses to this challenge:
+We see several responses to this challenge in the broader industry:
 
 \textbf{Private deployment of models.} Running models on internal infrastructure avoids external network traffic entirely. This works for smaller models but requires large compute resources for larger ones. Our local experiments used a workstation with unified memory shared between CPU and GPU, which defines the range of supported model sizes. Organizations must weigh infrastructure costs (hardware, maintenance, power) against API costs when choosing deployment approaches.
 
@@ -261,18 +261,18 @@ The practical impact extends beyond academic contribution. CARIAD can deploy the
 
 This work began with a direct question, can Large Language Models automate fuzz driver generation for automotive software? After five months of research, implementation, and deployment effort at CARIAD (May to September 2025), the answer is a qualified yes.
 
-The qualification matters. Not all models work. General-purpose models, even large ones, frequently did not produce usable output for this task. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is not a secondary consideration, it is a critical design decision.
+This qualification matters. Not all models work. General-purpose models, even large ones, frequently did not produce usable output for this task. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is not a secondary consideration, it is a critical design decision.
 
 Fine-tuning small models proved more effective than expected. Our LoRA adapted 1.5B model achieved measurable efficiency gains (detailed in Chapter 5) while producing usable fuzz drivers. For organizations with compute constraints or cost sensitivity, this approach deserves consideration.
 
 An important finding was the role of infrastructure. We expected the primary focus to be generating good code. In practice, a large portion of the project timeline was spent on deploying our solution within the corporate network architecture. Initial approaches including proxy configuration, boundary client integration, and container networking were iteratively refined to align with the enterprise network architecture. The solution ultimately required organizational support for Azure Private Link architecture.
 
-The economics strongly favor adoption. As shown in Chapter 5, LLM-assisted fuzzing represents a modest investment relative to typical automotive development budgets. The value comes from scaling security testing to match code production rates that manual approaches cannot achieve.
+Economically, adoption is well supported. As shown in Chapter 5, LLM-assisted fuzzing represents a modest investment relative to typical automotive development budgets. The value comes from scaling security testing to match code production rates that manual approaches cannot achieve.
 
 Looking forward, LLM-assisted security testing will likely become standard practice in automotive software development. The technology works well enough today for practical deployment. It will improve as models advance and deployment patterns mature. Organizations that develop expertise now will be better positioned as the technology evolves.
 
 For CARIAD specifically, this work establishes a foundation for expanded deployment. The architecture can accommodate additional target libraries. The cost model supports scaling. The infrastructure patterns can replicate across teams.
 
-The broader lesson extends beyond fuzzing. Automotive software development faces a core scaling problem. Code complexity grows faster than team sizes. AI-assisted tools offer a path to maintain quality at scale. Fuzz driver generation is one application of this principle. Others will follow.
+More broadly, our findings extend beyond fuzzing. Automotive software development faces a core scaling problem. Code complexity grows faster than team sizes. AI-assisted tools offer a path to maintain quality at scale. Fuzz driver generation is one application of this principle. Others will follow.
 
 A critical insight from this research is that infrastructure integration complexity often exceeds the technical challenges of the core technology. While specific components like Azure Private Link required approximately one month for deployment, the complete enterprise integration followed standard organizational workflows for evaluation, approval, infrastructure provisioning, testing, and documentation. Organizations planning similar deployments should allocate 2 to 3 months for the full integration process and plan time commensurate with their security policy complexity.
