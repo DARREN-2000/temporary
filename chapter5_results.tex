@@ -106,7 +106,7 @@ To validate whether the yaml-cpp findings generalize to other libraries, we test
 
 \textbf{fmt (formatting library):}
 
-The fmt library produced an unexpected result. Smaller models outperformed the larger ones that had succeeded on yaml-cpp. We attribute this to fmt's simpler, template-based API surface, which uses well-documented formatting functions with straightforward input/output patterns, making it easier for smaller models to generate correct drivers. In addition to the 14 models from our primary benchmark, we tested Llama 3 and Qwen 1.5 7B on fmt to broaden coverage across model families.
+The fmt library produced an unexpected result. Smaller models outperformed the larger ones that had succeeded on yaml-cpp. We attribute this to fmt's simpler, template-based API surface, which uses well-documented formatting functions with clear input/output patterns, making it easier for smaller models to generate correct drivers. In addition to the 14 models from our primary benchmark, we tested Llama 3 and Qwen 1.5 7B on fmt to broaden coverage across model families.
 
 \begin{table}[htbp]
 \centering
