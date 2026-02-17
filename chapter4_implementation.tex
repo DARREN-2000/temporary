@@ -48,7 +48,7 @@ A token limit of 40,000 was necessary because fuzz driver generation requires su
 
 \subsection{Development Environment}
 
-Local development happened on a MacBook Pro with an M1 Pro chip. This created some challenges. Docker Desktop had performance issues on Apple Silicon, so we switched to Podman. Podman provided better Linux container compatibility, which mattered because the enterprise CI/CD runners used Linux.
+Local development happened on a MacBook Pro with an M1 Pro chip. For improved Linux container compatibility on Apple Silicon, we chose Podman as our container runtime. Podman aligned well with the enterprise CI/CD runners, which also used Linux.
 
 \begin{lstlisting}[language=bash, caption={Podman Setup on macOS}]
 brew install podman
@@ -56,7 +56,7 @@ podman machine init --cpus 4 --memory 8192
 podman machine start
 \end{lstlisting}
 
-Transitioning from Docker to Podman required some adaptation. Several scripts assumed Docker-specific behavior, requiring approximately one week to debug container networking issues before achieving reliable operation.
+Transitioning from Docker to Podman required adapting several scripts to account for differences in container networking behavior.
 
 For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah \cite{buildah} instead of Docker for container operations. Buildah is daemonless, which fits better with security policies that restrict long-running processes.
 
@@ -248,25 +248,25 @@ Phase 3 focused on deploying the validated approach from Phases 1 and 2 into CAR
 
 \subsection{Architectural Challenges}
 
-Our initial integration strategy appeared simple in concept. The working local pipeline used standard Linux tools, and enterprise runners operated in similar environments. However, enterprise network security policies created barriers that required significant architectural redesign.
+Our initial integration strategy appeared simple in concept. The working local pipeline used standard Linux tools, and enterprise runners operated in similar environments. However, the enterprise network security policies required careful architectural planning to maintain compliance.
 
 \textbf{Challenge 1: Network Isolation}
 
-CARIAD operates with a zero-trust security model. CI/CD runners cannot access the public internet by default. Every external connection requires explicit approval. While this is appropriate for security, it creates challenges for AI integration.
+CARIAD operates with a zero-trust security model. CI/CD runners are isolated from the public internet, and external connections require explicit approval. Integrating cloud-based AI services within this security framework required a tailored architectural approach.
 
-Our initial pipeline tried to call Azure OpenAI during the build. The request never reached the Azure endpoint. It was blocked by the firewall before leaving the network.
+Our initial pipeline configuration did not account for the network isolation requirements. The Azure OpenAI requests were routed through the corporate firewall, which, as expected in a zero-trust environment, did not permit direct external API access.
 
-The error message was cryptic:
+The resulting error message required investigation to diagnose:
 \begin{lstlisting}
 Error: fatal: unable to access 'https://git.hub.vwgroup.com/...': 
 Failed to connect to 127.0.0.1 port 9000 after 0 ms: Couldn't connect to server
 \end{lstlisting}
 
-We spent considerable time investigating this. The proxy configuration we set for Azure was interfering with internal Git operations. The runner was trying to send Git traffic through a proxy that was not configured for that purpose.
+Investigation revealed that the proxy configuration intended for Azure was inadvertently affecting internal Git operations. The runner was trying to send Git traffic through a proxy that was not configured for that purpose.
 
 \textbf{Challenge 2: Container Networking}
 
-Runners use Buildah containers for isolation. Each build step runs inside a container with its own network namespace. Even if the host could reach external services, the container might not be able to.
+Runners use Buildah containers for isolation. Each build step runs in its own network namespace, providing strong security boundaries. External service access must be explicitly configured at the container level.
 
 We tried several approaches:
 
@@ -296,11 +296,11 @@ buildah run \
   /usr/bin/bash -c "cd /project/build && cifuzz spark target_name"
 \end{lstlisting}
 
-Each environment variable had to be passed explicitly. Missing one caused silent failures where the LLM call would not execute but the pipeline continued without clear error messages.
+Each environment variable had to be passed explicitly. Careful validation of the configuration was necessary, as the pipeline did not halt on missing LLM credentials.
 
 \subsection{Self-Hosted Runner Solution}
 
-After extended investigation of network issues, we concluded that the standard enterprise firewall configuration would not allow direct Azure OpenAI access. The solution required infrastructure changes that needed coordination with the infrastructure team.
+Following our investigation, we determined that direct Azure OpenAI access required a network architecture aligned with the enterprise security model. We collaborated with the infrastructure team to implement an appropriate solution.
 
 \textbf{Azure Private Link Architecture}
 
@@ -308,7 +308,7 @@ Our approved solution used Azure Private Link \cite{azure_private_link}. This cr
 
 From the runner's perspective, the Azure OpenAI endpoint has an internal IP address. The firewall allows internal traffic, so the LLM calls succeed.
 
-Setting up Private Link required coordination with the infrastructure team. The process took approximately one month:
+Setting up Private Link involved coordination with the infrastructure team, following the organization's established approval workflow:
 
 \begin{enumerate}
     \item Request submission with business justification
