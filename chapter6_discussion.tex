@@ -22,7 +22,7 @@ Qwen 2.5-Coder succeeded because it was trained specifically on code generation 
 
 The LoRA fine-tuning results reinforced this insight. A small 1.5 billion parameter model, after adaptation on high-quality OSS-Fuzz drivers, produced outputs matching the quality of much larger models while using far fewer resources. Specialized knowledge compensated for reduced parameter count.
 
-These findings challenge a common assumption in AI deployment. Organizations often select the largest model available, assuming more parameters means better results. Our data suggests this does not hold for specialized code generation tasks. A well-chosen smaller model, possibly with domain-specific fine-tuning, can match or exceed larger alternatives at a fraction of the cost.
+These findings challenge a common assumption in AI deployment. Organizations often select the largest model available, assuming more parameters mean better results. Our data suggests this does not hold for specialized code generation tasks. A well-chosen smaller model, possibly with domain-specific fine-tuning, can match or exceed larger alternatives at a fraction of the cost.
 
 What about the coverage numbers? The original thesis proposal considered that achieving even 40\% coverage while saving hours of expert time would constitute meaningful progress. By this standard, the automated approach succeeded. However, as discussed in Chapter 5, our examination of comparable manually-written fuzz drivers in OSS-Fuzz projects suggests expert-crafted drivers typically achieve 60 to 80\% line coverage for similar libraries, because they incorporate domain knowledge about edge cases that LLMs may miss.
 
@@ -66,7 +66,7 @@ This experience provided an important insight about AI deployment in enterprise 
 
 The answer is affirmative, though several conditions apply.
 
-The experiments demonstrated that specialized code models can generate fuzz drivers meeting these criteria. Results from Chapter 5 Section 5.2 show that the best performing models achieved 43 to 45\% line coverage on yaml-cpp.
+The experiments demonstrated that specialized code models can generate fuzz drivers meeting these criteria. Results from Chapter 5 Section 5.2 show that the best-performing models achieved 43 to 45\% line coverage on yaml-cpp.
 
 However, the qualifications matter. Not all models succeed. General-purpose models, even large ones, frequently did not produce usable output. Model selection matters. In practice, the question ``can LLMs do this'' should really be ``which LLMs can do this, and under what conditions.''
 
@@ -88,7 +88,7 @@ The performance requirement was met. Driver generation completed within reasonab
 
 The cost requirement was met. As detailed in Chapter 5 Section 5.4, enterprise deployment costs are minimal compared to manual security testing efforts or the cost of security incidents from undetected vulnerabilities.
 
-The security aspect required the most thorough engineering effort. Network isolation policies initially required an alternative deployment approach. The Azure Private Link solution addressed this, but required coordination with infrastructure teams. The security requirements are achievable, but organizations should plan integration timelines appropriate to their security requirements.
+The security aspect required the most thorough engineering effort. Network isolation policies initially required an alternative deployment approach. The Azure Private Link solution addressed this, but required coordination with infrastructure teams. These requirements are achievable, but organizations should plan integration timelines appropriate to their specific security policies.
 
 
 \subsection{Secondary Research Questions Analysis}
@@ -100,7 +100,7 @@ Beyond the primary questions, our work revealed answers to questions we did not 
 
 Experiments across multiple repositories showed that parsing libraries with clear documentation produced better drivers. Libraries with extensive header comments, consistent function signatures, and simple data types yielded higher success rates. Complex APIs with heavy template usage, deeply nested callback patterns, or implicit preconditions produced more failures.
 
-yaml-cpp fell in the middle range. Its parsing APIs are reasonably well documented, but the YAML specification itself introduces complexity. The cross-library results from Chapter 5 Section~\ref{sec:results_cross_library} revealed additional patterns, jsoncons achieved the highest coverage (45.64\%), while the fmt library showed that smaller models can outperform larger ones when the API surface is simpler. Libraries with mathematical interfaces (glm) or configuration-heavy APIs (spdlog) consistently produced 0\% coverage, suggesting these patterns remain challenging for current LLMs.
+yaml-cpp fell in the middle range. Its parsing APIs are reasonably well documented, but the YAML specification itself introduces complexity. The cross-library results from Chapter 5 Section~\ref{sec:results_cross_library} revealed additional patterns. jsoncons achieved the highest coverage (45.64\%), while the fmt library showed that smaller models can outperform larger ones when the API surface is simpler. Libraries with mathematical interfaces (glm) or configuration-heavy APIs (spdlog) consistently produced 0\% coverage, suggesting these patterns remain challenging for current LLMs.
 
 \textbf{How do generated drivers compare to manually written ones in bug finding capability?}
 
