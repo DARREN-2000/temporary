@@ -398,7 +398,7 @@ jobs:
 
 Our pipeline includes corpus persistence through JFrog Artifactory. Each run downloads the previous corpus, runs fuzzing to extend it, and uploads the updated corpus. This way, coverage improvements accumulate over time rather than starting fresh each build.
 
-The network architecture required for this deployment is illustrated in Figure~\ref{fig:enterprise_network} (Chapter 6). As discussed in the subsequent Discussion chapter, the Azure Private Link setup enables secure communication between the CARIAD internal network and Azure OpenAI services, bypassing the restrictions of the corporate firewall while maintaining security compliance. This architectural solution became the critical enabler for enterprise deployment.
+The network architecture required for this deployment is illustrated in Figure~\ref{fig:enterprise_network} (Chapter 6). As discussed in the subsequent Discussion chapter, the Azure Private Link setup enables secure communication between the CARIAD internal network and Azure OpenAI services without routing traffic through the public internet, while maintaining full security compliance. This architectural solution was the key component for enterprise deployment.
 
 \subsection{Operational Considerations}
 

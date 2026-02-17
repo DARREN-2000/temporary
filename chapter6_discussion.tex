@@ -42,7 +42,7 @@ Resolving this required evaluating several architectural approaches. The existin
 
 We collaborated with CARIAD's infrastructure team to provision Azure Private Link endpoints. This technology creates a private connection between the corporate network and Azure services, appearing as an internal address rather than external internet. The LLM API becomes reachable without traversing the public internet.
 
-The architecture of this solution is illustrated in Figure~\ref{fig:enterprise_network}, which shows how the Azure Private Link creates a secure tunnel between the CARIAD internal network and Azure OpenAI services, bypassing the corporate firewall's restrictions on public internet access while maintaining security compliance.
+The architecture of this solution is illustrated in Figure~\ref{fig:enterprise_network}, which shows how the Azure Private Link creates a secure tunnel between the CARIAD internal network and Azure OpenAI services, routing traffic through a private connection rather than the public internet while maintaining security compliance.
 
 \begin{figure}[htbp]
 \centering
@@ -53,7 +53,7 @@ The architecture of this solution is illustrated in Figure~\ref{fig:enterprise_n
     \item Corporate Network (CARIAD): GitHub Actions self-hosted runner and source code repository
     \item Azure Cloud: Azure Private Link endpoint and Azure OpenAI LLM Service
     \item Security Boundary: Corporate Firewall
-    \item Connections showing: Code to GH, GH to Firewall, Firewall with blocked public internet (marked with ❌), Firewall with private connection to Private Link endpoint (marked with ✅), Private Link to LLM Service, LLM returning generated fuzz driver back through the chain
+    \item Connections showing: Code to GH, GH to Firewall, Firewall with public internet path not used (marked with ❌), Firewall with private connection to Private Link endpoint (marked with ✅), Private Link to LLM Service, LLM returning generated fuzz driver back through the chain
 \end{itemize}}}}
 \end{figure}
 
@@ -138,13 +138,13 @@ The structural errors were often recoverable through prompt refinement. Adding e
 
 Our work has several technical limitations that affect how the results should be interpreted.
 
-\textbf{Model selection scope.} We evaluated 14 open-source LLMs (plus one additional reasoning-focused model, DeepSeek R1, outside the main benchmark), but this represents a small fraction of available models. New models appear monthly, including more advanced versions of GPT-4 \cite{gpt4} and other commercial offerings we could not test due to cost or access restrictions. Some models we did not test might perform better or worse than our selections. We chose models based on availability, documentation, and community adoption rather than exhaustive search.
+\textbf{Model selection scope.} We evaluated 14 open-source LLMs (plus one additional reasoning-focused model, DeepSeek R1, outside the main benchmark), but this represents a small fraction of available models. New models appear monthly, including more advanced versions of GPT-4 \cite{gpt4} and other commercial offerings we could not test due to cost or licensing considerations. Some models we did not test might perform better or worse than our selections. We chose models based on availability, documentation, and community adoption rather than exhaustive search.
 
 \textbf{Single target language.} All experiments focused on C++ libraries. Results might differ for other languages. C has similar challenges, but Python or Rust might show different patterns due to different memory safety characteristics and training data distribution.
 
 \textbf{Limited vulnerability discovery validation.} We measured code coverage as a proxy for fuzzing effectiveness, but coverage does not guarantee bug finding. A driver achieving 45\% coverage might miss critical code paths where vulnerabilities exist. We did not run extended fuzzing campaigns to measure actual vulnerability discovery rates.
 
-\textbf{Hardware constraints.} Our local experiments used a single workstation with limited GPU memory. This prevented running the largest models at full precision. Quantization may have affected performance for some models, though we attempted to use recommended settings.
+\textbf{Hardware constraints.} Our local experiments used a single workstation with limited GPU memory. This meant we could not run the largest models at full precision. Quantization may have affected performance for some models, though we attempted to use recommended settings.
 
 \textbf{Time constraints on fuzzing runs.} Each driver was executed for a limited time during evaluation. Longer fuzzing campaigns might reveal different coverage patterns as the fuzzer explores more deeply. Our snapshot measurements capture initial effectiveness but not long-term behavior.
 
