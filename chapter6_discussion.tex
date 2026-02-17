@@ -20,7 +20,7 @@ Why did the larger general-purpose models fail while smaller specialized ones su
 
 Qwen 2.5-Coder succeeded because it was trained specifically on code generation tasks. It understood the structural patterns of fuzz drivers from its training data. The model had seen enough examples of the correct form to reproduce it reliably. This matters more than raw parameter count.
 
-The LoRA fine-tuning results reinforced this insight. A small 1.5 billion parameter model, after adaptation on high-quality OSS-Fuzz drivers, produced outputs matching the quality of much larger models while using far fewer resources. Specialized knowledge compensated for reduced parameter count.
+The LoRA fine-tuning results reinforced this insight. A small 1.5 billion parameter model, after adaptation on high-quality OSS-Fuzz drivers, produced outputs matching the quality of much larger models while using markedly fewer resources. Specialized knowledge compensated for reduced parameter count.
 
 These findings challenge a common assumption in AI deployment. Organizations often select the largest model available, assuming a higher parameter count correlates with better results. Our data suggests this does not hold for specialized code generation tasks. A well-chosen smaller model, possibly with domain-specific fine-tuning, can match or exceed larger alternatives at a fraction of the cost.
 
@@ -34,7 +34,7 @@ This gap matters, but so does the time investment. A skilled security engineer m
 
 We anticipated the core technical challenge would be generating high-quality fuzz drivers. We expected difficulties with C++ complexity, API understanding, or coverage optimization. We planned our research around these expected challenges.
 
-Infrastructure integration became a major focus of the implementation effort.
+Infrastructure integration constituted a major focus of the implementation effort.
 
 When we moved from local experiments to CARIAD's production environment, we identified that integrating with the corporate network architecture required additional design considerations. The CI/CD runners operated in isolated network segments by design, and external API access required explicit network path configuration. Our architecture assumed we could call LLM services from build processes, but the corporate network security policies required a tailored approach.
 
@@ -68,7 +68,7 @@ The answer is affirmative, though several conditions apply.
 
 The experiments demonstrated that specialized code models can generate fuzz drivers meeting these criteria. Results from Chapter 5 Section 5.2 show that the best-performing models achieved 43 to 45\% line coverage on yaml-cpp.
 
-However, the qualifications matter. Not all models succeed. General-purpose models, even large ones, frequently did not produce usable output. Model selection matters. In practice, the question ``can LLMs do this'' should really be ``which LLMs can do this, and under what conditions.''
+However, the qualifications matter. Not all models succeed. General-purpose models, even large ones, frequently did not produce usable output. Model selection matters. In practice, the question ``can LLMs do this'' should more precisely be ``which LLMs can do this, and under what conditions.''
 
 While respectable, these coverage numbers likely trail expert human performance. LLM-generated drivers are useful for initial security testing but should not be considered equivalent to carefully crafted manual drivers for critical applications. Their advantage lies in automation speed, not coverage depth.
 
@@ -169,7 +169,7 @@ The automotive industry faces a particular combination of pressures that makes L
 
 Regulatory requirements are tightening. UNECE Regulation 155 \cite{UNECER155} (United Nations Economic Commission for Europe cybersecurity regulation) mandates cybersecurity management systems for vehicle manufacturers. ISO/SAE 21434 \cite{ISO21434} (International Organization for Standardization and Society of Automotive Engineers standard for automotive cybersecurity management) requires systematic security engineering throughout the vehicle lifecycle. Manufacturers must demonstrate that they have addressed security risks. Fuzzing provides evidence of security testing that regulators recognize.
 
-Software complexity continues to grow. Modern vehicles contain millions of lines of code across networked ECUs. Manual security review cannot scale to this volume. Automated approaches are necessary just to maintain coverage.
+Software complexity continues to grow. Modern vehicles contain millions of lines of code across networked ECUs. Manual security review cannot scale to this volume. Automated approaches are necessary to maintain coverage.
 
 Security engineering expertise is highly valued across industries. Automotive organizations benefit from tools that maximize the effectiveness of their security engineering teams. Tools that multiply the effectiveness of available engineers provide competitive advantage.
 
@@ -227,7 +227,7 @@ Our work opens several directions for future research.
 
 \textbf{Fine-tuning data curation.} Our LoRA experiments used OSS-Fuzz drivers as training data. Systematic study of what makes good fine-tuning examples, and how much data is needed, would guide practical deployment.
 
-\textbf{Security analysis of generated code.} LLM-generated code could contain vulnerabilities or backdoors. Analyzing the security properties of generated drivers, beyond just their fuzzing effectiveness, matters for deployment in security-sensitive contexts.
+\textbf{Security analysis of generated code.} LLM-generated code could contain vulnerabilities or backdoors. Analyzing the security properties of generated drivers, beyond their fuzzing effectiveness, matters for deployment in security-sensitive contexts.
 
 
 \section{Summary of Findings and Contributions}
@@ -245,7 +245,7 @@ This thesis makes several contributions to the understanding of LLM-assisted sec
 
 \textbf{Identification of infrastructure as a key consideration.} Our experience highlighted that network and security infrastructure, rather than model capability, often determines the timeline for deployment. This insight should guide planning for similar projects.
 
-\textbf{Open documentation of outcomes.} We reported not just successes but also which models did not produce usable output and why. This evidence helps others select appropriate models for their use cases.
+\textbf{Open documentation of outcomes.} We reported not only successes but also which models did not produce usable output and why. This evidence helps others select appropriate models for their use cases.
 
 The practical impact extends beyond academic contribution. CARIAD can deploy the system we developed. Other automotive organizations can adapt our architecture to their environments. The specific numbers and experiences we report provide guidance for real-world adoption.
 

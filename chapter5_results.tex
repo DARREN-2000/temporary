@@ -14,7 +14,7 @@ Our three-phase research, conducted between May and September 2025 with infrastr
 
 Choosing appropriate target libraries required careful consideration. We needed C++ libraries because safety-critical automotive systems running on AUTOSAR (AUTomotive Open System ARchitecture) \cite{autosar} platforms are predominantly written in C or C++. AUTOSAR is the dominant software architecture standard for automotive electronic control units (ECUs), making C++ relevance essential for practical automotive application. While Python-based testing would have involved less complexity, C++ was selected to match the language used in safety-critical automotive systems at CARIAD.
 
-After evaluating several candidates, we selected yaml-cpp as our primary target. This library parses YAML configuration files, a common task in automotive software where configuration management matters significantly. The library contains 35 source files with 1,061 potential fuzzing candidates identified through cifuzz spark analysis. It is also well-documented and actively maintained. OSS-Fuzz \cite{OSSFuzzBugs2021} already covers it, which gave us a baseline for comparison. We could measure whether our AI-generated drivers matched, exceeded, or fell short of existing human-written ones.
+After evaluating several candidates, we selected yaml-cpp as our primary target. This library parses YAML configuration files, a common task in automotive software where configuration management matters significantly. The library contains 35 source files with 1,061 potential fuzzing candidates identified through cifuzz spark analysis. It is also well-documented and actively maintained. OSS-Fuzz \cite{OSSFuzzBugs2021} already covers it, which provided a baseline for comparison. We could measure whether our AI-generated drivers matched, exceeded, or fell short of existing human-written ones.
 
 Additional targets included pugixml, jsoncons, fmt, spdlog, and glm. These provided broader validation across different library types, and results for the top-performing models on these libraries are presented in Section~\ref{sec:results_cross_library}.
 
@@ -58,7 +58,7 @@ Branch coverage measures the percentage of conditional branches (if/else, switch
 
 That said, these numbers require context. While 45\% coverage represents a meaningful automated achievement, we examined several comparable manually-written fuzz drivers in the OSS-Fuzz corpus for yaml-cpp and similar parsing libraries (pugixml, RapidJSON, libxml2). These expert-crafted drivers typically achieve 60 to 80\% line coverage, based on coverage reports available through the OSS-Fuzz project dashboards \cite{OSSFuzzBugs2021}. Our best AI-generated driver falls short of expert human work in absolute coverage terms. The value proposition is not surpassing humans but automating what would otherwise require considerable manual effort.
 
-Phi-4 14B showed lower coverage at 34.26\% despite generating more unique test cases (2,220 vs 2,050). It required significantly more tokens, 71.5k compared to Gemma's 40.2k, making it far less efficient for production use. More test cases do not necessarily mean better coverage.
+Phi-4 14B showed lower coverage at 34.26\% despite generating more unique test cases (2,220 vs 2,050). It required significantly more tokens, 71.5k compared to Gemma's 40.2k, making it considerably less efficient for production use. More test cases do not necessarily mean better coverage.
 
 The comparative performance of these three successful models is visualized in Figure~\ref{fig:model_comparison}. Gemma 3 27B and Qwen 2.5-Coder 32B achieved the highest coverage levels (45\% and 43\% respectively), while Phi-4 14B reached 34\%. Only these three of the fourteen evaluated models produced functional fuzz drivers that reached the fuzzing stage. The remaining eleven models did not produce functional output at the code generation stage and are discussed in Section~\ref{sec:results_unsuccessful}.
 
@@ -145,7 +145,7 @@ Gemma 3 27B & 0\% & 1h 12m 8s & 122k & Unsuccessful \\
 \end{tabular}
 \end{table}
 
-On pugixml, Qwen 2.5-Coder 32B achieved 34.77\% coverage, comparable to its yaml-cpp performance (43.08\%). Gemma 3 27B did not achieve any coverage despite consuming far more tokens (122k vs 40.2k on yaml-cpp), suggesting the XML parsing API posed challenges that the model was not able to address in this configuration.
+On pugixml, Qwen 2.5-Coder 32B achieved 34.77\% coverage, comparable to its yaml-cpp performance (43.08\%). Gemma 3 27B did not achieve any coverage despite consuming considerably more tokens (122k vs 40.2k on yaml-cpp), suggesting the XML parsing API posed challenges that the model was not able to address in this configuration.
 
 \textbf{jsoncons, glm, and spdlog (Qwen 2.5-Coder 32B only):}
 
@@ -179,7 +179,7 @@ Having established that specialized models outperform general-purpose ones, we i
 \subsection{LoRA Fine-Tuning Efficiency}
 \label{sec:results_lora_efficiency}
 
-Based on Phase 1 results, we selected the Qwen 2.5-Coder 1.5B model for fine-tuning experiments. The goal was to determine whether a small, fine-tuned model could match larger models while using far fewer resources.
+Based on Phase 1 results, we selected the Qwen 2.5-Coder 1.5B model for fine-tuning experiments. The goal was to determine whether a small, fine-tuned model could match larger models while using markedly fewer resources.
 
 We applied Low-Rank Adaptation (LoRA) \cite{Hu2021} fine-tuning using fuzz drivers from Google's OSS-Fuzz project as training data. LoRA works by freezing most of the original model weights and inserting small trainable matrices into the attention layers, so only a fraction of parameters are updated during training. This makes fine-tuning feasible on consumer hardware without the memory requirements of full model training. Our approach builds on recent work in LLM-based fuzzing \cite{llm4fuzz,TitanFuzz2022} but applies more aggressive model compression through fine-tuning. We curated two training datasets from publicly available OSS-Fuzz repositories, a small one with 172 examples and an extended one with 709 examples. Each example consisted of a fuzz driver paired with its target API context, covering security vulnerability patterns, fuzzing techniques, and automotive-specific code patterns.
 
@@ -218,7 +218,7 @@ With 709 examples, the extended dataset produced the largest improvements with 3
 
 Training data quality and quantity both matter, though quality appears more important. The 709-example dataset outperformed the 172-example dataset, but the improvement was incremental rather than dramatic. More diverse examples help the model generalize, but there are diminishing returns.
 
-One key insight is that a fine-tuned small model can match larger models while using far fewer computational resources. This makes enterprise deployment practical, as it does not require expensive GPU infrastructure to run effective fuzz driver generation.
+One key insight is that a fine-tuned small model can match larger models while using markedly fewer computational resources. This makes enterprise deployment practical, as it does not require expensive GPU infrastructure to run effective fuzz driver generation.
 
 However, we should note the limitations. The fine-tuned 1.5B model still does not match the coverage achieved by the larger Qwen 32B or Gemma 27B models. What it offers is efficiency, acceptable coverage at much lower cost and resource requirements.
 
@@ -230,7 +230,7 @@ The efficiency gains from fine-tuning directly impact deployment feasibility in 
 
 Beyond technical performance, successful enterprise deployment requires favorable economics. This section addresses the cost component of \textbf{RQ3}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? We analyzed both direct infrastructure costs and opportunity costs relative to manual approaches.
 
-We analyzed costs in detail because the ultimate question is not just ``does this work?'' but ``is this economically viable for real deployment?''
+We analyzed costs in detail because the question is not only ``does this work?'' but ``is this economically viable for real deployment?''
 
 \subsection{Azure OpenAI Cost Projections}
 \label{sec:results_cost_azure}

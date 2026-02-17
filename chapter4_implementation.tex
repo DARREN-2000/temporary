@@ -26,7 +26,7 @@ We needed to run models locally for several reasons. First, evaluating many diff
 
 We selected Ollama \cite{ollama} as our primary local inference server. Ollama simplifies model management. Installing a new model is one command: \texttt{ollama pull qwen2.5-coder:32b}. The server exposes an OpenAI-compatible API, which meant cifuzz spark worked without modification. Ollama handled quantized models well. Quantization compresses models to use reduced numerical precision (e.g., 4-bit instead of 16-bit weights), which let us run larger models on the available hardware.
 
-For models not available through Ollama, we used llama.cpp directly. This required more manual configuration but gave us flexibility. Some models from Hugging Face came as split GGUF files that needed merging before use. We handled this with the following command:
+For models not available through Ollama, we used llama.cpp directly. This required more manual configuration but provided additional flexibility. Some models from Hugging Face came as split GGUF files that needed merging before use. We handled this with the following command:
 
 \begin{lstlisting}[language=bash, caption={Merging Split GGUF Model Files}]
 llama-gguf-split --merge qwen2.5-coder-14b-instruct-q5_k_m-00001-of-00002.gguf \
@@ -85,7 +85,7 @@ The LLM-assisted fuzzing workflow, conceptually introduced in Chapter 3, demonst
 \section{Phase 1: Local LLM Evaluation Setup}
 \label{sec:impl_phase1}
 
-Phase 1 focused on understanding which models could actually generate useful fuzz drivers. The experiments in this phase target \textbf{RQ1} (Can LLMs generate compilable, executable fuzz drivers?) and \textbf{RQ2} (Does model size determine quality?). We did not assume any model would work well. Literature suggested mixed results for LLM code generation, and fuzz drivers are a specialized task.
+Phase 1 focused on understanding which models could generate useful fuzz drivers. The experiments in this phase target \textbf{RQ1} (Can LLMs generate compilable, executable fuzz drivers?) and \textbf{RQ2} (Does model size determine quality?). We did not assume any model would work well. Literature suggested mixed results for LLM code generation, and fuzz drivers are a specialized task.
 
 \subsection{Benchmarked Models}
 
@@ -141,7 +141,7 @@ yaml-cpp is a YAML parsing library with approximately 35 source files and over 1
     \item \textbf{jsoncons}: Another JSON library for comparison with RapidJSON.
 \end{itemize}
 
-These libraries cover different domains but share the characteristic of being C++ with clean public APIs. They all have existing fuzz targets in OSS-Fuzz, which gave us baselines for comparison.
+These libraries cover different domains but share the characteristic of being C++ with clean public APIs. They all have existing fuzz targets in OSS-Fuzz, which provided baselines for comparison.
 
 We also tested on several CARIAD internal libraries, though we cannot report those results in detail due to confidentiality constraints. The patterns we observed on open-source libraries were consistent with the results on internal ones.
 
@@ -194,7 +194,7 @@ We created two datasets:
 
 These examples included drivers for libraries like FreeType, LibPNG, SQLite, and zlib, covering a range of API styles from simple functions to complex object-oriented interfaces. We deliberately included diverse examples to help the model generalize rather than memorize specific patterns.
 
-Quality control was important. We manually reviewed a sample of the extracted drivers to verify they were actually functional and not stub implementations. Approximately 15\% (106 out of the initial pool) of extracted drivers were discarded because they were incomplete or contained obvious errors.
+Quality control was important. We manually reviewed a sample of the extracted drivers to verify they were functional and not stub implementations. Approximately 15\% (106 out of the initial pool) of extracted drivers were discarded because they were incomplete or contained obvious errors.
 
 \subsection{LoRA Configuration and Training}
 
@@ -244,7 +244,7 @@ We also tested the fine-tuned models on RapidJSON and pugixml to check generaliz
 \section{Phase 3: Enterprise CI/CD Integration}
 \label{sec:impl_phase3}
 
-Phase 3 focused on deploying the validated approach from Phases 1 and 2 into CARIAD's production CI/CD infrastructure using Azure OpenAI \cite{azure_openai} as the LLM backend. The central question for this phase was \textbf{RQ3}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? The transition from controlled local experiments with Ollama \cite{ollama} to enterprise deployment revealed additional infrastructure considerations that became the primary engineering focus of this phase.
+Phase 3 focused on deploying the validated approach from Phases 1 and 2 into CARIAD's production CI/CD infrastructure using Azure OpenAI \cite{azure_openai} as the LLM backend. The central question for this phase was \textbf{RQ3}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? The transition from controlled local experiments with Ollama \cite{ollama} to enterprise deployment revealed additional infrastructure considerations that constituted the primary engineering focus of this phase.
 
 \subsection{Architectural Challenges}
 
