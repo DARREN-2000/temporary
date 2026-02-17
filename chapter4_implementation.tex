@@ -16,7 +16,7 @@ For the fuzzing engine itself, we chose libFuzzer combined with Clang sanitizers
 
 We compiled all targets with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled. ASan catches memory errors like buffer overflows, use-after-free, and memory leaks \cite{LibFuzzer2015}. UBSan catches undefined behavior like signed integer overflow and null pointer dereferences. These sanitizers add runtime overhead, but for security testing the tradeoff is acceptable, since detecting vulnerabilities takes priority over execution speed.
 
-For integration with our build systems, we used cifuzz from Code Intelligence. Cifuzz wraps libFuzzer and provides additional functionality like corpus management, coverage reporting, and build system integration. The critical feature for our work was cifuzz spark, which handles the LLM integration. Spark takes a CMake target as input, extracts API information automatically, sends it to the configured LLM, and produces a fuzz driver ready for execution.
+For integration with our build systems, we used cifuzz from Code Intelligence. Cifuzz wraps libFuzzer and provides additional functionality like corpus management, coverage reporting, and build system integration. The most relevant feature for our work was cifuzz spark, which handles the LLM integration. Spark takes a CMake target as input, extracts API information automatically, sends it to the configured LLM, and produces a fuzz driver ready for execution.
 
 Our choice of cifuzz was based on a systematic evaluation. We compared several alternatives including Google's ClusterFuzz \cite{OSSFuzzBugs2021} and standalone libFuzzer setups. Cifuzz offered a good balance between ease of use and enterprise features. Its spark module specifically addressed our core research question by providing a clean interface between the fuzzing infrastructure and LLM backends.
 
@@ -24,7 +24,7 @@ Our choice of cifuzz was based on a systematic evaluation. We compared several a
 
 We needed to run models locally for several reasons. First, evaluating many different models through paid APIs would have been cost-prohibitive. Second, some models are open-source and only available for local deployment. Third, understanding local deployment options was essential for the enterprise integration phase.
 
-We selected Ollama \cite{ollama} as our primary local inference server. Ollama simplifies model management. Installing a new model is one command: \texttt{ollama pull qwen2.5-coder:32b}. The server exposes an OpenAI-compatible API, which meant cifuzz spark worked without modification. Ollama handled quantized models well, meaning models compressed to use reduced numerical precision (e.g., 4-bit instead of 16-bit weights), which let us run larger models on the available hardware.
+We selected Ollama \cite{ollama} as our primary local inference server. Ollama simplifies model management. Installing a new model is one command: \texttt{ollama pull qwen2.5-coder:32b}. The server exposes an OpenAI-compatible API, which meant cifuzz spark worked without modification. Ollama handled quantized models well. Quantization compresses models to use reduced numerical precision (e.g., 4-bit instead of 16-bit weights), which let us run larger models on the available hardware.
 
 For models not available through Ollama, we used llama.cpp directly. This required more manual configuration but gave us flexibility. Some models from Hugging Face came as split GGUF files that needed merging before use. We handled this with the following command:
 
