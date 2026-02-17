@@ -26,7 +26,7 @@ These findings challenge a common assumption in AI deployment. Organizations oft
 
 What about the coverage numbers? The original thesis proposal considered that achieving even 40\% coverage while saving hours of expert time would constitute meaningful progress. By this standard, the automated approach succeeded. However, as discussed in Chapter 5, our examination of comparable manually-written fuzz drivers in OSS-Fuzz projects suggests expert-crafted drivers typically achieve 60 to 80\% line coverage for similar libraries, because they incorporate domain knowledge about edge cases that LLMs may miss.
 
-This gap matters, but so does the time investment. A skilled security engineer might spend 2 to 8 hours writing and debugging a fuzz driver for a new library. Our automated pipeline generates a usable driver in approximately 30 minutes. Even if the automated driver achieves lower coverage, the time savings are substantial.
+This gap matters, but so does the time investment. A skilled security engineer might spend 2 to 8 hours writing and debugging a fuzz driver for a new library. Our automated pipeline generates a usable driver in approximately 30 minutes. Even if the automated driver achieves lower coverage, the time savings are meaningful.
 
 
 \subsection{Unexpected Findings: Network Architecture}
@@ -34,7 +34,7 @@ This gap matters, but so does the time investment. A skilled security engineer m
 
 We anticipated the core technical challenge would be generating high-quality fuzz drivers. We expected difficulties with C++ complexity, API understanding, or coverage optimization. We planned our research around these expected challenges.
 
-Infrastructure integration became a significant focus of the implementation effort.
+Infrastructure integration became a notable focus of the implementation effort.
 
 When we moved from local experiments to CARIAD's production environment, we identified that integrating with the corporate network architecture required additional design considerations. The CI/CD runners operated in isolated network segments by design, and external API access required explicit network path configuration. Our architecture assumed we could call LLM services from build processes, but the corporate network security policies required a tailored approach.
 
@@ -94,7 +94,7 @@ The performance requirement was met. Driver generation completed within reasonab
 
 The cost requirement was clearly met. As detailed in Chapter 5 Section 5.4, enterprise deployment costs are minimal compared to manual security testing efforts or the cost of security incidents from undetected vulnerabilities.
 
-The security requirement required the most comprehensive engineering effort. Network isolation policies initially required an alternative deployment approach. The Azure Private Link solution addressed this, but required coordination with infrastructure teams. The security requirements are achievable, but organizations should plan integration timelines appropriate to their security requirements.
+The security requirement required the most thorough engineering effort. Network isolation policies initially required an alternative deployment approach. The Azure Private Link solution addressed this, but required coordination with infrastructure teams. The security requirements are achievable, but organizations should plan integration timelines appropriate to their security requirements.
 
 
 \subsection{Secondary Research Questions Analysis}
@@ -127,7 +127,7 @@ Based on our observations during experiments, failures fell into several categor
 
 Structural errors were the most frequent issue. The models often generated code that resembled fuzz drivers but lacked the correct \texttt{LLVMFuzzerTestOneInput} function signature or proper libFuzzer entry point structure.
 
-The structural errors were often recoverable through prompt refinement. Adding explicit examples of correct fuzz driver structure to the prompt reduced these failures significantly in follow-up experiments.
+The structural errors were often recoverable through prompt refinement. Adding explicit examples of correct fuzz driver structure to the prompt reduced these failures in follow-up experiments.
 
 
 \section{Limitations and Constraints}
@@ -156,7 +156,7 @@ Beyond technical limitations, our methodology has boundaries that constrain gene
 
 \textbf{Single organization context.} The enterprise integration work happened at CARIAD. Their network architecture, security policies, and tooling differ from other organizations. The specific solutions we developed (Azure Private Link, self-hosted runners) may not transfer directly to other environments.
 
-\textbf{Limited manual driver comparison.} We compared against OSS-Fuzz drivers where available, but did not commission expert written drivers specifically for comparison. Recent research on LLM-assisted fuzzing \cite{efficient_finetuning} suggests that efficient fine-tuning can improve parameter efficiency substantially. The human baseline is somewhat indirect.
+\textbf{Limited manual driver comparison.} We compared against OSS-Fuzz drivers where available, but did not commission expert written drivers specifically for comparison. Recent research on LLM-assisted fuzzing \cite{efficient_finetuning} suggests that efficient fine-tuning can improve parameter efficiency by a large margin. The human baseline is somewhat indirect.
 
 \textbf{No user study.} We did not evaluate how developers interact with generated drivers in practice. Do they trust the output? Do they modify it before use? These human factors affect practical deployment but were outside our scope.
 
@@ -183,7 +183,7 @@ LLM-assisted fuzzing addresses all three pressures. It provides documented secur
 
 The cost analysis from Chapter 5 Section 5.4 reinforces this argument. At modest annual costs, even incremental improvements in security testing efficiency produce positive return on investment.
 
-Adoption considerations remain. Automotive organizations follow rigorous validation processes when adopting new tools for safety-adjacent applications. Validation requirements for tools used in ISO 26262 contexts create additional steps. The path from research prototype to certified production tool involves considerable effort.
+Adoption considerations remain. Automotive organizations follow rigorous validation processes when adopting new tools for safety-adjacent applications. Validation requirements for tools used in ISO 26262 contexts create additional steps. The path from research prototype to certified production tool involves significant effort.
 
 We recommend a phased approach. Start with non safety-critical subsystems like infotainment or connectivity features. Build confidence and collect metrics. Gradually expand to more critical systems as the approach proves reliable.
 
@@ -201,7 +201,7 @@ Aligning AI deployment requirements with enterprise security models requires tho
 
 We see several responses to this challenge:
 
-\textbf{Private deployment of models.} Running models on internal infrastructure avoids external network traffic entirely. This works for smaller models but requires significant compute resources for larger ones. Our local experiments used a workstation with unified memory shared between CPU and GPU, which defines the range of supported model sizes. Organizations must weigh infrastructure costs (hardware, maintenance, power) against API costs when choosing deployment approaches.
+\textbf{Private deployment of models.} Running models on internal infrastructure avoids external network traffic entirely. This works for smaller models but requires large compute resources for larger ones. Our local experiments used a workstation with unified memory shared between CPU and GPU, which defines the range of supported model sizes. Organizations must weigh infrastructure costs (hardware, maintenance, power) against API costs when choosing deployment approaches.
 
 \textbf{Cloud provider private connectivity.} Services like Azure Private Link \cite{azure_private_link}, AWS PrivateLink, and Google Cloud Private Service Connect create private paths to cloud services. These maintain security boundaries while enabling access. Configuration requires coordination between cloud and enterprise network teams.
 
@@ -265,7 +265,7 @@ The qualification matters. Not all models work. General-purpose models, even lar
 
 Fine-tuning small models proved more effective than expected. Our LoRA adapted 1.5B model achieved measurable efficiency gains (detailed in Chapter 5) while producing usable fuzz drivers. For organizations with compute constraints or cost sensitivity, this approach deserves consideration.
 
-An important finding was the role of infrastructure. We expected the primary focus to be generating good code. In practice, a substantial portion of the project timeline was spent on deploying our solution within the corporate network architecture. Initial approaches including proxy configuration, boundary client integration, and container networking were iteratively refined to align with the enterprise network architecture. The solution ultimately required organizational support for Azure Private Link architecture.
+An important finding was the role of infrastructure. We expected the primary focus to be generating good code. In practice, a large portion of the project timeline was spent on deploying our solution within the corporate network architecture. Initial approaches including proxy configuration, boundary client integration, and container networking were iteratively refined to align with the enterprise network architecture. The solution ultimately required organizational support for Azure Private Link architecture.
 
 The economics strongly favor adoption. As shown in Chapter 5, LLM-assisted fuzzing represents a modest investment relative to typical automotive development budgets. The value comes from scaling security testing to match code production rates that manual approaches cannot achieve.
 
@@ -273,6 +273,6 @@ Looking forward, LLM-assisted security testing will likely become standard pract
 
 For CARIAD specifically, this work establishes a foundation for expanded deployment. The architecture can accommodate additional target libraries. The cost model supports scaling. The infrastructure patterns can replicate across teams.
 
-The broader lesson extends beyond fuzzing. Automotive software development faces a fundamental scaling problem. Code complexity grows faster than team sizes. AI-assisted tools offer a path to maintain quality at scale. Fuzz driver generation is one application of this principle. Others will follow.
+The broader lesson extends beyond fuzzing. Automotive software development faces a core scaling problem. Code complexity grows faster than team sizes. AI-assisted tools offer a path to maintain quality at scale. Fuzz driver generation is one application of this principle. Others will follow.
 
 A critical insight from this research is that infrastructure integration complexity often exceeds the technical challenges of the core technology. While specific components like Azure Private Link required approximately one month for deployment, the complete enterprise integration followed standard organizational workflows for evaluation, approval, infrastructure provisioning, testing, and documentation. Organizations planning similar deployments should allocate 2 to 3 months for the full integration process and plan time commensurate with their security policy complexity.

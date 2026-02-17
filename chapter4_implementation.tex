@@ -44,7 +44,7 @@ export CIFUZZ_LLM_API_TOKEN="<api-key>"
 export CIFUZZ_LLM_MAX_TOKENS=40000
 \end{lstlisting}
 
-A token limit of 40,000 was necessary because fuzz driver generation requires substantial context. Prompts include header files, example code, and detailed instructions. Smaller token limits led to truncation and reduced output quality.
+A token limit of 40,000 was necessary because fuzz driver generation requires extensive context. Prompts include header files, example code, and detailed instructions. Smaller token limits led to truncation and reduced output quality.
 
 \subsection{Development Environment}
 
@@ -89,7 +89,7 @@ Phase 1 focused on understanding which models could actually generate useful fuz
 
 \subsection{Benchmarked Models}
 
-We evaluated 14 models spanning a wide range of sizes and architectures. The selection included both general-purpose models and code-specialized variants. Our goal was to understand whether model size, training data, or architecture had the most significant impact on fuzz driver quality.
+We evaluated 14 models spanning a wide range of sizes and architectures. The selection included both general-purpose models and code-specialized variants. Our goal was to understand whether model size, training data, or architecture had the greatest impact on fuzz driver quality.
 
 \textbf{Large Models (25 to 35 billion parameters):}
 \begin{itemize}
@@ -122,7 +122,7 @@ We evaluated 14 models spanning a wide range of sizes and architectures. The sel
 
 Code-specialized models like Qwen Coder, DeepSeek Coder, and CodeLlama were trained specifically on programming tasks. General-purpose models like Mixtral and Yi were included to investigate whether raw scale could compensate for lack of specialization. This allowed us to test a key hypothesis, whether a 46B general model outperforms a 7B code-specialized model. Results, discussed in Chapter 5, were surprising, as general-purpose models like Mixtral (46.7B) and Yi (34B) achieved 0\% code coverage, while the specialized Qwen 2.5-Coder (32B) and Gemma 3 (27B) consistently achieved over 43\% line coverage. Even some code-specialized models like CodeLlama (34B) did not produce working drivers, suggesting that specialization alone is not sufficient without adequate training on fuzz-driver-specific patterns.
 
-Installing these models required significant disk space. The larger models exceeded 20~GB each in their quantized forms. We used 4-bit and 5-bit quantization to fit models into available VRAM while maintaining reasonable output quality.
+Installing these models required considerable disk space. The larger models exceeded 20~GB each in their quantized forms. We used 4-bit and 5-bit quantization to fit models into available VRAM while maintaining reasonable output quality.
 
 \subsection{Target Repositories}
 
@@ -173,7 +173,7 @@ After the initial evaluation showed promising results from Qwen 2.5-Coder models
 
 \subsection{Training Data Preparation}
 
-Most important for fine-tuning is the training data. High-quality examples of fuzz drivers paired with source code were essential. Previous work on LLM-based fuzzing like LLM4Fuzz \cite{llm4fuzz} and TitanFuzz \cite{TitanFuzz2022} has demonstrated that quality training data significantly impacts generation success.
+Most important for fine-tuning is the training data. High-quality examples of fuzz drivers paired with source code were essential. Previous work on LLM-based fuzzing like LLM4Fuzz \cite{llm4fuzz} and TitanFuzz \cite{TitanFuzz2022} has demonstrated that quality training data directly impacts generation success.
 
 To build our dataset, we extracted training examples from OSS-Fuzz \cite{OSSFuzzBugs2021}. Google has fuzz-tested hundreds of open-source projects through OSS-Fuzz, and the fuzz drivers are publicly available. We focused on C and C++ drivers because those matched our target domain.
 
@@ -235,7 +235,7 @@ After training, we evaluated the fine-tuned models on the same yaml-cpp benchmar
     \item Coverage remained comparable to the larger Qwen 2.5-Coder 32B model, which achieved 43\% line coverage (see Chapter 5 for detailed results)
 \end{itemize}
 
-Fine-tuned models generated more concise code. They learned the structure of fuzz drivers and did not waste tokens on unnecessary explanations or boilerplate. These efficiency gains meant that generating each driver took substantially less time and fewer API tokens, which directly impacts operational costs.
+Fine-tuned models generated more concise code. They learned the structure of fuzz drivers and did not waste tokens on unnecessary explanations or boilerplate. These efficiency gains meant that generating each driver took less time and fewer API tokens, which directly impacts operational costs.
 
 More training data did not always produce proportionally better results. The 709-example dataset achieved the best efficiency improvements (see Chapter 5 for detailed metrics), but it included some lower-quality drivers that may have introduced noise. While the extended dataset reduced generation time and token usage, the coverage quality did not improve proportionally. Quality matters more than quantity for fine-tuning specialized tasks.
 
