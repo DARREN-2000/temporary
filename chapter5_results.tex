@@ -60,20 +60,20 @@ That said, these numbers require context. While 45\% coverage represents substan
 
 Phi-4 14B showed lower coverage at 34.26\% despite generating more unique test cases (2,220 vs 2,050). It required significantly more tokens, 71.5k compared to Gemma's 40.2k, making it far less efficient for production use. More test cases do not necessarily mean better coverage.
 
-The comparative performance of these three successful models is visualized in Figure~\ref{fig:model_comparison}. Gemma 3 27B and Qwen 2.5-Coder 32B achieved the highest coverage levels (45\% and 43\% respectively), while Phi-4 14B reached 34\%. Only these three of the fourteen evaluated models produced functional fuzz drivers that reached the fuzzing stage. The remaining eleven models failed at the code generation stage and are discussed in Section~\ref{sec:results_unsuccessful}.
+The comparative performance of these three successful models is visualized in Figure~\ref{fig:model_comparison}. Gemma 3 27B and Qwen 2.5-Coder 32B achieved the highest coverage levels (45\% and 43\% respectively), while Phi-4 14B reached 34\%. Only these three of the fourteen evaluated models produced functional fuzz drivers that reached the fuzzing stage. The remaining eleven models did not produce functional output at the code generation stage and are discussed in Section~\ref{sec:results_unsuccessful}.
 
 \begin{figure}[htbp]
 \centering
 \caption{Code Coverage by Model (yaml-cpp). Only three of the fourteen evaluated models produced functional fuzz drivers.}
 \label{fig:model_comparison}
-\fbox{\parbox{\linewidth}{\textit{Note: This diagram should be rendered from the Mermaid chart using Mermaid Live Editor (https://mermaid.live) and inserted as a PDF or PNG image. The chart shows a bar graph comparing code coverage percentages for the three models that produced functional fuzz drivers: Gemma 3 27B (45.06\%), Qwen 2.5-Coder 32B (43.08\%), and Phi-4 14B (34.26\%). The remaining eleven models failed to produce compilable or functional drivers and are discussed in Section~\ref{sec:results_unsuccessful} and Table~\ref{tab:unsuccessful_models}.}}}
+\fbox{\parbox{\linewidth}{\textit{Note: This diagram should be rendered from the Mermaid chart using Mermaid Live Editor (https://mermaid.live) and inserted as a PDF or PNG image. The chart shows a bar graph comparing code coverage percentages for the three models that produced functional fuzz drivers: Gemma 3 27B (45.06\%), Qwen 2.5-Coder 32B (43.08\%), and Phi-4 14B (34.26\%). The remaining eleven models did not produce compilable or functional drivers and are discussed in Section~\ref{sec:results_unsuccessful} and Table~\ref{tab:unsuccessful_models}.}}}
 \end{figure}
 
 
 \subsection{Unsuccessful Models: Critical Findings}
 \label{sec:results_unsuccessful}
 
-Several models failed completely. This was one of the more important findings of the research.
+Several models did not produce usable output. This was one of the more important findings of the research.
 
 \begin{table}[htbp]
 \centering
@@ -84,7 +84,7 @@ Several models failed completely. This was one of the more important findings of
 \toprule
 Model & Failure Reason & Lessons Learned \\
 \midrule
-Yi 34B & Generation hallucinations, 0\% coverage & General-purpose models inadequate for code tasks \\
+Yi 34B & Generation hallucinations, 0\% coverage & General-purpose models not suited for specialized code tasks \\
 DeepSeek R1 & Poor fuzzing context understanding & Reasoning-focused training alone does not guarantee code generation ability \\
 Mixtral 46.7B & Resource constraints due to size & Hardware limitations require model size consideration \\
 \bottomrule
@@ -92,7 +92,7 @@ Mixtral 46.7B & Resource constraints due to size & Hardware limitations require 
 }
 \end{table}
 
-Yi 34B demonstrated a fundamental limitation of general-purpose models for specialized code tasks. Despite having 34 billion parameters, it produced hallucinated outputs that achieved zero percent coverage. The generated drivers compiled successfully in some cases and were not syntactically broken, but they did nothing useful. Functions were called with nonsensical parameter combinations, or the driver simply returned immediately without exercising any library functionality. We spent considerable time verifying this was not a prompt engineering issue. It was not.
+Yi 34B demonstrated a characteristic of general-purpose models when applied to specialized code tasks. Despite having 34 billion parameters, it produced outputs that achieved zero percent coverage. The generated drivers compiled successfully in some cases and were not syntactically broken, but they did not exercise the target library effectively. Functions were called with incorrect parameter combinations, or the driver simply returned immediately without exercising any library functionality. We spent considerable time verifying this was not a prompt engineering issue. It was not.
 
 We also tested DeepSeek R1, a reasoning-focused model, outside the original 14-model benchmark. It was designed for reasoning tasks, but in our experiments, that capability did not translate to effective fuzz driver generation. Mixtral's 46.7 billion parameters simply exceeded available hardware resources, we could not even complete a full evaluation run.
 
@@ -120,13 +120,13 @@ Model & Code Coverage & Time Taken & Tokens Used & Result \\
 Phi-4 14B & 100\% & 12m 8s & 59.8k & Successful \\
 Llama 3 & 100\% & 3m 41s & 27.6k & Successful \\
 Qwen 1.5 7B & 89.47\% & 6m 9s & 50k & Successful \\
-Qwen 2.5-Coder 32B & 0\% & 43m 20s & 59.8k & Failed \\
-Gemma 3 27B & 0\% & 41m 59s & 73.9k & Failed \\
+Qwen 2.5-Coder 32B & 0\% & 43m 20s & 59.8k & Unsuccessful \\
+Gemma 3 27B & 0\% & 41m 59s & 73.9k & Unsuccessful \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-This result was counterintuitive. The two best-performing models on yaml-cpp (Qwen 2.5-Coder 32B and Gemma 3 27B) both failed on fmt with 0\% coverage, while smaller models achieved near-perfect coverage. The fmt library has a simpler API surface than yaml-cpp, which may favor models that generate concise, targeted code rather than verbose outputs. This finding reinforces that no single model dominates across all library types.
+This result was counterintuitive. The two best-performing models on yaml-cpp (Qwen 2.5-Coder 32B and Gemma 3 27B) both achieved 0\% on fmt, while smaller models achieved near-perfect coverage. The fmt library has a simpler API surface than yaml-cpp, which may favor models that generate concise, targeted code rather than verbose outputs. This finding reinforces that no single model dominates across all library types.
 
 \textbf{pugixml (XML processing library):}
 
@@ -140,12 +140,12 @@ This result was counterintuitive. The two best-performing models on yaml-cpp (Qw
 Model & Code Coverage & Time Taken & Tokens Used & Result \\
 \midrule
 Qwen 2.5-Coder 32B & 34.77\% & 37m 24s & 43.1k & Successful \\
-Gemma 3 27B & 0\% & 1h 12m 8s & 122k & Failed \\
+Gemma 3 27B & 0\% & 1h 12m 8s & 122k & Unsuccessful \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-On pugixml, Qwen 2.5-Coder 32B achieved 34.77\% coverage, comparable to its yaml-cpp performance (43.08\%). Gemma 3 27B failed entirely despite consuming significantly more tokens (122k vs 40.2k on yaml-cpp), suggesting the XML parsing API posed challenges that the model could not overcome.
+On pugixml, Qwen 2.5-Coder 32B achieved 34.77\% coverage, comparable to its yaml-cpp performance (43.08\%). Gemma 3 27B did not achieve any coverage despite consuming significantly more tokens (122k vs 40.2k on yaml-cpp), suggesting the XML parsing API posed challenges that the model was not able to address in this configuration.
 
 \textbf{jsoncons, glm, and spdlog (Qwen 2.5-Coder 32B only):}
 
@@ -166,7 +166,7 @@ spdlog & 0\% & 49m 33s & 62.9k & 0 & 0 \\
 }
 \end{table}
 
-jsoncons showed the highest coverage of any library we tested (45.64\%), slightly exceeding even yaml-cpp. Both are parsing libraries with similar API patterns, which may explain the consistency. glm (a mathematics library for graphics) and spdlog (a logging library) both produced 0\% coverage, indicating that the models struggled with non-parsing API patterns. Libraries with mathematical or configuration-heavy interfaces appear more challenging for current LLMs.
+jsoncons showed the highest coverage of any library we tested (45.64\%), slightly exceeding even yaml-cpp. Both are parsing libraries with similar API patterns, which may explain the consistency. glm (a mathematics library for graphics) and spdlog (a logging library) both produced 0\% coverage, indicating that the models did not generate effective drivers for non-parsing API patterns. Libraries with mathematical or configuration-heavy interfaces appear more challenging for current LLMs.
 
 \textbf{Cross-library summary:} The results show that model performance varies substantially across libraries. Parsing libraries (yaml-cpp, jsoncons, pugixml) consistently produced the best results, while utility libraries (glm, spdlog) were more challenging. Library complexity did not always predict difficulty, as fmt's simpler API yielded perfect coverage with smaller models. These findings suggest that API style and documentation quality matter more than library size or domain.
 
@@ -283,7 +283,7 @@ The experiments produced several clear findings, along with some important cavea
 
 First, model specialization matters more than size. Gemma 3 27B outperformed Yi 34B despite having fewer parameters. Code-specialized models beat larger general-purpose models consistently across our tests.
 
-Second, performance varies across library types. Parsing libraries (yaml-cpp, jsoncons, pugixml) consistently produced the best coverage results, while utility libraries (glm, spdlog) proved more challenging. The fmt library revealed that smaller models can outperform larger ones on simpler APIs, with Phi-4 14B and Llama 3 achieving 100\% coverage where the larger Qwen 2.5-Coder 32B and Gemma 3 27B both failed.
+Second, performance varies across library types. Parsing libraries (yaml-cpp, jsoncons, pugixml) consistently produced the best coverage results, while utility libraries (glm, spdlog) proved more challenging. The fmt library revealed that smaller models can outperform larger ones on simpler APIs, with Phi-4 14B and Llama 3 achieving 100\% coverage where the larger Qwen 2.5-Coder 32B and Gemma 3 27B both achieved 0\%.
 
 Third, fine-tuning enables efficient deployment. The fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens compared to the base model, though it still did not match the coverage of larger specialized models.
 

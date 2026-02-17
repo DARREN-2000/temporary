@@ -34,7 +34,7 @@ This gap matters, but so does the time investment. A skilled security engineer m
 
 We anticipated the core technical challenge would be generating high-quality fuzz drivers. We expected difficulties with C++ complexity, API understanding, or coverage optimization. We planned our research around these expected challenges.
 
-The actual bottleneck turned out to be infrastructure.
+The primary focus of effort turned out to be infrastructure.
 
 When we moved from local experiments to CARIAD's production environment, we identified that integrating with the corporate network architecture required additional design considerations. The CI/CD runners operated in isolated network segments by design, and external API access required explicit network path configuration. Our architecture assumed we could call LLM services from build processes, but the corporate network security policies required a tailored approach.
 
@@ -74,7 +74,7 @@ Yes, with qualifications.
 
 Our experiments demonstrated that specialized code models can generate fuzz drivers meeting these criteria. Results from Chapter 5 Section 5.2 show that the best performing models achieved 43 to 45\% line coverage on yaml-cpp.
 
-However, the qualifications matter. Not all models succeed. General-purpose models, even large ones, frequently failed. Model selection is critical. In practice, the question ``can LLMs do this'' should really be ``which LLMs can do this, and under what conditions.''
+However, the qualifications matter. Not all models succeed. General-purpose models, even large ones, frequently did not produce usable output. Model selection is critical. In practice, the question ``can LLMs do this'' should really be ``which LLMs can do this, and under what conditions.''
 
 While respectable, these coverage numbers likely trail expert human performance. LLM-generated drivers are useful for initial security testing but should not be considered equivalent to carefully crafted manual drivers for critical applications. Their advantage lies in automation speed, not coverage depth.
 
@@ -82,19 +82,19 @@ While respectable, these coverage numbers likely trail expert human performance.
 
 Our data strongly supports the second hypothesis. Domain-specific training matters more than raw parameter count for this task.
 
-Evidence from Chapter 5 Section 5.2 is clear, code-specialized models succeeded where larger general-purpose models failed completely. Our LoRA fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens while producing usable fuzz drivers (see Section 5.3). These specialized models understood what a fuzz driver should look like because they had seen relevant examples during training.
+Evidence from Chapter 5 Section 5.2 is clear, code-specialized models succeeded where larger general-purpose models did not produce usable output. Our LoRA fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens while producing usable fuzz drivers (see Section 5.3). These specialized models understood what a fuzz driver should look like because they had seen relevant examples during training.
 
 This finding has practical implications. Organizations deploying LLM-based fuzzing do not need expensive API access to the largest available models. A well-chosen mid-sized model, or a fine-tuned smaller model, provides better results at lower cost.
 
 \textbf{RQ3: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements?}
 
-Yes, but with significant infrastructure effort.
+Yes, but with considerable infrastructure effort.
 
 The performance requirement was met. Driver generation completed within reasonable timeframes, and fuzzing execution can run asynchronously without blocking developer feedback.
 
 The cost requirement was clearly met. As detailed in Chapter 5 Section 5.4, enterprise deployment costs are minimal compared to manual security testing efforts or the cost of security incidents from undetected vulnerabilities.
 
-The security requirement was the hardest to satisfy. Network isolation policies initially prevented deployment entirely. The Azure Private Link solution addressed this, but required substantial coordination with infrastructure teams. The security requirements are achievable, but organizations should expect integration effort proportional to their security policy complexity.
+The security requirement was the most involved to satisfy. Network isolation policies initially required an alternative deployment approach. The Azure Private Link solution addressed this, but required coordination with infrastructure teams. The security requirements are achievable, but organizations should expect integration effort proportional to their security policy complexity.
 
 
 \subsection{Secondary Research Questions Analysis}
@@ -183,7 +183,7 @@ LLM-assisted fuzzing addresses all three pressures. It provides documented secur
 
 The cost analysis from Chapter 5 Section 5.4 reinforces this argument. At annual costs lower than a single day of consultant time, even modest improvements in security testing efficiency produce positive return on investment.
 
-Adoption barriers remain. Automotive organizations follow rigorous validation processes when adopting new tools for safety-adjacent applications. Validation requirements for tools used in ISO 26262 contexts create additional overhead. The path from research prototype to certified production tool involves significant effort.
+Adoption considerations remain. Automotive organizations follow rigorous validation processes when adopting new tools for safety-adjacent applications. Validation requirements for tools used in ISO 26262 contexts create additional steps. The path from research prototype to certified production tool involves considerable effort.
 
 We recommend a phased approach. Start with non safety-critical subsystems like infotainment or connectivity features. Build confidence and collect metrics. Gradually expand to more critical systems as the approach proves reliable.
 
@@ -193,7 +193,7 @@ We recommend a phased approach. Start with non safety-critical subsystems like i
 
 Our integration experience illustrates a broader consideration for enterprises adopting AI tools.
 
-Modern AI services typically operate as cloud APIs. Organizations call external endpoints, send data, receive results. This model works well for many applications. It fails when security policies restrict external communication.
+Modern AI services typically operate as cloud APIs. Organizations call external endpoints, send data, receive results. This model works well for many applications. It requires adaptation when security policies govern external communication.
 
 Large enterprises, particularly in regulated industries, operate on the assumption that internal networks are isolated from the internet. Data stays inside the perimeter. External services are accessed through carefully controlled gateways. This security model was established before cloud computing and AI services became prevalent, and is being adapted to accommodate these new capabilities.
 
@@ -249,9 +249,9 @@ This thesis makes several contributions to the understanding of LLM-assisted sec
 
 \textbf{Cost analysis framework.} Our economic analysis in Chapter 5 Section 5.4 provides a template for organizations evaluating similar deployments, establishing that cost does not limit adoption.
 
-\textbf{Identification of infrastructure as key challenge.} Our experience highlighted that network and security infrastructure, rather than model capability, often determines deployment success. This insight should guide planning for similar projects.
+\textbf{Identification of infrastructure as a key consideration.} Our experience highlighted that network and security infrastructure, rather than model capability, often determines the timeline for deployment. This insight should guide planning for similar projects.
 
-\textbf{Open documentation of failures.} We reported not just successes but also which models failed and why. This negative evidence helps others avoid unproductive approaches.
+\textbf{Open documentation of outcomes.} We reported not just successes but also which models did not produce usable output and why. This evidence helps others select appropriate models for their use cases.
 
 The practical impact extends beyond academic contribution. CARIAD can deploy the system we developed. Other automotive organizations can adapt our architecture to their environments. The specific numbers and experiences we report provide guidance for real-world adoption.
 
@@ -261,11 +261,11 @@ The practical impact extends beyond academic contribution. CARIAD can deploy the
 
 This work began with a direct question, can Large Language Models automate fuzz driver generation for automotive software? After five months of research, implementation, and deployment effort at CARIAD (May to September 2025), the answer is a qualified yes.
 
-The qualification matters. Not all models work. General-purpose models, even large ones, frequently failed at this task. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is not a secondary consideration, it is a critical design decision.
+The qualification matters. Not all models work. General-purpose models, even large ones, frequently did not produce usable output for this task. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is not a secondary consideration, it is a critical design decision.
 
 Fine-tuning small models proved more effective than expected. Our LoRA adapted 1.5B model achieved measurable efficiency gains (detailed in Chapter 5) while producing usable fuzz drivers. For organizations with compute constraints or cost sensitivity, this approach deserves consideration.
 
-An important finding was the role of infrastructure. We expected the primary challenge to be generating good code. The actual bottleneck was deploying our solution within corporate network policies. Initial approaches including proxy configuration, boundary client integration, and container networking required redesign to align with the enterprise firewall architecture. The solution ultimately required organizational support for Azure Private Link architecture.
+An important finding was the role of infrastructure. We expected the primary focus to be generating good code. The majority of effort went into deploying our solution within the corporate network architecture. Initial approaches including proxy configuration, boundary client integration, and container networking required redesign to align with the enterprise network design. The solution ultimately required organizational support for Azure Private Link architecture.
 
 The economics strongly favor adoption. As shown in Chapter 5, LLM-assisted fuzzing represents a modest investment relative to typical automotive development budgets. The value comes from scaling security testing to match code production rates that manual approaches cannot achieve.
 
