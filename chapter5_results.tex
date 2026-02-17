@@ -168,7 +168,7 @@ spdlog & 0\% & 49m 33s & 62.9k & 0 & 0 \\
 
 jsoncons showed the highest coverage of any library we tested (45.64\%), slightly exceeding even yaml-cpp. Both are parsing libraries with similar API patterns, which may explain the consistency. glm (a mathematics library for graphics) and spdlog (a logging library) both produced 0\% coverage, indicating that the models did not generate effective drivers for non-parsing API patterns. Libraries with mathematical or configuration-heavy interfaces appear more challenging for current LLMs.
 
-\textbf{Cross-library summary:} The results show that model performance varies considerably across libraries. Parsing libraries (yaml-cpp, jsoncons, pugixml) consistently produced the best results, while utility libraries (glm, spdlog) were more challenging. Library complexity did not always predict difficulty, as fmt's simpler API yielded perfect coverage with smaller models. These findings suggest that API style and documentation quality matter more than library size or domain.
+\textbf{Cross-library summary:} The results show that model performance varies considerably across libraries. Parsing libraries (yaml-cpp, jsoncons, pugixml) consistently produced the highest coverage, while utility libraries (glm, spdlog) were more challenging. Library complexity did not always predict difficulty, as fmt's simpler API yielded perfect coverage with smaller models. These findings suggest that API style and documentation quality matter more than library size or domain.
 
 
 \section{Model Optimization Results}
@@ -210,7 +210,7 @@ Base 1.5B & 15 min & 112k & Baseline \\
 \end{tabular}
 \end{table}
 
-With 709 examples, the extended dataset achieved the best results, 33\% faster generation and 55\% fewer tokens compared to the base model. The fine-tuned model learned to generate more concise, targeted code rather than verbose outputs padded with unnecessary boilerplate.
+With 709 examples, the extended dataset produced the largest improvements, 33\% faster generation and 55\% fewer tokens compared to the base model. The fine-tuned model learned to generate more concise, targeted code rather than verbose outputs padded with unnecessary boilerplate.
 
 
 \subsection{Comparative Analysis}

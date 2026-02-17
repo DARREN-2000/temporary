@@ -212,7 +212,7 @@ DEVICE = "auto"         # Uses optimal hardware
 DTYPE = "float16"       # Memory-efficient precision
 \end{lstlisting}
 
-A rank of 16 was a balance between adaptation capacity and training speed. Higher ranks can capture more complex patterns but require more memory and training time. We tested ranks of 8, 16, and 32. Rank 16 gave the best results for our dataset size.
+A rank of 16 was a balance between adaptation capacity and training speed. Higher ranks can capture more complex patterns but require more memory and training time. We tested ranks of 8, 16, and 32. Rank 16 produced the strongest output for our dataset size.
 
 We trained on the Qwen 2.5-Coder 1.5B base model. This is a small model that runs quickly on modest hardware. This size was chosen to investigate whether fine-tuning could make small models competitive with larger ones.
 

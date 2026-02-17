@@ -64,7 +64,7 @@ This experience provided an important insight about AI deployment in enterprise 
 
 \textbf{RQ1: Can Large Language Models generate fuzz drivers for C++ code that compile successfully, execute without errors, and achieve meaningful code coverage?}
 
-Yes, though several conditions apply.
+The answer is affirmative, though several conditions apply.
 
 The experiments demonstrated that specialized code models can generate fuzz drivers meeting these criteria. Results from Chapter 5 Section 5.2 show that the best performing models achieved 43 to 45\% line coverage on yaml-cpp.
 
@@ -82,11 +82,11 @@ This finding has practical implications. Organizations deploying LLM-based fuzzi
 
 \textbf{RQ3: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements?}
 
-Yes, but with considerable infrastructure effort.
+Integration is feasible, but requires considerable infrastructure effort.
 
 The performance requirement was met. Driver generation completed within reasonable timeframes, and fuzzing execution can run asynchronously without blocking developer feedback.
 
-The cost requirement was clearly met. As detailed in Chapter 5 Section 5.4, enterprise deployment costs are minimal compared to manual security testing efforts or the cost of security incidents from undetected vulnerabilities.
+The cost requirement was met. As detailed in Chapter 5 Section 5.4, enterprise deployment costs are minimal compared to manual security testing efforts or the cost of security incidents from undetected vulnerabilities.
 
 The security requirement required the most thorough engineering effort. Network isolation policies initially required an alternative deployment approach. The Azure Private Link solution addressed this, but required coordination with infrastructure teams. The security requirements are achievable, but organizations should plan integration timelines appropriate to their security requirements.
 
