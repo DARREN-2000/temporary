@@ -22,7 +22,7 @@ Additional targets included pugixml, jsoncons, fmt, spdlog, and glm. These provi
 \subsection{Hardware and Software Configuration}
 \label{sec:exp_hardware}
 
-All local experiments ran on macOS with an Apple M1 Pro processor. The container runtime used Podman with 4 CPUs and 8 GB memory allocated. This choice was deliberate, we wanted hardware that typical automotive development teams have access to. If our approach required dedicated GPU clusters, practical adoption would be more constrained.
+All local experiments ran on macOS with an Apple M1 Pro processor. The container runtime used Podman with 4 CPUs and 8 GB memory allocated. This choice was deliberate. We wanted hardware that typical automotive development teams have access to. If our approach required dedicated GPU clusters, practical adoption would be more constrained.
 
 Our software stack consisted of Podman for containers (chosen to match the Linux-based container runtime used in the enterprise CI/CD environment), CMake with Clang for building, libFuzzer via cifuzz for fuzzing, and Ollama for local model inference. For enterprise deployment testing, we used Azure OpenAI with GPT-4o connected via Azure Private Link, a configuration established through the enterprise provisioning process, as detailed in Chapter 4.
 
@@ -52,11 +52,11 @@ Phi-4 14B & 34.26\% & 36m 36s & 71.5k & 2,220 & 1 \\
 }
 \end{table}
 
-The ``Successful Tests'' column requires explanation, as this metric counts tests that discovered actual bugs or edge cases, not tests that simply compiled and ran. Most generated tests exercised valid code paths without finding vulnerabilities, which is expected behavior, not failure. The high number of unique test cases with few ``successful'' findings reflects that fuzzing is a numbers game, you generate many tests hoping a few will discover issues.
+The ``Successful Tests'' column requires explanation, as this metric counts tests that discovered actual bugs or edge cases, not tests that simply compiled and ran. Most generated tests exercised valid code paths without finding vulnerabilities, which is expected behavior, not failure. The high number of unique test cases with few ``successful'' findings reflects that fuzzing is a numbers game where you generate many tests hoping a few will discover issues.
 
-Code coverage measures the percentage of source code lines or branches executed during testing and is the standard metric for evaluating fuzz driver quality. Gemma 3 27B achieved the highest coverage at 45.06\%, slightly outperforming the larger Qwen 2.5-Coder 32B which reached 43.08\%. This was unexpected, the smaller model outperformed the larger one while using fewer tokens. We initially suspected measurement error, but the results held across multiple runs with consistent reproducibility.
+Code coverage measures the percentage of source code lines or branches executed during testing and is the standard metric for evaluating fuzz driver quality. Gemma 3 27B achieved the highest coverage at 45.06\%, slightly outperforming the larger Qwen 2.5-Coder 32B which reached 43.08\%. This was unexpected. The smaller model outperformed the larger one while using fewer tokens. We initially suspected measurement error, but the results held across multiple runs with consistent reproducibility.
 
-That said, these numbers require context. While 45\% coverage represents a meaningful automated achievement, we examined several comparable manually-written fuzz drivers in the OSS-Fuzz corpus for yaml-cpp and similar parsing libraries (pugixml, RapidJSON, libxml2). These expert-crafted drivers typically achieve 60 to 80\% line coverage, based on coverage reports available through the OSS-Fuzz project dashboards \cite{OSSFuzzBugs2021}. Our best AI-generated driver falls short of expert human work in absolute coverage terms. The value proposition is not surpassing humans, it is automating what would otherwise require considerable manual effort.
+That said, these numbers require context. While 45\% coverage represents a meaningful automated achievement, we examined several comparable manually-written fuzz drivers in the OSS-Fuzz corpus for yaml-cpp and similar parsing libraries (pugixml, RapidJSON, libxml2). These expert-crafted drivers typically achieve 60 to 80\% line coverage, based on coverage reports available through the OSS-Fuzz project dashboards \cite{OSSFuzzBugs2021}. Our best AI-generated driver falls short of expert human work in absolute coverage terms. The value proposition is not surpassing humans but automating what would otherwise require considerable manual effort.
 
 Phi-4 14B showed lower coverage at 34.26\% despite generating more unique test cases (2,220 vs 2,050). It required significantly more tokens, 71.5k compared to Gemma's 40.2k, making it far less efficient for production use. More test cases do not necessarily mean better coverage.
 
@@ -96,7 +96,7 @@ Yi 34B demonstrated a characteristic of general-purpose models when applied to s
 
 We also tested DeepSeek R1, a reasoning-focused model, outside the original 14-model benchmark. It was designed for reasoning tasks, but in our experiments, that capability did not translate to effective fuzz driver generation. Mixtral's 46.7 billion parameters exceeded the available hardware capacity, preventing completion of a full evaluation run.
 
-A clear pattern emerged, code-specialized models outperformed larger general-purpose models by wide margins. Size alone does not determine quality for specialized tasks like fuzz driver generation.
+A clear pattern emerged. Code-specialized models outperformed larger general-purpose models by wide margins. Size alone does not determine quality for specialized tasks like fuzz driver generation.
 
 
 \subsection{Cross-Library Validation}
@@ -254,7 +254,7 @@ Enterprise & \texteuro{}5.50 & \texteuro{}121.00 & \texteuro{}1,452.00 & Complet
 \end{tabular}
 \end{table}
 
-Even at the enterprise level with complete automation, annual costs stay under \texteuro{}1,500. This is minimal compared to alternatives, however, this represents only the direct infrastructure costs.
+Even at the enterprise level with complete automation, annual costs stay under \texteuro{}1,500. This is minimal compared to alternatives. However, this represents only the direct infrastructure costs.
 
 
 \subsection{Comparison with Manual Testing}
@@ -281,7 +281,7 @@ The economic advantage appears clear, but there is an important caveat. Current 
 
 The experiments produced several clear findings, along with some important caveats.
 
-Model specialization matters more than size. Gemma 3 27B outperformed Yi 34B despite having fewer parameters. Code-specialized models beat larger general-purpose models consistently across our tests.
+Model specialization matters more than size. Gemma 3 27B outperformed Yi 34B despite having fewer parameters. Code-specialized models outperformed larger general-purpose models consistently across our tests.
 
 Performance also varies across library types. Parsing libraries (yaml-cpp, jsoncons, pugixml) consistently produced the best coverage results, while utility libraries (glm, spdlog) proved more challenging. The fmt library revealed that smaller models can outperform larger ones on simpler APIs, with Phi-4 14B and Llama 3 achieving 100\% coverage where the larger Qwen 2.5-Coder 32B and Gemma 3 27B both achieved 0\%.
 
@@ -291,8 +291,8 @@ The economics appear favorable as well. Annual infrastructure costs range from \
 
 Mapping these findings to our research questions:
 
-\textbf{RQ1 (Effectiveness)}: Can Large Language Models generate fuzz drivers for C++ code that compile successfully, execute without errors, and achieve meaningful code coverage? Yes, our best models achieved over 40\% coverage on yaml-cpp and up to 100\% on fmt, with drivers that compiled and executed correctly. Cross-library testing (Section~\ref{sec:results_cross_library}) confirmed these results generalize to other parsing libraries like jsoncons (45.64\%) and pugixml (34.77\%), though performance on non-parsing libraries was more variable. We consider 34 to 45\% coverage ``meaningful'' because it represents automated baseline coverage that would otherwise require 2 to 8 hours of manual engineering per target. While this falls short of expert human-written drivers (60 to 80\% coverage), the value lies in automation at scale, not matching human experts.
+\textbf{RQ1 (Effectiveness)}: Can Large Language Models generate fuzz drivers for C++ code that compile successfully, execute without errors, and achieve meaningful code coverage? The results support this. Our best models achieved over 40\% coverage on yaml-cpp and up to 100\% on fmt, with drivers that compiled and executed correctly. Cross-library testing (Section~\ref{sec:results_cross_library}) confirmed these results generalize to other parsing libraries like jsoncons (45.64\%) and pugixml (34.77\%), though performance on non-parsing libraries was more variable. We consider 34 to 45\% coverage ``meaningful'' because it represents automated baseline coverage that would otherwise require 2 to 8 hours of manual engineering per target. While this falls short of expert human-written drivers (60 to 80\% coverage), the value lies in automation at scale, not matching human experts.
 
 \textbf{RQ2 (Optimization)}: Does model size determine fuzz driver quality, or can smaller models with domain-specific training match or exceed larger general-purpose models? Smaller specialized models consistently outperformed larger general-purpose models. Fine-tuning further improved efficiency, though not coverage.
 
-\textbf{RQ3 (Feasibility)}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? Yes, at costs under \texteuro{}1,500 annually, but integration required careful infrastructure planning (Azure Private Link) to meet the security requirements of regulated environments.
+\textbf{RQ3 (Feasibility)}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? Integration proved feasible at costs under \texteuro{}1,500 annually, but integration required careful infrastructure planning (Azure Private Link) to meet the security requirements of regulated environments.

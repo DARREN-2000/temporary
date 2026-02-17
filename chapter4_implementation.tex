@@ -12,7 +12,7 @@ Before writing any code, we needed to select the appropriate tools. Several fact
 
 \subsection{Fuzzing Infrastructure}
 
-For the fuzzing engine itself, we chose libFuzzer combined with Clang sanitizers. libFuzzer is the industry standard for coverage-guided fuzzing in C and C++ projects \cite{LibFuzzer2015}, though alternatives like AFL++ \cite{AFLPlusPlus} also have strong communities. LibFuzzer integrates directly with the LLVM toolchain, which means compilation and fuzzing use the same infrastructure. Google uses libFuzzer for OSS-Fuzz \cite{OSSFuzzBugs2021}, so the documentation and community support are excellent.
+For the fuzzing engine itself, we chose libFuzzer combined with Clang sanitizers. libFuzzer is the industry standard for coverage-guided fuzzing in C and C++ projects \cite{LibFuzzer2015}, though alternatives like AFL++ \cite{AFLPlusPlus} also have strong communities. libFuzzer integrates directly with the LLVM toolchain, which means compilation and fuzzing use the same infrastructure. Google uses libFuzzer for OSS-Fuzz \cite{OSSFuzzBugs2021}, so the documentation and community support are excellent.
 
 We compiled all targets with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled. ASan catches memory errors like buffer overflows, use-after-free, and memory leaks \cite{LibFuzzer2015}. UBSan catches undefined behavior like signed integer overflow and null pointer dereferences. These sanitizers add runtime overhead, but for security testing the tradeoff is acceptable, since detecting vulnerabilities takes priority over execution speed.
 
