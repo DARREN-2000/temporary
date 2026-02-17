@@ -24,7 +24,7 @@ Our choice of cifuzz was based on a systematic evaluation. We compared several a
 
 We needed to run models locally for several reasons. First, evaluating many different models through paid APIs would have been cost-prohibitive. Second, some models are open-source and only available for local deployment. Third, understanding local deployment options was essential for the enterprise integration phase.
 
-We selected Ollama \cite{ollama} as our primary local inference server. Ollama simplifies model management. Installing a new model is one command: \texttt{ollama pull qwen2.5-coder:32b}. The server exposes an OpenAI-compatible API, which meant cifuzz spark worked without modification. Ollama handled quantized models well, which let us run larger models on the available hardware.
+We selected Ollama \cite{ollama} as our primary local inference server. Ollama simplifies model management. Installing a new model is one command: \texttt{ollama pull qwen2.5-coder:32b}. The server exposes an OpenAI-compatible API, which meant cifuzz spark worked without modification. Ollama handled quantized models well, meaning models compressed to use reduced numerical precision (e.g., 4-bit instead of 16-bit weights), which let us run larger models on the available hardware.
 
 For models not available through Ollama, we used llama.cpp directly. This required more manual configuration but gave us flexibility. Some models from Hugging Face came as split GGUF files that needed merging before use. We handled this with the following command:
 
