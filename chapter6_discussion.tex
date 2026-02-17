@@ -32,7 +32,7 @@ This gap matters, but so does the time investment. A skilled security engineer m
 \subsection{Unexpected Findings: Network Architecture}
 \label{sec:discussion_network}
 
-We anticipated the core technical challenge would be generating high-quality fuzz drivers. The models would struggle with C++ complexity, API understanding, or coverage optimization. We planned our research around these expected difficulties.
+We anticipated the core technical challenge would be generating high-quality fuzz drivers. The models would face difficulties with C++ complexity, API understanding, or coverage optimization. We planned our research around these expected challenges.
 
 The actual bottleneck turned out to be infrastructure.
 
@@ -92,7 +92,7 @@ Yes, but with significant infrastructure effort.
 
 The performance requirement was met. Driver generation completed within reasonable timeframes, and fuzzing execution can run asynchronously without blocking developer feedback.
 
-The cost requirement was clearly met. As detailed in Chapter 5 Section 5.4, enterprise deployment costs are minimal compared to security engineering salaries or the cost of security incidents from undetected vulnerabilities.
+The cost requirement was clearly met. As detailed in Chapter 5 Section 5.4, enterprise deployment costs are minimal compared to manual security testing efforts or the cost of security incidents from undetected vulnerabilities.
 
 The security requirement was the hardest to satisfy. Network isolation policies initially prevented deployment entirely. The Azure Private Link solution addressed this, but required substantial coordination with infrastructure teams. The security requirements are achievable, but organizations should expect integration effort proportional to their security policy complexity.
 
@@ -247,7 +247,7 @@ This thesis makes several contributions to the understanding of LLM-assisted sec
 
 \textbf{Enterprise integration architecture.} We documented a complete architecture for integrating LLM-assisted fuzzing into secure enterprise CI/CD pipelines, including the Azure Private Link solution for network isolation challenges.
 
-\textbf{Cost analysis framework.} Our economic analysis in Chapter 5 Section 5.4 provides a template for organizations evaluating similar deployments, establishing that cost is not a barrier to adoption.
+\textbf{Cost analysis framework.} Our economic analysis in Chapter 5 Section 5.4 provides a template for organizations evaluating similar deployments, establishing that cost does not limit adoption.
 
 \textbf{Identification of infrastructure as key challenge.} Our experience highlighted that network and security infrastructure, rather than model capability, often determines deployment success. This insight should guide planning for similar projects.
 
