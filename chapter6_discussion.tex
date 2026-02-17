@@ -48,13 +48,7 @@ The architecture of this solution is illustrated in Figure~\ref{fig:enterprise_n
 \centering
 \caption{Enterprise Network Architecture with Azure Private Link}
 \label{fig:enterprise_network}
-\fbox{\parbox{\linewidth}{\textit{Note: This diagram should be rendered from the Mermaid chart using Mermaid Live Editor (https://mermaid.live) and inserted as a PDF or PNG image. The diagram shows:
-\begin{itemize}
-    \item Corporate Network (CARIAD): GitHub Actions self-hosted runner and source code repository
-    \item Azure Cloud: Azure Private Link endpoint and Azure OpenAI LLM Service
-    \item Security Boundary: Corporate Firewall
-    \item Connections showing: Code to GH, GH to Firewall, Firewall with Public Internet (Not Used, marked with ❌), Firewall with private connection to Private Link endpoint (marked with ✅), Private Link to LLM Service, LLM returning generated fuzz driver back through the chain
-\end{itemize}}}}
+\includegraphics[width=\linewidth]{bilder/figure6_1_network_architecture.png}
 \end{figure}
 
 Setting up Private Link involved organizational coordination, including approval processes, security reviews, configuration testing, and documentation, which are standard steps for enterprise deployments in regulated industries. The technical configuration itself was manageable once approvals were obtained, requiring approximately one month from initial request to operational deployment.
