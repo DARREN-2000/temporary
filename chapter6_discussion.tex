@@ -34,7 +34,7 @@ This gap matters, but so does the time investment. A skilled security engineer m
 
 We anticipated the core technical challenge would be generating high-quality fuzz drivers. We expected difficulties with C++ complexity, API understanding, or coverage optimization. We planned our research around these expected challenges.
 
-Infrastructure integration became a notable focus of the implementation effort.
+Infrastructure integration became a major focus of the implementation effort.
 
 When we moved from local experiments to CARIAD's production environment, we identified that integrating with the corporate network architecture required additional design considerations. The CI/CD runners operated in isolated network segments by design, and external API access required explicit network path configuration. Our architecture assumed we could call LLM services from build processes, but the corporate network security policies required a tailored approach.
 
