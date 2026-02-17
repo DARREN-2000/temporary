@@ -296,7 +296,7 @@ buildah run \
   /usr/bin/bash -c "cd /project/build && cifuzz spark target_name"
 \end{lstlisting}
 
-Each environment variable had to be passed explicitly. Careful validation of the configuration was necessary, as the pipeline did not halt on missing LLM credentials.
+Each environment variable had to be passed explicitly. Careful validation of the configuration was necessary, as missing LLM credentials would cause the generation step to be skipped without halting the pipeline. We addressed this by adding pre-flight checks to verify all required variables before the LLM call.
 
 \subsection{Self-Hosted Runner Solution}
 
