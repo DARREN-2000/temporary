@@ -265,7 +265,7 @@ The qualification matters. Not all models work. General-purpose models, even lar
 
 Fine-tuning small models proved more effective than expected. Our LoRA adapted 1.5B model achieved measurable efficiency gains (detailed in Chapter 5) while producing usable fuzz drivers. For organizations with compute constraints or cost sensitivity, this approach deserves consideration.
 
-An important finding was the role of infrastructure. We expected the primary focus to be generating good code. The majority of effort went into deploying our solution within the corporate network architecture. Initial approaches including proxy configuration, boundary client integration, and container networking required redesign to align with the enterprise network design. The solution ultimately required organizational support for Azure Private Link architecture.
+An important finding was the role of infrastructure. We expected the primary focus to be generating good code. In practice, a substantial portion of the project timeline was spent on deploying our solution within the corporate network architecture. Initial approaches including proxy configuration, boundary client integration, and container networking required redesign to align with the enterprise network design. The solution ultimately required organizational support for Azure Private Link architecture.
 
 The economics strongly favor adoption. As shown in Chapter 5, LLM-assisted fuzzing represents a modest investment relative to typical automotive development budgets. The value comes from scaling security testing to match code production rates that manual approaches cannot achieve.
 
