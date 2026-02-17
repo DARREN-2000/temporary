@@ -82,7 +82,7 @@ While respectable, these coverage numbers likely trail expert human performance.
 
 Our data strongly supports the second hypothesis. Domain-specific training matters more than raw parameter count for this task.
 
-Evidence from Chapter 5 Section 5.2 is clear, code-specialized models succeeded where larger general-purpose models did not produce usable output. Our LoRA fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens while producing usable fuzz drivers (see Section 5.3). These specialized models understood what a fuzz driver should look like because they had seen relevant examples during training.
+Evidence from Chapter 5 Section 5.2 indicates that code-specialized models succeeded where larger general-purpose models did not produce usable output. Our LoRA fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens while producing usable fuzz drivers (see Section 5.3). These specialized models understood what a fuzz driver should look like because they had seen relevant examples during training.
 
 This finding has practical implications. Organizations deploying LLM-based fuzzing do not need expensive API access to the largest available models. A well-chosen mid-sized model, or a fine-tuned smaller model, provides better results at lower cost.
 
@@ -261,7 +261,7 @@ The practical impact extends beyond academic contribution. CARIAD can deploy the
 
 This work began with a direct question, can Large Language Models automate fuzz driver generation for automotive software? After five months of research, implementation, and deployment effort at CARIAD (May to September 2025), the answer is a qualified yes.
 
-This qualification matters. Not all models work. General-purpose models, even large ones, frequently did not produce usable output for this task. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is not a secondary consideration, it is a critical design decision.
+This qualification matters. Not all models work. General-purpose models, even large ones, frequently did not produce usable output for this task. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is a critical design decision.
 
 Fine-tuning small models proved more effective than expected. Our LoRA adapted 1.5B model achieved measurable efficiency gains (detailed in Chapter 5) while producing usable fuzz drivers. For organizations with compute constraints or cost sensitivity, this approach deserves consideration.
 
