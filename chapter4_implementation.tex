@@ -58,7 +58,7 @@ podman machine start
 
 Transitioning from Docker to Podman involved adapting several scripts to align with Podman's container networking model.
 
-For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah \cite{buildah} instead of Docker for container operations. Buildah is daemonless, which aligns with security policies governing long-running processes.
+For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah \cite{buildah} instead of Docker for container operations. Buildah is daemonless, which complies with security policies that govern long-running daemon processes.
 
 Our build toolchain used CMake for project configuration and Clang for compilation. We required CMake version 3.5 or higher because cifuzz integration depends on features from that version. The CMake configuration for enabling fuzzing required minimal setup:
 

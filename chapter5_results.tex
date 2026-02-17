@@ -24,7 +24,7 @@ Additional targets included pugixml, jsoncons, fmt, spdlog, and glm. These provi
 
 All local experiments ran on macOS with an Apple M1 Pro processor. The container runtime used Podman with 4 CPUs and 8 GB memory allocated. This choice was deliberate, we wanted hardware that typical automotive development teams have access to. If our approach required dedicated GPU clusters, practical adoption would be more constrained.
 
-Our software stack consisted of Podman for containers (chosen for alignment with the enterprise container runtime environment), CMake with Clang for building, libFuzzer via cifuzz for fuzzing, and Ollama for local model inference. For enterprise deployment testing, we used Azure OpenAI with GPT-4o connected via Azure Private Link, a configuration established through the enterprise provisioning process, as detailed in Chapter 4.
+Our software stack consisted of Podman for containers (chosen to match the Linux-based container runtime used in the enterprise CI/CD environment), CMake with Clang for building, libFuzzer via cifuzz for fuzzing, and Ollama for local model inference. For enterprise deployment testing, we used Azure OpenAI with GPT-4o connected via Azure Private Link, a configuration established through the enterprise provisioning process, as detailed in Chapter 4.
 
 
 \section{LLM Fuzz Driver Generation Results}
