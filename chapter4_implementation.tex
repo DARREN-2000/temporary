@@ -3,12 +3,12 @@
 \chapter{Implementation}
 \label{chap:implementation}
 
-This chapter describes how we turned the methodology from Chapter 3 into working code and systems. The implementation happened in three phases, each building on the previous one. We explain the tools we chose, the specific steps we followed, and the problems we solved along the way.
+This chapter describes how we turned the methodology from Chapter 3 into working code and systems. The implementation happened in three phases, each building on the previous one. We explain the tools we chose, the specific steps we followed, and the engineering decisions we made along the way.
 
 \section{Toolchain Selection and Rationale}
 \label{sec:impl_toolchain}
 
-Before writing any code, we needed to select the appropriate tools. The selection involved balancing multiple requirements. Research reproducibility required tools with stable APIs and clear documentation. Industrial deployment required compatibility with CARIAD's existing infrastructure. Hardware availability constrained which models could run locally with acceptable performance.
+Before writing any code, we needed to select the appropriate tools. The selection involved balancing multiple requirements. Research reproducibility required tools with stable APIs and clear documentation. Industrial deployment required compatibility with CARIAD's existing infrastructure. Hardware specifications influenced which models could run locally with acceptable performance.
 
 \subsection{Fuzzing Infrastructure}
 
@@ -33,7 +33,7 @@ llama-gguf-split --merge qwen2.5-coder-14b-instruct-q5_k_m-00001-of-00002.gguf \
                  qwen2.5-coder-14b-instruct-q5_k_m.gguf
 \end{lstlisting}
 
-This merging step added complexity to our workflow but was necessary for evaluating the larger models.
+This merging step was an additional workflow requirement for evaluating the larger models.
 
 For cloud deployment in the enterprise phase, we configured Azure OpenAI \cite{azure_openai}. Azure provided GPT-4o through a managed endpoint. The authentication used API keys stored as GitHub secrets. We configured the following environment variables:
 
@@ -44,11 +44,11 @@ export CIFUZZ_LLM_API_TOKEN="<api-key>"
 export CIFUZZ_LLM_MAX_TOKENS=40000
 \end{lstlisting}
 
-A token limit of 40,000 was necessary because fuzz driver generation requires substantial context. Prompts include header files, example code, and detailed instructions. Smaller token limits caused truncation and worse results.
+A token limit of 40,000 was necessary because fuzz driver generation requires substantial context. Prompts include header files, example code, and detailed instructions. Smaller token limits led to truncation and reduced output quality.
 
 \subsection{Development Environment}
 
-Local development happened on a MacBook Pro with an M1 Pro chip. For improved Linux container compatibility on Apple Silicon, we chose Podman as our container runtime. Podman aligned well with the enterprise CI/CD runners, which also used Linux.
+Local development happened on a MacBook Pro with an M1 Pro chip. For Linux container support on Apple Silicon, we chose Podman as our container runtime. Podman aligned well with the enterprise CI/CD runners, which also used Linux.
 
 \begin{lstlisting}[language=bash, caption={Podman Setup on macOS}]
 brew install podman
@@ -56,9 +56,9 @@ podman machine init --cpus 4 --memory 8192
 podman machine start
 \end{lstlisting}
 
-Transitioning from Docker to Podman required adapting several scripts to account for differences in container networking behavior.
+Transitioning from Docker to Podman involved adapting several scripts to align with Podman's container networking model.
 
-For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah \cite{buildah} instead of Docker for container operations. Buildah is daemonless, which fits better with security policies that restrict long-running processes.
+For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah \cite{buildah} instead of Docker for container operations. Buildah is daemonless, which aligns with security policies governing long-running processes.
 
 Our build toolchain used CMake for project configuration and Clang for compilation. We required CMake version 3.5 or higher because cifuzz integration depends on features from that version. The CMake configuration for enabling fuzzing required minimal setup:
 
@@ -73,7 +73,7 @@ enable_fuzz_testing()
 add_subdirectory(cifuzz-spark)
 \end{lstlisting}
 
-We also needed to update CMakeLists.txt files in subdirectories. Several target libraries had older CMake configurations that conflicted with our setup. The fix was consistent across all subdirectories:
+We also needed to update CMakeLists.txt files in subdirectories. Several target libraries used CMake configurations that needed updates for compatibility with our setup. The fix was consistent across all subdirectories:
 
 \begin{lstlisting}[language=cmake, caption={Subdirectory CMake Updates}]
 cmake_minimum_required(VERSION 3.10...3.22)
@@ -134,7 +134,7 @@ yaml-cpp is a YAML parsing library with approximately 35 source files and over 1
 
 \textbf{Secondary Targets:}
 \begin{itemize}
-    \item \textbf{RapidJSON}: A JSON parsing library widely used in performance-critical applications. We had some initial difficulties with RapidJSON's CMake configuration, but resolved them by re-downloading a clean version of the source.
+    \item \textbf{RapidJSON}: A JSON parsing library widely used in performance-critical applications. RapidJSON's CMake configuration needed adjustments for our setup, which we resolved by re-downloading a clean version of the source.
     \item \textbf{pugixml}: XML processing library with similar parsing challenges to yaml-cpp.
     \item \textbf{fmt}: Text formatting library with different API patterns than the parsers.
     \item \textbf{spdlog}: Logging library with many configuration options.
@@ -147,7 +147,7 @@ We also tested on several CARIAD internal libraries, though we cannot report tho
 
 \subsection{Evaluation Environment}
 
-Hardware for local evaluation was a workstation with sufficient GPU memory for running 32B parameter models with 4-bit quantization. Larger models like Mixtral 46.7B required offloading to system RAM, which slowed inference.
+Hardware for local evaluation was a workstation with sufficient GPU memory for running 32B parameter models with 4-bit quantization. Larger models like Mixtral 46.7B required offloading to system RAM, which increased inference time.
 
 Each model's evaluation followed these steps:
 
@@ -244,7 +244,7 @@ We also tested the fine-tuned models on RapidJSON and pugixml to check generaliz
 \section{Phase 3: Enterprise CI/CD Integration}
 \label{sec:impl_phase3}
 
-Phase 3 focused on deploying the validated approach from Phases 1 and 2 into CARIAD's production CI/CD infrastructure using Azure OpenAI \cite{azure_openai} as the LLM backend. This phase directly addressed \textbf{RQ3}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? The transition from controlled local experiments with Ollama \cite{ollama} to enterprise deployment revealed unexpected infrastructure challenges that became the dominant technical hurdle of this phase.
+Phase 3 focused on deploying the validated approach from Phases 1 and 2 into CARIAD's production CI/CD infrastructure using Azure OpenAI \cite{azure_openai} as the LLM backend. This phase directly addressed \textbf{RQ3}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? The transition from controlled local experiments with Ollama \cite{ollama} to enterprise deployment revealed additional infrastructure considerations that became the primary engineering focus of this phase.
 
 \subsection{Architectural Challenges}
 
@@ -254,7 +254,7 @@ Our initial integration strategy appeared simple in concept. The working local p
 
 CARIAD operates with a zero-trust security model. CI/CD runners are isolated from the public internet, and external connections require explicit approval. Integrating cloud-based AI services within this security framework required a tailored architectural approach.
 
-Our initial pipeline configuration did not account for the network isolation requirements. The Azure OpenAI requests were routed through the corporate firewall, which, as expected in a zero-trust environment, did not permit direct external API access.
+Our initial pipeline configuration was designed for direct connectivity and was subsequently adapted for the network isolation requirements. The Azure OpenAI requests were routed through the corporate firewall, which, as expected in a zero-trust environment, did not permit direct external API access.
 
 The resulting error message required investigation to diagnose:
 \begin{lstlisting}
@@ -262,7 +262,7 @@ Error: fatal: unable to access 'https://git.hub.vwgroup.com/...':
 Failed to connect to 127.0.0.1 port 9000 after 0 ms: Couldn't connect to server
 \end{lstlisting}
 
-Investigation revealed that the proxy configuration intended for Azure was inadvertently affecting internal Git operations. The runner was trying to send Git traffic through a proxy that was not configured for that purpose.
+Investigation revealed that the proxy configuration scope needed refinement to separate Azure-bound traffic from internal Git operations. The runner was directing Git traffic through the Azure proxy endpoint, which was configured exclusively for LLM API access.
 
 \textbf{Challenge 2: Container Networking}
 
@@ -274,13 +274,13 @@ Host network mode:
 \begin{lstlisting}[language=bash]
 buildah run --network host -v $(pwd):/project $containerid /bin/bash -c "cifuzz spark target"
 \end{lstlisting}
-This gave the container the host's network access. Still blocked by the firewall.
+This provided the container with host-level network access, though the firewall policy continued to govern external connections.
 
 Custom DNS entries:
 \begin{lstlisting}[language=bash]
 buildah run --add-host ny4mdomain.openai.azure.com:${OPENAI_IP} ...
 \end{lstlisting}
-Did not help because the issue was firewall policy, not DNS resolution.
+This approach was not effective because the connectivity requirement originated from firewall policy rather than DNS resolution.
 
 \textbf{Challenge 3: Credential Management}
 
@@ -319,7 +319,7 @@ Setting up Private Link involved coordination with the infrastructure team, foll
     \item Testing and validation
 \end{enumerate}
 
-We prepared a detailed business case including cost analysis (approximately \texteuro{}74 to \texteuro{}1,452 annually depending on usage) and security risk assessment. This documentation was essential for getting approval.
+We prepared a detailed business case including cost analysis (approximately \texteuro{}74 to \texteuro{}1,452 annually depending on usage) and security risk assessment. This documentation supported the approval process.
 
 \textbf{Working Pipeline Configuration}
 

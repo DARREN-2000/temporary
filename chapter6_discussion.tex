@@ -16,7 +16,7 @@ Our experimental results revealed patterns we did not anticipate at the outset o
 
 Most surprising was the inverse relationship between model size and performance. Conventional wisdom in machine learning suggests larger models perform better. Our fuzz driver experiments showed something different.
 
-Why did the larger general-purpose models fail while smaller specialized ones succeeded? We spent time analyzing the failures and found a consistent explanation. The larger models generated code that looked plausible but fundamentally misunderstood the fuzz driver task. They would create elaborate test scaffolding, call APIs in reasonable sequences, but miss the essential structure that a libFuzzer driver requires. The \texttt{LLVMFuzzerTestOneInput} function signature was wrong. The input parsing was incorrect.
+Why did the larger general-purpose models fail while smaller specialized ones succeeded? We spent time analyzing the failures and found a consistent explanation. The larger models generated code that appeared syntactically plausible but did not align with the structural requirements of the fuzz driver task. They would create elaborate test scaffolding, call APIs in reasonable sequences, but miss the essential structure that a libFuzzer driver requires. The \texttt{LLVMFuzzerTestOneInput} function signature was wrong. The input parsing was incorrect.
 
 Qwen 2.5-Coder succeeded because it was trained specifically on code generation tasks. It understood the structural patterns of fuzz drivers from its training data. The model had seen enough examples of the correct form to reproduce it reliably. This matters more than raw parameter count.
 
@@ -34,7 +34,7 @@ This gap matters, but so does the time investment. A skilled security engineer m
 
 We anticipated the core technical challenge would be generating high-quality fuzz drivers. We expected difficulties with C++ complexity, API understanding, or coverage optimization. We planned our research around these expected challenges.
 
-The primary focus of effort turned out to be infrastructure.
+Infrastructure integration became a significant focus of the implementation effort.
 
 When we moved from local experiments to CARIAD's production environment, we identified that integrating with the corporate network architecture required additional design considerations. The CI/CD runners operated in isolated network segments by design, and external API access required explicit network path configuration. Our architecture assumed we could call LLM services from build processes, but the corporate network security policies required a tailored approach.
 
@@ -59,7 +59,7 @@ The architecture of this solution is illustrated in Figure~\ref{fig:enterprise_n
 
 Setting up Private Link involved organizational coordination, including approval processes, security reviews, configuration testing, and documentation, which are standard steps for enterprise deployments in regulated industries. The technical configuration itself was manageable once approvals were obtained, requiring approximately one month from initial request to operational deployment.
 
-This experience provided an important insight about AI deployment in enterprise environments. The machine learning challenges are often less complex than the infrastructure requirements. Corporate IT infrastructure, security policies, and approval processes introduce considerations that academic research environments typically do not encounter. Anyone planning to deploy LLM-based tools in large organizations should plan for a comprehensive integration timeline beyond the technical implementation. Based on our experience, organizations should allocate 2 to 3 months for enterprise integration even when the core technology is proven.
+This experience provided an important insight about AI deployment in enterprise environments. The machine learning components are complemented by infrastructure integration requirements. Enterprise environments introduce additional considerations, including network architecture, security compliance, and provisioning workflows, that differ from academic research settings. Anyone planning to deploy LLM-based tools in large organizations should allocate appropriate time for enterprise integration alongside the technical implementation. Based on our experience, organizations should plan for a 2 to 3 month enterprise integration timeline to accommodate standard provisioning and compliance workflows.
 
 
 \section{Addressing Research Questions}
@@ -94,7 +94,7 @@ The performance requirement was met. Driver generation completed within reasonab
 
 The cost requirement was clearly met. As detailed in Chapter 5 Section 5.4, enterprise deployment costs are minimal compared to manual security testing efforts or the cost of security incidents from undetected vulnerabilities.
 
-The security requirement was the most involved to satisfy. Network isolation policies initially required an alternative deployment approach. The Azure Private Link solution addressed this, but required coordination with infrastructure teams. The security requirements are achievable, but organizations should expect integration effort proportional to their security policy complexity.
+The security requirement required the most comprehensive engineering effort. Network isolation policies initially required an alternative deployment approach. The Azure Private Link solution addressed this, but required coordination with infrastructure teams. The security requirements are achievable, but organizations should plan integration timelines appropriate to their security requirements.
 
 
 \subsection{Secondary Research Questions Analysis}
@@ -177,11 +177,11 @@ Regulatory requirements are tightening. UNECE Regulation 155 \cite{UNECER155} (U
 
 Software complexity continues to grow. Modern vehicles contain millions of lines of code across networked ECUs. Manual security review cannot scale to this volume. Automated approaches are necessary just to maintain coverage.
 
-Skilled security engineers are in high demand across industries. Automotive organizations benefit from tools that maximize the effectiveness of their security engineering teams. Tools that multiply the effectiveness of available engineers provide competitive advantage.
+Security engineering expertise is highly valued across industries. Automotive organizations benefit from tools that maximize the effectiveness of their security engineering teams. Tools that multiply the effectiveness of available engineers provide competitive advantage.
 
-LLM-assisted fuzzing addresses all three pressures. It provides documented security testing for compliance. It scales to large codebases. It reduces demands on specialized personnel.
+LLM-assisted fuzzing addresses all three pressures. It provides documented security testing for compliance. It scales to large codebases. It enables more efficient use of specialized personnel.
 
-The cost analysis from Chapter 5 Section 5.4 reinforces this argument. At annual costs lower than a single day of consultant time, even modest improvements in security testing efficiency produce positive return on investment.
+The cost analysis from Chapter 5 Section 5.4 reinforces this argument. At modest annual costs, even incremental improvements in security testing efficiency produce positive return on investment.
 
 Adoption considerations remain. Automotive organizations follow rigorous validation processes when adopting new tools for safety-adjacent applications. Validation requirements for tools used in ISO 26262 contexts create additional steps. The path from research prototype to certified production tool involves considerable effort.
 
@@ -195,13 +195,13 @@ Our integration experience illustrates a broader consideration for enterprises a
 
 Modern AI services typically operate as cloud APIs. Organizations call external endpoints, send data, receive results. This model works well for many applications. It requires adaptation when security policies govern external communication.
 
-Large enterprises, particularly in regulated industries, operate on the assumption that internal networks are isolated from the internet. Data stays inside the perimeter. External services are accessed through carefully controlled gateways. This security model was established before cloud computing and AI services became prevalent, and is being adapted to accommodate these new capabilities.
+Large enterprises, particularly in regulated industries, operate on the assumption that internal networks are isolated from the internet. Data stays inside the perimeter. External services are accessed through carefully controlled gateways. This security model continues to evolve as cloud computing and AI services become integral to enterprise operations.
 
 Aligning AI deployment requirements with enterprise security models requires thoughtful architecture. Teams adopting AI tools must work with infrastructure teams to establish compliant access paths, which involves standard enterprise provisioning timelines.
 
 We see several responses to this challenge:
 
-\textbf{Private deployment of models.} Running models on internal infrastructure avoids external network traffic entirely. This works for smaller models but requires significant compute resources for larger ones. Our local experiments used a workstation with unified memory shared between CPU and GPU, which limits model size options. Organizations must weigh infrastructure costs (hardware, maintenance, power) against API costs when choosing deployment approaches.
+\textbf{Private deployment of models.} Running models on internal infrastructure avoids external network traffic entirely. This works for smaller models but requires significant compute resources for larger ones. Our local experiments used a workstation with unified memory shared between CPU and GPU, which defines the range of supported model sizes. Organizations must weigh infrastructure costs (hardware, maintenance, power) against API costs when choosing deployment approaches.
 
 \textbf{Cloud provider private connectivity.} Services like Azure Private Link \cite{azure_private_link}, AWS PrivateLink, and Google Cloud Private Service Connect create private paths to cloud services. These maintain security boundaries while enabling access. Configuration requires coordination between cloud and enterprise network teams.
 
@@ -265,7 +265,7 @@ The qualification matters. Not all models work. General-purpose models, even lar
 
 Fine-tuning small models proved more effective than expected. Our LoRA adapted 1.5B model achieved measurable efficiency gains (detailed in Chapter 5) while producing usable fuzz drivers. For organizations with compute constraints or cost sensitivity, this approach deserves consideration.
 
-An important finding was the role of infrastructure. We expected the primary focus to be generating good code. In practice, a substantial portion of the project timeline was spent on deploying our solution within the corporate network architecture. Initial approaches including proxy configuration, boundary client integration, and container networking required redesign to align with the enterprise network design. The solution ultimately required organizational support for Azure Private Link architecture.
+An important finding was the role of infrastructure. We expected the primary focus to be generating good code. In practice, a substantial portion of the project timeline was spent on deploying our solution within the corporate network architecture. Initial approaches including proxy configuration, boundary client integration, and container networking were iteratively refined to align with the enterprise network architecture. The solution ultimately required organizational support for Azure Private Link architecture.
 
 The economics strongly favor adoption. As shown in Chapter 5, LLM-assisted fuzzing represents a modest investment relative to typical automotive development budgets. The value comes from scaling security testing to match code production rates that manual approaches cannot achieve.
 

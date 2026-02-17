@@ -22,9 +22,9 @@ Additional targets included pugixml, jsoncons, fmt, spdlog, and glm. These provi
 \subsection{Hardware and Software Configuration}
 \label{sec:exp_hardware}
 
-All local experiments ran on macOS with an Apple M1 Pro processor. The container runtime used Podman with 4 CPUs and 8 GB memory allocated. This choice was deliberate, we wanted hardware that typical automotive development teams have access to. If our approach required expensive GPU clusters, adoption would be severely limited in practice.
+All local experiments ran on macOS with an Apple M1 Pro processor. The container runtime used Podman with 4 CPUs and 8 GB memory allocated. This choice was deliberate, we wanted hardware that typical automotive development teams have access to. If our approach required dedicated GPU clusters, practical adoption would be more constrained.
 
-Our software stack consisted of Podman for containers (chosen over Docker for enterprise compatibility reasons that became apparent during CI/CD integration), CMake with Clang for building, libFuzzer via cifuzz for fuzzing, and Ollama for local model inference. For enterprise deployment testing, we used Azure OpenAI with GPT-4o connected via Azure Private Link, a configuration that took weeks to properly establish, as detailed in Chapter 4.
+Our software stack consisted of Podman for containers (chosen for alignment with the enterprise container runtime environment), CMake with Clang for building, libFuzzer via cifuzz for fuzzing, and Ollama for local model inference. For enterprise deployment testing, we used Azure OpenAI with GPT-4o connected via Azure Private Link, a configuration established through the enterprise provisioning process, as detailed in Chapter 4.
 
 
 \section{LLM Fuzz Driver Generation Results}
@@ -84,9 +84,9 @@ Several models did not produce usable output. This was one of the more important
 \toprule
 Model & Failure Reason & Lessons Learned \\
 \midrule
-Yi 34B & Generation hallucinations, 0\% coverage & General-purpose models not suited for specialized code tasks \\
-DeepSeek R1 & Poor fuzzing context understanding & Reasoning-focused training alone does not guarantee code generation ability \\
-Mixtral 46.7B & Resource constraints due to size & Hardware limitations require model size consideration \\
+Yi 34B & Generation hallucinations, 0\% coverage & General-purpose training alone may not prepare models for specialized code generation \\
+DeepSeek R1 & Poor fuzzing context understanding & Reasoning-focused training may not transfer directly to code generation tasks \\
+Mixtral 46.7B & Model exceeded available hardware capacity & Practical deployment requires matching model size to available hardware \\
 \bottomrule
 \end{tabular}%
 }
@@ -94,7 +94,7 @@ Mixtral 46.7B & Resource constraints due to size & Hardware limitations require 
 
 Yi 34B demonstrated a characteristic of general-purpose models when applied to specialized code tasks. Despite having 34 billion parameters, it produced outputs that achieved zero percent coverage. The generated drivers compiled successfully in some cases and were not syntactically broken, but they did not exercise the target library effectively. Functions were called with incorrect parameter combinations, or the driver simply returned immediately without exercising any library functionality. We tested multiple prompt variations to verify this was not a prompt engineering issue. The results were consistent across all attempts.
 
-We also tested DeepSeek R1, a reasoning-focused model, outside the original 14-model benchmark. It was designed for reasoning tasks, but in our experiments, that capability did not translate to effective fuzz driver generation. Mixtral's 46.7 billion parameters simply exceeded available hardware resources, we could not even complete a full evaluation run.
+We also tested DeepSeek R1, a reasoning-focused model, outside the original 14-model benchmark. It was designed for reasoning tasks, but in our experiments, that capability did not translate to effective fuzz driver generation. Mixtral's 46.7 billion parameters exceeded the available hardware capacity, preventing completion of a full evaluation run.
 
 A clear pattern emerged, code-specialized models outperformed larger general-purpose models by substantial margins. Size alone does not determine quality for specialized tasks like fuzz driver generation.
 
@@ -262,7 +262,7 @@ Even at the enterprise level with complete automation, annual costs stay under \
 
 Industry estimates for manual fuzz driver development:
 \begin{itemize}
-    \item Senior security engineer hourly rate: \texteuro{}80 to 120 (industry average)
+    \item Senior security engineer hourly rate: \texteuro{}80 to 120 (based on published industry benchmarks)
     \item Time to write an effective fuzz driver: 2 to 8 hours per target
     \item Annual cost for security engineering resources: varies by market and seniority
 \end{itemize}
