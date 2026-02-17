@@ -12,7 +12,7 @@ This chapter interprets the experimental results from Chapter 5, connects them t
 \subsection{What the Data Reveals}
 \label{sec:discussion_data}
 
-Our experimental results revealed patterns we did not anticipate at the outset of this work.
+The experimental results revealed patterns we did not anticipate at the outset of this work.
 
 Most surprising was the inverse relationship between model size and performance. Conventional wisdom in machine learning suggests larger models perform better. Our fuzz driver experiments showed something different.
 
@@ -64,9 +64,9 @@ This experience provided an important insight about AI deployment in enterprise 
 
 \textbf{RQ1: Can Large Language Models generate fuzz drivers for C++ code that compile successfully, execute without errors, and achieve meaningful code coverage?}
 
-Yes, with qualifications.
+Yes, though several conditions apply.
 
-Our experiments demonstrated that specialized code models can generate fuzz drivers meeting these criteria. Results from Chapter 5 Section 5.2 show that the best performing models achieved 43 to 45\% line coverage on yaml-cpp.
+The experiments demonstrated that specialized code models can generate fuzz drivers meeting these criteria. Results from Chapter 5 Section 5.2 show that the best performing models achieved 43 to 45\% line coverage on yaml-cpp.
 
 However, the qualifications matter. Not all models succeed. General-purpose models, even large ones, frequently did not produce usable output. Model selection matters. In practice, the question ``can LLMs do this'' should really be ``which LLMs can do this, and under what conditions.''
 
@@ -74,7 +74,7 @@ While respectable, these coverage numbers likely trail expert human performance.
 
 \textbf{RQ2: Does model size determine fuzz driver quality, or can smaller models with domain-specific training match or exceed larger general-purpose models?}
 
-Our data strongly supports the second hypothesis. Domain-specific training matters more than raw parameter count for this task.
+The data strongly supports the second hypothesis. Domain-specific training matters more than raw parameter count for this task.
 
 Evidence from Chapter 5 Section 5.2 indicates that code-specialized models succeeded where larger general-purpose models did not produce usable output. Our LoRA fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens while producing usable fuzz drivers (see Section 5.3). These specialized models understood what a fuzz driver should look like because they had seen relevant examples during training.
 
@@ -98,7 +98,7 @@ Beyond the primary questions, our work revealed answers to questions we did not 
 
 \textbf{What types of libraries are best suited for LLM-generated fuzz drivers?}
 
-Our experiments across multiple repositories showed that parsing libraries with clear documentation produced better drivers. Libraries with extensive header comments, consistent function signatures, and simple data types yielded higher success rates. Complex APIs with heavy template usage, deeply nested callback patterns, or implicit preconditions produced more failures.
+Experiments across multiple repositories showed that parsing libraries with clear documentation produced better drivers. Libraries with extensive header comments, consistent function signatures, and simple data types yielded higher success rates. Complex APIs with heavy template usage, deeply nested callback patterns, or implicit preconditions produced more failures.
 
 yaml-cpp fell in the middle range. Its parsing APIs are reasonably well documented, but the YAML specification itself introduces complexity. The cross-library results from Chapter 5 Section~\ref{sec:results_cross_library} revealed additional patterns, jsoncons achieved the highest coverage (45.64\%), while the fmt library showed that smaller models can outperform larger ones when the API surface is simpler. Libraries with mathematical interfaces (glm) or configuration-heavy APIs (spdlog) consistently produced 0\% coverage, suggesting these patterns remain challenging for current LLMs.
 
@@ -253,7 +253,7 @@ The practical impact extends beyond academic contribution. CARIAD can deploy the
 \section{Conclusion}
 \label{sec:discussion_conclusion}
 
-This work began with a direct question, can Large Language Models automate fuzz driver generation for automotive software? After five months of research, implementation, and deployment effort at CARIAD (May to September 2025), the answer is a qualified yes.
+This work began with a direct question, can Large Language Models automate fuzz driver generation for automotive software? After research, implementation, and deployment effort at CARIAD spanning May through September 2025, the answer is a qualified yes.
 
 This qualification matters. Not all models work. General-purpose models, even large ones, frequently did not produce usable output for this task. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is a key design decision.
 

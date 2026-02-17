@@ -3,7 +3,7 @@
 \chapter{Experimental Results}
 \label{chap:results}
 
-In this chapter, we present the experimental findings from our three-phase research conducted between May and September 2025. The goal was to determine whether LLMs can generate useful fuzz drivers, and if so, under what conditions. The results were mixed, with some outcomes differing from initial expectations and others confirming our hypotheses. These findings directly address the research questions defined in Chapter 1.
+Our three-phase research, conducted between May and September 2025, produced both expected and unexpected results. Some models generated working fuzz drivers while the majority did not. Fine-tuning improved efficiency but not coverage. Enterprise deployment was technically feasible but required more infrastructure work than anticipated. This chapter presents these findings in detail, organized by research phase, and maps them to the research questions from Chapter 1.
 
 
 \section{Experimental Setup}
@@ -56,7 +56,7 @@ The ``Successful Tests'' column requires explanation, as this metric counts test
 
 Code coverage measures the percentage of source code lines or branches executed during testing and is the standard metric for evaluating fuzz driver quality. Gemma 3 27B achieved the highest coverage at 45.06\%, slightly outperforming the larger Qwen 2.5-Coder 32B which reached 43.08\%. This was unexpected, the smaller model outperformed the larger one while using fewer tokens. We initially suspected measurement error, but the results held across multiple runs with consistent reproducibility.
 
-That said, these numbers require context. While 45\% coverage represents a meaningful automated achievement, analysis of comparable manually-written fuzz drivers in OSS-Fuzz projects (based on examination of yaml-cpp and similar parsing library drivers) suggests expert-crafted drivers typically achieve 60 to 80\% line coverage for libraries of similar complexity. Our best AI-generated driver falls short of expert human work in absolute coverage terms. The value proposition is not surpassing humans, it is automating what would otherwise require considerable manual effort.
+That said, these numbers require context. While 45\% coverage represents a meaningful automated achievement, we examined several comparable manually-written fuzz drivers in the OSS-Fuzz corpus for yaml-cpp and similar parsing libraries (pugixml, RapidJSON, libxml2). These expert-crafted drivers typically achieve 60 to 80\% line coverage, based on coverage reports available through the FuzzBench \cite{FuzzBench2021} infrastructure and OSS-Fuzz project dashboards. Our best AI-generated driver falls short of expert human work in absolute coverage terms. The value proposition is not surpassing humans, it is automating what would otherwise require considerable manual effort.
 
 Phi-4 14B showed lower coverage at 34.26\% despite generating more unique test cases (2,220 vs 2,050). It required significantly more tokens, 71.5k compared to Gemma's 40.2k, making it far less efficient for production use. More test cases do not necessarily mean better coverage.
 
@@ -174,7 +174,7 @@ jsoncons showed the highest coverage of any library we tested (45.64\%), slightl
 \section{Model Optimization Results}
 \label{sec:results_optimization}
 
-Having established that specialized models outperform general-purpose ones, we investigated whether fine-tuning could further improve efficiency while reducing computational requirements. This phase directly addresses the optimization aspect of \textbf{RQ2}: can smaller models with domain-specific training match or exceed larger general-purpose models?
+Having established that specialized models outperform general-purpose ones, we investigated whether fine-tuning could further improve efficiency while reducing computational requirements. These experiments address the optimization aspect of \textbf{RQ2}: can smaller models with domain-specific training match or exceed larger general-purpose models?
 
 \subsection{LoRA Fine-Tuning Efficiency}
 \label{sec:results_lora_efficiency}
@@ -263,7 +263,7 @@ Even at the enterprise level with complete automation, annual costs stay under \
 Industry estimates for manual fuzz driver development:
 \begin{itemize}
     \item Senior security engineer hourly rate: \texteuro{}80 to 120 (based on published industry benchmarks)
-    \item Time to write an effective fuzz driver: 2 to 8 hours per target
+    \item Time to write an effective fuzz driver: 2 to 8 hours per target (lower end for well-documented parsing APIs, upper end for complex C++ libraries with heavy template usage)
     \item Annual cost for security engineering resources: varies by market and seniority
 \end{itemize}
 
@@ -281,15 +281,15 @@ The economic advantage appears clear, but there is an important caveat. Current 
 
 The experiments produced several clear findings, along with some important caveats.
 
-First, model specialization matters more than size. Gemma 3 27B outperformed Yi 34B despite having fewer parameters. Code-specialized models beat larger general-purpose models consistently across our tests.
+Model specialization matters more than size. Gemma 3 27B outperformed Yi 34B despite having fewer parameters. Code-specialized models beat larger general-purpose models consistently across our tests.
 
-Second, performance varies across library types. Parsing libraries (yaml-cpp, jsoncons, pugixml) consistently produced the best coverage results, while utility libraries (glm, spdlog) proved more challenging. The fmt library revealed that smaller models can outperform larger ones on simpler APIs, with Phi-4 14B and Llama 3 achieving 100\% coverage where the larger Qwen 2.5-Coder 32B and Gemma 3 27B both achieved 0\%.
+Performance also varies across library types. Parsing libraries (yaml-cpp, jsoncons, pugixml) consistently produced the best coverage results, while utility libraries (glm, spdlog) proved more challenging. The fmt library revealed that smaller models can outperform larger ones on simpler APIs, with Phi-4 14B and Llama 3 achieving 100\% coverage where the larger Qwen 2.5-Coder 32B and Gemma 3 27B both achieved 0\%.
 
-Third, fine-tuning enables efficient deployment. The fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens compared to the base model, though it still did not match the coverage of larger specialized models.
+Fine-tuning enables efficient deployment. The fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens compared to the base model, though it still did not match the coverage of larger specialized models.
 
-Fourth, the economics are favorable, at least on paper. Annual infrastructure costs range from \texteuro{}74 for light usage to \texteuro{}1,452 for full enterprise deployment. Manual security engineering involves higher personnel investment, though the two approaches serve complementary rather than substitutable roles, the LLM automates initial driver creation while human expertise remains necessary for review and refinement.
+The economics appear favorable as well. Annual infrastructure costs range from \texteuro{}74 for light usage to \texteuro{}1,452 for full enterprise deployment. Manual security engineering involves higher personnel investment, though the two approaches serve complementary rather than substitutable roles, the LLM automates initial driver creation while human expertise remains necessary for review and refinement.
 
-These findings directly address our research questions:
+Mapping these findings to our research questions:
 
 \textbf{RQ1 (Effectiveness)}: Can Large Language Models generate fuzz drivers for C++ code that compile successfully, execute without errors, and achieve meaningful code coverage? Yes, our best models achieved over 40\% coverage on yaml-cpp and up to 100\% on fmt, with drivers that compiled and executed correctly. Cross-library testing (Section~\ref{sec:results_cross_library}) confirmed these results generalize to other parsing libraries like jsoncons (45.64\%) and pugixml (34.77\%), though performance on non-parsing libraries was more variable. We consider 34 to 45\% coverage ``meaningful'' because it represents automated baseline coverage that would otherwise require 2 to 8 hours of manual engineering per target. While this falls short of expert human-written drivers (60 to 80\% coverage), the value lies in automation at scale, not matching human experts.
 
