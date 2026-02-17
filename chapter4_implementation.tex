@@ -160,7 +160,7 @@ Each model's evaluation followed these steps:
     \item Record coverage metrics using llvm-cov
 \end{enumerate}
 
-We ran each model five times on yaml-cpp to account for stochastic output variation. We chose five runs as a balance between statistical reliability and evaluation time, as preliminary tests showed that variance in coverage results stabilized after three to four runs. Some models produced different outputs on identical prompts, making multiple runs necessary for reliable comparison. This variability was itself an interesting finding that we discuss further in Chapter 5.
+We ran each model five times on yaml-cpp to account for stochastic output variation. Preliminary tests showed that variance in coverage results stabilized after three to four runs, so we chose five runs to provide an additional margin of confidence. Some models produced different outputs on identical prompts, making multiple runs necessary for reliable comparison. This variability was itself an interesting finding that we discuss further in Chapter 5.
 
 A full evaluation cycle for one model on one target took approximately 10 to 15 minutes. With 14 models and 6 primary targets, plus five runs per configuration for consistency checking, the complete Phase 1 evaluation required approximately two weeks of continuous testing.
 
