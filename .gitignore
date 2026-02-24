@@ -1,0 +1,18 @@
+# LaTeX build artifacts
+Thesis_Latex/*.aux
+Thesis_Latex/*.bbl
+Thesis_Latex/*.bcf
+Thesis_Latex/*.blg
+Thesis_Latex/*.fdb_latexmk
+Thesis_Latex/*.fls
+Thesis_Latex/*.idx
+Thesis_Latex/*.ilg
+Thesis_Latex/*.ind
+Thesis_Latex/*.lof
+Thesis_Latex/*.log
+Thesis_Latex/*.lot
+Thesis_Latex/*.out
+Thesis_Latex/*.run.xml
+Thesis_Latex/*.synctex.gz
+Thesis_Latex/*.toc
+Thesis_Latex/thesis.pdf

@@ -72,6 +72,15 @@ Previous work worth noting includes HyLLfuzz, which combines LLM-generated seeds
 
 Across these studies, authors repeatedly note a gap between code that compiles and code that does something meaningful. LLMs produce code that compiles at high rates but may not exercise meaningful behavior.
 
+\subsection{Research Gap of LLM-Based Fuzzing Techniques}
+\label{sec:lit_llm_fuzzing_gap}
+
+While the systems surveyed above demonstrate that LLMs can generate fuzz targets and even fuzz drivers in controlled settings (e.g., TitanFuzz, FuzzGPT, and Fuzz4All) \cite{TitanFuzz2022, FuzzGPT2023, Fuzz4All2023}, they do not constitute a drop-in solution for the setting of this thesis: automated generation of C/C++ libFuzzer-style drivers under enterprise and automotive constraints. In particular, prior work repeatedly highlights that compilation success is not equivalent to meaningful test behavior \cite{LLMDriverGenEffectiveness2023}. For fuzzing, this is a critical limitation: a driver can compile yet still (i)~abort immediately due to invalid API usage, (ii)~execute only shallow ``happy-path'' code, or (iii)~miss error-handling and boundary-condition paths that are most relevant for security.
+
+Beyond this ``compiles vs.\ meaningful coverage'' gap, several practical constraints prevent directly adopting existing techniques in our environment. Many approaches implicitly assume (a)~high-quality, complete API documentation to prompt the model, even though real-world C++ libraries often expose large, template-heavy surfaces with incomplete documentation; (b)~cloud-based model access, which conflicts with IP protection requirements and network-isolated CI runners; and (c)~a research-style workflow where manual prompt iteration and human correction are acceptable, rather than a repeatable CI/CD-compatible process with predictable latency and cost. Hybrid approaches such as HyLLfuzz show the value of combining LLM generation with mutation-based fuzzing \cite{HyLLfuzz2024}, but they still leave open how to systematically operationalize the approach across targets, models, and enterprise deployment constraints.
+
+This thesis therefore proposes an end-to-end technique that retains the core idea of LLM-based harness/driver generation from API context \cite{TitanFuzz2022, Fuzz4All2023} and the hybrid principle of letting conventional coverage-guided fuzzing do the large-scale exploration \cite{HyLLfuzz2024}, while adding the missing components needed in practice: automated context extraction, automated compilation and sanitizer validation, and coverage-based evaluation gates to ensure generated drivers are not merely syntactically valid but also behaviorally useful. Chapter~3 presents this method in detail.
+
 \section{CI/CD Pipeline Security Integration}
 \label{sec:lit_cicd_integration}
 

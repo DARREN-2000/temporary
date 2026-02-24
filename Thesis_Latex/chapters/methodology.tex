@@ -29,37 +29,134 @@ We recognized that imperfect automation still helps. If an LLM generates a drive
 \section{Technical Architecture Design}
 \label{sec:meth_architecture}
 
-Moving from concept to working system required a robust technical design. Our system uses a layered architecture with three main components: \textbf{Input Analysis}, \textbf{Generation}, and \textbf{Execution}.
+Moving from concept to working system required a robust technical design. Our system uses a layered architecture with three main layers: the \textbf{Input Layer}, the \textbf{Generation Layer}, and the \textbf{Execution Layer} (corresponding to Sections~\ref{sec:input_layer}--\ref{sec:exec_layer}). Each layer is marked in Figure~\ref{fig:tech_architecture}.
 
 \begin{figure}[htbp]
     \centering
-    
+    \resizebox{\textwidth}{!}{
+    \begin{tikzpicture}[
+        databox/.style={draw, rectangle, minimum width=4cm, minimum height=0.9cm, align=center, fill=blue!8, thick, font=\small},
+        newdatabox/.style={draw, rectangle, minimum width=4cm, minimum height=0.9cm, align=center, fill=green!15, thick, font=\small},
+        procbox/.style={draw, rounded corners=8pt, rectangle, minimum width=4cm, minimum height=0.9cm, align=center, fill=orange!12, thick, font=\small},
+        newprocbox/.style={draw, rounded corners=8pt, rectangle, minimum width=4cm, minimum height=0.9cm, align=center, fill=yellow!25, thick, font=\small, draw=orange!80!black},
+        arrow/.style={->, >=stealth, thick},
+        layerlabel/.style={font=\bfseries\small, rotate=90, anchor=south},
+        layerbox/.style={draw, dashed, rounded corners=4pt, inner sep=10pt, fill opacity=0.03}
+    ]
 
-[Technical Architecture Diagram]
+    % ============ INPUT LAYER ============
+    \node[databox] (srccode) at (0, 0) {Source Code\\{\footnotesize(C/C++ project)}};
+    \node[databox] (headers) at (5.5, 0) {Public Header Files\\{\footnotesize(\texttt{.h} / \texttt{.hpp})}};
 
-    \includegraphics[width=0.85\textwidth]{bilder/architecture.png}
-    \caption{Technical Architecture Implementation. The workflow integrates the LLM as an automated frontend to the standard \textbf{Fuzzing Engine}, replacing manual driver development while maintaining the established execution pipeline.}
+    \node[newprocbox] (ctxextract) at (2.75, -2) {\textbf{Automated Context}\\
+    \textbf{Extraction}\\{\footnotesize(cifuzz spark \cite{cifuzzspark})}};
+
+    \node[newdatabox] (apictx) at (2.75, -4.2) {Extracted API Context\\{\footnotesize(signatures, types, classes)}};
+
+    % ============ GENERATION LAYER ============
+    \node[newdatabox] (fuzzinstr) at (-2.5, -6.4) {Fuzzing Instructions\\{\footnotesize(libFuzzer harness rules,}\\{\footnotesize safety constraints)}};
+
+    \node[newprocbox] (promptbuild) at (2.75, -6.8) {\textbf{Prompt Construction}\\{\footnotesize(API context + instructions)}};
+
+    \node[newdatabox] (prompt) at (2.75, -9) {Assembled Prompt};
+
+    \node[databox] (llmmodel) at (8, -9) {LLM Model\\{\footnotesize(local via Ollama /}\\{\footnotesize cloud via Azure OpenAI)}};
+
+    \node[newprocbox] (llmgen) at (5.5, -11) {\textbf{LLM-Based Driver}\\
+    \textbf{Generation}};
+
+    \node[newdatabox] (gendriver) at (5.5, -13) {Generated Fuzz Driver\\{\footnotesize(C++ source code)}};
+
+    % ============ EXECUTION LAYER ============
+    \node[procbox] (compile) at (2.5, -15) {\textbf{Compilation}\\{\footnotesize(Clang + ASan/UBSan)}};
+
+    \node[databox] (binary) at (2.5, -17) {Instrumented Binary};
+
+    \node[databox] (seedinputs) at (8.5, -17) {Seed Inputs};
+
+    \node[procbox] (fuzzexec) at (5.5, -19) {\textbf{Fuzzing Execution}\\{\footnotesize(libFuzzer)}};
+
+    \node[databox] (covdata) at (8.5, -21) {Coverage Data};
+    \node[databox] (crashdata) at (2.5, -21) {Crash Reports};
+
+    \node[newprocbox] (coveval) at (8.5, -23) {\textbf{Coverage Evaluation}\\{\footnotesize(quality gate)}};
+
+    \node[newdatabox] (covreport) at (8.5, -25) {Coverage Report\\{\footnotesize(pass / fail)}};
+
+    % ============ ARROWS ============
+    % Input layer
+    \draw[arrow] (srccode) -- (ctxextract);
+    \draw[arrow] (headers) -- (ctxextract);
+    \draw[arrow] (ctxextract) -- (apictx);
+
+    % Generation layer
+    \draw[arrow] (apictx) -- (promptbuild);
+    \draw[arrow] (fuzzinstr) -- (promptbuild);
+    \draw[arrow] (promptbuild) -- (prompt);
+    \draw[arrow] (prompt) -- (llmgen);
+    \draw[arrow] (llmmodel) -- (llmgen);
+    \draw[arrow] (llmgen) -- (gendriver);
+
+    % Execution layer
+    \draw[arrow] (gendriver) -- (compile);
+    \draw[arrow] (compile) -- (binary);
+    \draw[arrow] (binary) -- (fuzzexec);
+    \draw[arrow] (seedinputs) -- (fuzzexec);
+    \draw[arrow] (fuzzexec) -- (crashdata);
+    \draw[arrow] (fuzzexec) -- (covdata);
+    \draw[arrow] (covdata) -- (coveval);
+    \draw[arrow] (coveval) -- (covreport);
+
+    % ============ LAYER BRACKETS ============
+    \begin{scope}[on background layer]
+        \node[layerbox, fit=(srccode)(headers)(apictx)(ctxextract), fill=blue!3] (inputlayer) {};
+        \node[layerbox, fit=(fuzzinstr)(promptbuild)(prompt)(llmmodel)(llmgen)(gendriver), fill=yellow!3] (genlayer) {};
+        \node[layerbox, fit=(compile)(binary)(seedinputs)(fuzzexec)(covdata)(crashdata)(coveval)(covreport), fill=orange!3] (execlayer) {};
+    \end{scope}
+
+    \node[layerlabel] at ([xshift=-1.1cm]inputlayer.west) {Input Layer (\S\ref{sec:input_layer})};
+    \node[layerlabel] at ([xshift=-1.1cm]genlayer.west) {Generation Layer (\S\ref{sec:gen_layer})};
+    \node[layerlabel] at ([xshift=-1.1cm]execlayer.west) {Execution Layer (\S\ref{sec:exec_layer})};
+
+    % ============ LEGEND ============
+    \node[databox, minimum width=2.2cm, minimum height=0.55cm, font=\footnotesize] (legdata) at (12, -1) {Data};
+    \node[right=0.1cm of legdata, font=\footnotesize] {Existing data};
+    \node[newdatabox, minimum width=2.2cm, minimum height=0.55cm, font=\footnotesize] (legnewdata) at (12, -2) {Data};
+    \node[right=0.1cm of legnewdata, font=\footnotesize] {New (our contribution)};
+    \node[procbox, minimum width=2.2cm, minimum height=0.55cm, font=\footnotesize] (legproc) at (12, -3) {Process};
+    \node[right=0.1cm of legproc, font=\footnotesize] {Existing process};
+    \node[newprocbox, minimum width=2.2cm, minimum height=0.55cm, font=\footnotesize] (legnewproc) at (12, -4) {Process};
+    \node[right=0.1cm of legnewproc, font=\footnotesize] {New (our contribution)};
+
+    \end{tikzpicture}
+    }
+    \caption{Technical Architecture of our LLM-based fuzz driver generation pipeline. The three layers are marked with dashed borders. Data artifacts are shown in rectangular boxes; processing steps in boxes with rounded corners. Green/yellow highlighted elements denote new contributions of this work with respect to the state of the art (cf.\ Figure~\ref{fig:fuzzing_concept}).}
     \label{fig:tech_architecture}
 \end{figure}
 
-As shown in Figure \ref{fig:tech_architecture}, the data flows from source code through the LLM to the final execution engine.
+As shown in Figure~\ref{fig:tech_architecture}, the source code and its public header files serve as the primary input to the pipeline. These inputs are processed through three successive layers---context extraction, LLM-based generation, and automated execution---to ultimately produce coverage reports and crash data, replacing the manual fuzz driver creation step shown in Figure~\ref{fig:fuzzing_concept}.
 
 \subsection{Input Layer (Automated Context Extraction)}
-The first step is preparing the context. Instead of writing custom parsers, we used the analysis capabilities of \textbf{cifuzz spark}. This tool automatically parses the project structure, identifying public headers and API surfaces relevant for testing. It handles the complex task of traversing the abstract syntax tree (AST) to extract function signatures and class definitions. This ensures the LLM receives accurate context about the code it needs to test, without requiring manual intervention or maintenance of regex scripts.
+\label{sec:input_layer}
+The first layer prepares the context that the LLM needs to generate a meaningful fuzz driver. Instead of writing custom parsers, we used the analysis capabilities of \textbf{cifuzz spark}, a module of the cifuzz fuzzing toolkit developed by Code Intelligence~\cite{cifuzzspark}. Given a CMake-based C/C++ project, cifuzz spark automatically parses the project structure, identifying public headers and API surfaces relevant for testing. It traverses the abstract syntax tree (AST) to extract function signatures, class definitions, type aliases, and parameter types. The output is the \emph{extracted API context}: a structured summary of the target library's public interface, including function names, their parameter types, return types, and enclosing class or namespace information. This ensures the LLM receives accurate and complete context about the code it needs to test, without requiring manual intervention or maintenance of custom extraction scripts.
 
 \subsection{Generation Layer (LLM Interface)}
-This component handles the interaction with the LLM model. It includes two critical sub-systems:
+\label{sec:gen_layer}
+This layer handles the interaction with the LLM and the construction of the prompt that drives driver generation. It includes two critical sub-systems:
 \begin{itemize}
-    \item \textbf{Prompt Engineering:} We combine the extracted API context with specific fuzzing instructions for the fuzz test case structure.
-    \item \textbf{Backend Abstraction:} We configured the environment to swap between different model backends. While `cifuzz` manages the workflow, we routed the generation requests to both local models (via Ollama) and cloud models (via Azure OpenAI) to compare performance across different architectures.
+    \item \textbf{Prompt Construction:} We combine the \emph{extracted API context} (the structured function signatures, types, and class definitions produced by the Input Layer) with a set of \emph{fuzzing instructions}. These fuzzing instructions are predefined rules and constraints that describe what a valid libFuzzer fuzz driver must look like---specifically, the required \emph{fuzz test case structure}: the driver must implement the \texttt{LLVMFuzzerTestOneInput(const uint8\_t *data, size\_t size)} entry point, correctly consume the fuzzer-provided byte buffer, translate those bytes into valid API calls, and avoid trivial or undefined behavior. The instructions also encode safety constraints (e.g., do not call \texttt{exit()}, avoid infinite loops) to ensure the generated driver is compatible with the fuzzing engine.
+
+    \item \textbf{Backend Abstraction:} We configured the \emph{environment}---the runtime configuration that determines which LLM backend serves the generation requests---to swap between different model backends. While cifuzz manages the overall workflow, we routed the generation requests to both local models (via Ollama) and cloud-hosted models (via Azure OpenAI) to compare performance across different architectures. This abstraction allows the same pipeline to operate in network-isolated environments (using local models) or leverage more powerful cloud models when network access is available.
 \end{itemize}
 
 \subsection{Execution Layer (Evaluation Pipeline)}
-Generated drivers are useless if they do not run. This component handles the compilation and execution pipeline.
+\label{sec:exec_layer}
+The generated fuzz drivers---the C++ source files produced by the LLM in the Generation Layer---are useless if they do not compile and run correctly. This layer handles the automated compilation, execution, and evaluation pipeline:
 \begin{enumerate}
-    \item \textbf{Validation:} We try to compile the driver against the target library using Clang.
-    \item \textbf{Sanitization:} We compile with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) to detect memory errors.
-    \item \textbf{Execution:} If compilation succeeds, the driver runs under \texttt{libFuzzer}. The system monitors coverage metrics and records any crashes.
+    \item \textbf{Compilation and Validation:} The generated driver source code is compiled against the target library using Clang. This step verifies that the LLM-produced code is syntactically valid and links correctly against the target API.
+    \item \textbf{Sanitizer Instrumentation:} The driver is recompiled with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled. This detects memory errors, buffer overflows, and undefined behavior that might not cause an immediate crash but indicate incorrect API usage.
+    \item \textbf{Fuzzing Execution:} If compilation succeeds, the instrumented binary runs under \texttt{libFuzzer} together with any available seed inputs. The fuzzing engine monitors coverage metrics and records any crashes.
+    \item \textbf{Coverage Evaluation:} After the fuzzing run completes, the collected coverage data is evaluated against a quality gate to determine whether the generated driver achieves meaningful coverage of the target library, ensuring the driver is not merely syntactically valid but also behaviorally useful.
 \end{enumerate}
 
 \section{Research Strategy: Three-Phase Approach}

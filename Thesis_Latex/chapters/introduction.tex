@@ -32,14 +32,64 @@ Security is different. The adversary is intelligent, creative, and unconstrained
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{bilder/fuzzing.png}
-    \caption{The Fuzzing Process. The manual creation of "Fuzz Drivers" (center) is the bottleneck this thesis aims to automate.}
+    \resizebox{\textwidth}{!}{
+    \begin{tikzpicture}[
+        databox/.style={draw, rectangle, minimum width=3.8cm, minimum height=1cm, align=center, fill=blue!8, thick, font=\small},
+        procbox/.style={draw, rounded corners=8pt, rectangle, minimum width=3.8cm, minimum height=1cm, align=center, fill=orange!12, thick, font=\small},
+        arrow/.style={->, >=stealth, thick},
+        every node/.style={inner sep=6pt}
+    ]
+    % --- ROW 1: Developer inputs ---
+    \node[databox] (srccode) at (0,0) {Source Code};
+    \node[databox] (domknow) at (5.5,0) {Domain Knowledge};
+
+    % --- ROW 2: Manual driver writing (bottleneck) ---
+    \node[procbox, fill=red!15] (driverwrite) at (2.75,-2) {\textbf{Manual Fuzz Driver}\\\textbf{Creation} {\footnotesize(bottleneck)}};
+
+    % --- ROW 3: Fuzz Driver ---
+    \node[databox] (fuzzdriver) at (2.75,-4) {Fuzz Driver};
+    \node[databox] (seedinputs) at (8,-4) {Seed Inputs};
+
+    % --- ROW 4: Fuzzing Engine ---
+    \node[procbox] (fuzzengine) at (5,-6) {Fuzzing Engine\\{\footnotesize(libFuzzer / AFL++)}};
+
+    % --- ROW 5: Outputs ---
+    \node[databox] (crashdata) at (1.5,-8.5) {Crash Data};
+    \node[databox] (covdata) at (8.5,-8.5) {Coverage Data};
+
+    % --- ROW 6: Processing ---
+    \node[procbox] (vuln) at (1.5,-10.5) {Vulnerability Report\\Generation};
+    \node[procbox] (mutate) at (8.5,-10.5) {Input Mutation};
+
+    % --- ROW 7: Final outputs ---
+    \node[databox] (vulnreport) at (1.5,-12.5) {Vulnerability Report};
+    \node[databox] (mutinputs) at (8.5,-12.5) {Mutated Inputs};
+
+    % --- ARROWS ---
+    \draw[arrow] (srccode) -- (driverwrite);
+    \draw[arrow] (domknow) -- (driverwrite);
+    \draw[arrow] (driverwrite) -- (fuzzdriver);
+    \draw[arrow] (fuzzdriver) -- (fuzzengine);
+    \draw[arrow] (seedinputs) -- (fuzzengine);
+    \draw[arrow] (fuzzengine) -- (crashdata);
+    \draw[arrow] (fuzzengine) -- (covdata);
+    \draw[arrow] (crashdata) -- (vuln);
+    \draw[arrow] (covdata) -- (mutate);
+    \draw[arrow] (vuln) -- (vulnreport);
+    \draw[arrow] (mutate) -- (mutinputs);
+
+    % --- Feedback loop ---
+    \draw[arrow] (mutinputs.east) -- ++(1.2,0) |- (fuzzengine.east);
+
+    \end{tikzpicture}
+    }
+    \caption{The Fuzzing Process. Data artifacts are shown in rectangular boxes; processing steps are shown in rounded boxes. The manual creation of fuzz drivers (highlighted in red) is the bottleneck this thesis aims to automate.}
     \label{fig:fuzzing_concept}
 \end{figure}
 
-The fuzzing architecture begins with the human element. The developer writes the initial source code and possesses the critical domain knowledge required to understand the intended software logic. Because an automated system cannot inherently know what specific areas to target, the developer must manually define the testing scope and generate the initial fuzz tests. This manual creation step requires significant effort and represents the primary bottleneck that this research aims to automate.
+The fuzzing architecture begins with the human element. The developer writes the initial source code and possesses the critical domain knowledge required to understand the intended software logic. Because an automated system cannot inherently know what specific areas to target, the developer must manually define the testing scope and create the fuzz driver, a small program that translates raw fuzzer inputs into meaningful API calls. This manual creation step requires significant effort and specialized expertise, representing the primary bottleneck that this research aims to automate.
 
-Once these initial tests are supplied, the automated fuzzing engine takes control. The engine continuously executes the target software using the provided inputs while actively monitoring the system for unexpected behavior. If a crash is detected, the engine extracts the crash data and generates a vulnerability report. Conversely, if the execution completes without error, the engine collects coverage data to understand which code paths were reached. It then mutates the previous inputs to create slightly altered variations. These mutated inputs are fed back into the execution loop, driving a continuous cycle of automated vulnerability discovery.
+Once the fuzz driver and seed inputs are supplied, the automated fuzzing engine takes control. As illustrated in Figure~\ref{fig:fuzzing_concept}, the engine continuously executes the fuzz driver against the target software, feeding it generated inputs while actively monitoring for unexpected behavior. If a crash is detected, the engine extracts the crash data, and a vulnerability report is generated. Conversely, if the execution completes without error, the engine collects coverage data to understand which code paths were reached. An input mutation step then creates slightly altered variations of the previous inputs. These mutated inputs are fed back into the execution loop, driving a continuous cycle of automated vulnerability discovery.
 
 
 \subsection{CI/CD Pipeline Context}
