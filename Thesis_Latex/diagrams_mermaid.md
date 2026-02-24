@@ -247,6 +247,136 @@ The TikZ versions are already embedded in the LaTeX files and compile directly. 
 \end{figure}
 ```
 
+---
+
+## Figure 4.x — Evaluation Environment Component Diagram
+
+```mermaid
+flowchart LR
+    %% ===== DATA (rectangular) =====
+    TGT["C++ Target Library<br/><i>(yaml-cpp, etc.)</i>"]
+    DRV["Generated<br/>Fuzz Driver"]
+    BIN["Instrumented<br/>Binary"]
+    COV["Coverage<br/>Report"]
+
+    %% ===== COMPONENTS (rounded / stadium) =====
+    OLL(["<b>Ollama</b><br/><i>Local LLM Server</i>"])
+    LCP(["<b>llama.cpp</b><br/><i>Alternative Backend</i>"])
+    CIF(["<b>cifuzz spark</b><br/><i>Driver Generation</i>"])
+    CMK(["<b>CMake + Clang</b><br/><i>Build System</i>"])
+    LFZ(["<b>libFuzzer</b><br/><i>Fuzzing Engine</i>"])
+    LCV(["<b>llvm-cov</b><br/><i>Coverage Tool</i>"])
+    POD(["<b>Podman</b><br/><i>Container Runtime</i>"])
+
+    %% ===== FLOW =====
+    OLL -->|OpenAI API| CIF
+    LCP -->|OpenAI API| CIF
+    TGT --> CIF
+    CIF --> DRV
+    DRV --> CMK
+    CMK --> BIN
+    BIN --> LFZ
+    LFZ --> LCV
+    LCV --> COV
+
+    POD -.->|manages| CIF
+    POD -.->|manages| CMK
+    POD -.->|manages| LFZ
+
+    %% ===== STYLING =====
+    style TGT fill:#d4edda,stroke:#333,stroke-width:2px
+    style DRV fill:#d4edda,stroke:#333,stroke-width:2px
+    style BIN fill:#d4edda,stroke:#333,stroke-width:2px
+    style COV fill:#d4edda,stroke:#333,stroke-width:2px
+
+    style OLL fill:#dce6f1,stroke:#333,stroke-width:2px
+    style LCP fill:#dce6f1,stroke:#333,stroke-width:2px
+    style CIF fill:#fde8cd,stroke:#333,stroke-width:2px
+    style CMK fill:#fde8cd,stroke:#333,stroke-width:2px
+    style LFZ fill:#fde8cd,stroke:#333,stroke-width:2px
+    style LCV fill:#fde8cd,stroke:#333,stroke-width:2px
+    style POD fill:#e8e8e8,stroke:#666,stroke-width:2px,stroke-dasharray:5
+```
+
+**Caption:** Evaluation Environment Component Diagram. Components (rounded boxes) interact via defined interfaces. Ollama or llama.cpp serve the LLM; cifuzz spark orchestrates driver generation; CMake/Clang builds the driver; libFuzzer executes it; llvm-cov measures coverage. All build and fuzzing components run inside a Podman container.
+
+**How to use:** Export as PNG from [mermaid.live](https://mermaid.live) and replace the TikZ block at `chapters/implementation.tex` lines 193–241 with:
+```latex
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{bilder/eval_environment_mermaid.png}
+    \caption{Evaluation Environment Component Diagram. Components (rounded boxes) interact via defined interfaces. Ollama or llama.cpp serve the LLM; cifuzz spark orchestrates driver generation; CMake/Clang builds the driver; libFuzzer executes it; llvm-cov measures coverage. All build and fuzzing components run inside a Podman container.}
+    \label{fig:eval_environment}
+\end{figure}
+```
+
+---
+
+## Figure 4.x — CI/CD Pipeline Workflow Diagram
+
+```mermaid
+flowchart TD
+    %% ===== DATA (rectangular) =====
+    TRIG["Git Push<br/><i>(code commit)</i>"]
+    CRASH["Crash<br/>Reports"]
+    COVD["Coverage<br/>Data"]
+
+    %% ===== PROCESSING (rounded / stadium) =====
+    CO(["Checkout<br/>Repository"])
+    LI(["Login to<br/>JFrog Artifactory"])
+    DC(["Download<br/>Previous Corpus"])
+    PC(["Pull cifuzz<br/>Container Image"])
+    BLD(["Build Project<br/><i>(CMake + Clang)</i>"])
+    SPK(["<b>cifuzz spark</b><br/><i>Generate Fuzz Driver</i><br/><i>via Azure OpenAI</i>"])
+    RB(["Rebuild with<br/>Generated Driver"])
+    FZ(["Run libFuzzer<br/><i>(30s, ASan+UBSan)</i>"])
+    UL(["Upload Updated<br/>Corpus to Artifactory"])
+
+    %% ===== FLOW =====
+    TRIG --> CO
+    CO --> LI
+    LI --> DC
+    CO --> PC
+    PC --> BLD
+    DC --> BLD
+    BLD --> SPK
+    SPK --> RB
+    RB --> FZ
+    FZ --> CRASH
+    FZ --> COVD
+    FZ --> UL
+    UL -->|next run| DC
+
+    %% ===== STYLING =====
+    style TRIG fill:#dce6f1,stroke:#333,stroke-width:2px
+    style CRASH fill:#dce6f1,stroke:#333,stroke-width:2px
+    style COVD fill:#dce6f1,stroke:#333,stroke-width:2px
+
+    style CO fill:#fde8cd,stroke:#333,stroke-width:2px
+    style LI fill:#fde8cd,stroke:#333,stroke-width:2px
+    style DC fill:#fde8cd,stroke:#333,stroke-width:2px
+    style PC fill:#fde8cd,stroke:#333,stroke-width:2px
+    style BLD fill:#fde8cd,stroke:#333,stroke-width:2px
+    style SPK fill:#fff3cd,stroke:#856404,stroke-width:2px
+    style RB fill:#fde8cd,stroke:#333,stroke-width:2px
+    style FZ fill:#fde8cd,stroke:#333,stroke-width:2px
+    style UL fill:#fde8cd,stroke:#333,stroke-width:2px
+```
+
+**Caption:** CI/CD Pipeline Workflow. Processing steps are in rounded boxes; data artifacts in rectangular boxes. The highlighted step (cifuzz spark) invokes the LLM via Azure Private Link. Corpus persistence through JFrog Artifactory enables cumulative coverage improvement across runs.
+
+**How to use:** Export as PNG from [mermaid.live](https://mermaid.live) and replace the TikZ block at `chapters/implementation.tex` lines 458–519 with:
+```latex
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{bilder/cicd_workflow_mermaid.png}
+    \caption{CI/CD Pipeline Workflow. Processing steps are in rounded boxes; data artifacts in rectangular boxes. The highlighted step (cifuzz spark) invokes the LLM via Azure Private Link. Corpus persistence through JFrog Artifactory enables cumulative coverage improvement across runs.}
+    \label{fig:cicd_workflow}
+\end{figure}
+```
+
+---
+
 ### Important Notes
 - Keep the `\caption` and `\label` exactly as shown — other parts of the thesis reference these labels
 - Make sure the PNG is high resolution (at least 300 DPI or use the 4x export option in mermaid.live)
