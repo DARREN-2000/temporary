@@ -29,7 +29,7 @@ The Transformer architecture, introduced in 2017, enabled training on vastly lar
 
 GPT-3 (2020) demonstrated this principle. With 175 billion parameters, it could write coherent text and syntactically valid code. The specific finding that mattered for software engineering: the model had learned patterns from code in its training data and could apply them to generate new code.
 
-Code-specific models followed. Codex, which powers GitHub Copilot, achieved 28.8\% success on the HumanEval benchmark initially and 70.2\% with multiple sampling attempts. GPT-4 further improved code generation with better contextual understanding and reduced subtle errors. Context windows expanded from 2K to 128K tokens, enabling inclusion of multiple source files, headers, and documentation in prompts.
+Code-specific models followed. Codex, which powers GitHub Copilot, achieved 28.8\% success on the HumanEval benchmark initially and 70.2\% with multiple sampling attempts \cite{Chen2021}. GPT-4 further improved code generation with better contextual understanding and reduced subtle errors. Context windows expanded from 2K to 128K tokens, enabling inclusion of multiple source files, headers, and documentation in prompts.
 
 Open-source alternatives emerged as major counterparts. Meta's LLaMA 
 showed that competitive performance was achievable with smaller, publicly available models \cite{Touvron2023}. Code-specific variants like StarCoder and CodeLlama targeted programming tasks specifically. This mattered for automotive applications where intellectual property constraints make sending code to external services problematic.
