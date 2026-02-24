@@ -174,15 +174,80 @@ flowchart TD
 
 ## How to Use These Mermaid Diagrams
 
-### Option A: Render online and export
+### Option A: Render online and export (RECOMMENDED)
 1. Go to [mermaid.live](https://mermaid.live)
-2. Paste the Mermaid code
-3. Export as PNG (high resolution) or SVG
-4. Save to `bilder/` folder
-5. In LaTeX: `\includegraphics[width=\textwidth]{bilder/fuzzing_mermaid.png}`
+2. Paste the Mermaid code for the diagram you want
+3. Export as **PNG** (choose high resolution, e.g., 4x) or **SVG**
+4. Save the exported file to the `bilder/` folder
+5. Replace the TikZ code in the `.tex` file with `\includegraphics` (see exact instructions below)
 
 ### Option B: Use the `mermaid-filter` for Pandoc
 If you convert through Pandoc, install `mermaid-filter` and it auto-renders.
 
 ### Option C: Keep using the TikZ versions already in the .tex files
-The TikZ versions are already embedded in the LaTeX files and compile directly. They use the same notation (rectangular = data, rounded = process) and follow the top-down layout.
+The TikZ versions are already embedded in the LaTeX files and compile directly. They use the same notation (rectangular = data, rounded = process) and follow the top-down layout. **No action needed.**
+
+---
+
+## Exact Lines to Change to Switch from TikZ to Mermaid
+
+### Figure 1.2 (Fuzzing Process) — in `chapters/introduction.tex`
+
+**What to do:** Export the Mermaid diagram above as `bilder/fuzzing_mermaid.png`, then replace lines 33–88 of `chapters/introduction.tex`.
+
+**Replace this entire TikZ block (lines 33–88):**
+```latex
+\begin{figure}[htbp]
+    \centering
+    \resizebox{\textwidth}{!}{
+    \begin{tikzpicture}[
+        ...entire TikZ code...
+    \end{tikzpicture}
+    }
+    \caption{The Fuzzing Process...}
+    \label{fig:fuzzing_concept}
+\end{figure}
+```
+
+**With this:**
+```latex
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{bilder/fuzzing_mermaid.png}
+    \caption{The Fuzzing Process. Data artifacts are shown in rectangular boxes; processing steps are shown in rounded boxes. The manual creation of fuzz drivers (highlighted in red) is the bottleneck this thesis aims to automate.}
+    \label{fig:fuzzing_concept}
+\end{figure}
+```
+
+### Figure 3.1 (Technical Architecture) — in `chapters/methodology.tex`
+
+**What to do:** Export the Mermaid diagram above as `bilder/architecture_mermaid.png`, then replace lines 34–135 of `chapters/methodology.tex`.
+
+**Replace this entire TikZ block (lines 34–135):**
+```latex
+\begin{figure}[htbp]
+    \centering
+    \resizebox{\textwidth}{!}{
+    \begin{tikzpicture}[
+        ...entire TikZ code...
+    \end{tikzpicture}
+    }
+    \caption{Technical Architecture of our LLM-based...}
+    \label{fig:tech_architecture}
+\end{figure}
+```
+
+**With this:**
+```latex
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{bilder/architecture_mermaid.png}
+    \caption{Technical Architecture of our LLM-based fuzz driver generation pipeline. The three layers are marked with dashed borders. Data artifacts are shown in rectangular boxes; processing steps in boxes with rounded corners. Green/yellow highlighted elements denote new contributions of this work with respect to the state of the art (cf.\ Figure~\ref{fig:fuzzing_concept}).}
+    \label{fig:tech_architecture}
+\end{figure}
+```
+
+### Important Notes
+- Keep the `\caption` and `\label` exactly as shown — other parts of the thesis reference these labels
+- Make sure the PNG is high resolution (at least 300 DPI or use the 4x export option in mermaid.live)
+- The SVG format also works if you use `\usepackage{svg}` in thesis.tex (add before `\begin{document}`)

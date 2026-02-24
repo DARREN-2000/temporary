@@ -31,8 +31,7 @@ GPT-3 (2020) demonstrated this principle. With 175 billion parameters, it could 
 
 Code-specific models followed. Codex, which powers GitHub Copilot, achieved 28.8\% success on the HumanEval benchmark initially and 70.2\% with multiple sampling attempts \cite{Chen2021}. GPT-4 further improved code generation with better contextual understanding and reduced subtle errors. Context windows expanded from 2K to 128K tokens, enabling inclusion of multiple source files, headers, and documentation in prompts.
 
-Open-source alternatives emerged as major counterparts. Meta's LLaMA 
-showed that competitive performance was achievable with smaller, publicly available models \cite{Touvron2023}. Code-specific variants like StarCoder and CodeLlama targeted programming tasks specifically. This mattered for automotive applications where intellectual property constraints make sending code to external services problematic.
+Open-source alternatives emerged as major counterparts. Meta's LLaMA showed that competitive performance was achievable with smaller, publicly available models \cite{Touvron2023}. Code-specific variants like StarCoder and CodeLlama targeted programming tasks specifically. This mattered for automotive applications where intellectual property constraints make sending code to external services problematic.
 
 Researchers have systematically tested LLM code generation. Deng et al. found that models generated syntactically valid code at high rates but frequently contained semantic issues: code that compiled but exercised APIs incorrectly \cite{TitanFuzz2022}. Wang et al. observed similar patterns in mutation testing experiments, noting high success on simple cases with degrading performance as complexity increased \cite{LLMMutationTesting2024}.
 
@@ -58,7 +57,7 @@ Despite these advances, challenges persist in fuzzing practice. Writing fuzz har
 
 Combining machine learning and fuzzing has led to a growing body of research. This section surveys the current state.
 
-\textbf{LLM-Based Test Case Generation} represents a fundamentally different approach. rather than mutating existing inputs, LLMs generate tests from specifications, documentation, or source code.
+\textbf{LLM-Based Test Case Generation} represents a fundamentally different approach. Rather than mutating existing inputs, LLMs generate tests from specifications, documentation, or source code.
 
 Deng et al. introduced TitanFuzz, demonstrating that LLMs could generate effective fuzz targets for deep learning library APIs by prompting models with API documentation \cite{TitanFuzz2022}. TitanFuzz produced test cases achieving higher coverage than manually written tests for several libraries and discovered previously unknown bugs. This demonstrated that tests produced by LLMs can be applied in real projects.
 
@@ -145,7 +144,7 @@ Automotive software operates under regulatory constraints unlike most other doma
 \node[above=0.2cm of at, font=\bfseries] {Validation Phase};
 \end{tikzpicture}
 }
-\caption{The V-Model Development Lifecycle. The diagram illustrates the relationship between each development phase (left) and its corresponding testing phase (right), converging at the Code implementation.}
+\caption{The V-Model Development Lifecycle (adapted from ISO~26262~\cite{ISO26262}). The diagram illustrates the relationship between each development phase (left) and its corresponding testing phase (right), converging at the Code implementation.}
 \label{fig:v_model}
 \end{figure}
 
