@@ -249,7 +249,7 @@ The TikZ versions are already embedded in the LaTeX files and compile directly. 
 
 ---
 
-## Figure 4.x — Evaluation Environment Component Diagram
+## Figure 4.1 — Evaluation Environment Component Diagram
 
 ```mermaid
 flowchart LR
@@ -312,7 +312,7 @@ flowchart LR
 
 ---
 
-## Figure 4.x — CI/CD Pipeline Workflow Diagram
+## Figure 4.2 — CI/CD Pipeline Workflow Diagram
 
 ```mermaid
 flowchart TD
