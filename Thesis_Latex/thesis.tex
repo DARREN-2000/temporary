@@ -18,6 +18,7 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{enumitem}
+\usepackage{amsmath}
 \usepackage{tikz}     
 % Required for V-Model diagram and architecture diagrams
 \usetikzlibrary{positioning, arrows.meta, shapes.geometric, fit, backgrounds, calc}
@@ -291,34 +292,100 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 \section{Pipeline Configuration}
 \label{sec:appendix_pipeline}
 
-Listing~\ref{lst:appendix_yml} shows a simplified version of the GitHub Actions workflow used for CI/CD integration (the complete version with Azure OpenAI configuration is presented in Chapter~4, Section~\ref{sec:impl_phase3}).
+Listing~\ref{lst:appendix_yml} shows the complete GitHub Actions workflow configuration for CI/CD integration with Azure OpenAI, as discussed in Chapter~4, Section~\ref{sec:impl_phase3}. The workflow diagram in Figure~\ref{fig:cicd_workflow} visualizes this pipeline.
 
-\begin{lstlisting}[language=yaml, caption={GitHub Actions Workflow Snippet}, label={lst:appendix_yml}]
-name: Fuzzing Pipeline
-on: [push]
+\begin{lstlisting}[language=yaml, caption={Complete GitHub Actions Workflow with Azure OpenAI Integration}, label={lst:appendix_yml}]
+name: fuzz
+env:
+  PROJ_NAME: "INIFUZZ"
+  VERSION: "0.1"
+  ARTIFACTORY_CORPUS_URL: "https://jfrog.hub.vwgroup.com/..."
 jobs:
   fuzz:
-    runs-on: self-hosted
+    runs-on: [auto-buildah-base]
+    env:
+      JFROG_API_KEY: ${{ secrets.JFROG_API_KEY }}
+      ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+      PROJECT_FOLDER: "/project/"
+      CIFUZZ_LLM_API_URL: "https://<endpoint>.openai.azure.com"
+      CIFUZZ_LLM_AZURE_DEPLOYMENT_NAME: "gpt-4o"
+      CIFUZZ_LLM_MAX_TOKENS: "40000"
+      CIFUZZ_LLM_API_TOKEN: ${{ secrets.CIFUZZ_LLM_API_TOKEN }}
     steps:
       - uses: actions/checkout@v3
-      
+      - name: Login to JFrog
+        run: buildah login -u $ARTIFACTORY_USER -p $JFROG_API_KEY ...
+      - name: Download previous corpus
+        run: |
+          # Download corpus archive if it exists in Artifactory
+          curl -u "$ARTIFACTORY_USER:$JFROG_API_KEY" ... | tar -xz
+      - name: Pull cifuzz container
+        run: |
+          containerid=$(buildah from .../cifuzz:${VERSION})
+          echo "containerid=$containerid" >> $GITHUB_ENV
       - name: Build project
         run: |
-          mkdir build && cd build
-          cmake .. && make
-          
+          buildah run -v $(pwd):/$PROJECT_FOLDER $containerid \
+            /bin/bash -c "cd /project && mkdir build && cd build && cmake .. && make"
       - name: Generate fuzz driver via LLM
         run: |
-          cd build && cifuzz spark target_name
-          
-      - name: Run fuzzing
+          buildah run --env CIFUZZ_LLM_API_URL ... \
+            /bin/bash -c "cd /project/build && cifuzz spark parser_target"
+      - name: Rebuild with generated tests
+        run: buildah run ... "cd /project/build && make"
+      - name: Run fuzzing (30s, ASan+UBSan)
         run: |
-          cd build
-          cifuzz run target_name --libfuzzer-arg=-max_total_time=60
-          
-      - name: Collect coverage
+          buildah run ... "cifuzz run parser_target \
+            --libfuzzer-arg=-max_total_time=30"
+      - name: Upload updated corpus
         run: |
-          cd build && cifuzz coverage target_name
+          tar -czf ${PROJ_NAME}_corpus.gz .cifuzz-corpus
+          curl -T ${PROJ_NAME}_corpus.gz ...
+\end{lstlisting}
+
+\section{Sample LLM Prompt for Fuzz Driver Generation}
+\label{sec:appendix_prompt}
+
+Listing~\ref{lst:appendix_prompt_example} shows a representative prompt sent to the LLM during fuzz driver generation. The prompt combines the extracted API context (abbreviated for space) with the fuzzing instructions that define the required driver structure. This example targets the yaml-cpp library.
+
+\begin{lstlisting}[caption={Representative cifuzz spark Prompt (abbreviated)}, label={lst:appendix_prompt_example}]
+=== SYSTEM ===
+You are a security-focused C++ developer specializing in fuzz testing
+with libFuzzer. Generate a fuzz driver for the target API.
+
+=== FUZZING INSTRUCTIONS ===
+1. The driver MUST implement:
+   extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+2. Consume the byte buffer `data` of length `size` as input.
+3. Translate bytes into valid API calls to the target library.
+4. Do NOT call exit(), abort(), or _exit().
+5. Do NOT use static or global state that persists across calls.
+6. Catch and handle exceptions; do not let them propagate.
+7. Return 0 on success.
+
+=== EXTRACTED API CONTEXT ===
+// File: yaml-cpp/yaml.h
+namespace YAML {
+  class Node {
+  public:
+    Node();
+    Node Load(const std::string& input);
+    bool IsMap() const;
+    bool IsSequence() const;
+    bool IsScalar() const;
+    // ... (50+ additional methods) ...
+    template<typename T> T as() const;
+    iterator begin();
+    iterator end();
+    std::size_t size() const;
+  };
+  // ... (additional classes: Parser, Emitter, Exception) ...
+}
+
+=== TASK ===
+Generate a complete fuzz driver that exercises the YAML::Node API.
+Include all necessary #include directives.
+Maximize code coverage of the target library.
 \end{lstlisting}
 
 \cleardoublepage

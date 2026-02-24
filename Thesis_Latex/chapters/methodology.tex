@@ -134,7 +134,7 @@ Moving from concept to working system required a robust technical design. Our sy
     \label{fig:tech_architecture}
 \end{figure}
 
-As shown in Figure~\ref{fig:tech_architecture}, the source code and its public header files serve as the primary input to the pipeline. These inputs are processed through three successive layers---context extraction, LLM-based generation, and automated execution---to ultimately produce coverage reports and crash data, replacing the manual fuzz driver creation step shown in Figure~\ref{fig:fuzzing_concept}.
+As shown in Figure~\ref{fig:tech_architecture}, the source code and its public header files serve as the primary input to the pipeline. These inputs are processed through three successive layers (context extraction, LLM-based generation, and automated execution) to ultimately produce coverage reports and crash data, replacing the manual fuzz driver creation step shown in Figure~\ref{fig:fuzzing_concept}.
 
 \subsection{Input Layer (Automated Context Extraction)}
 \label{sec:input_layer}
@@ -144,14 +144,14 @@ The first layer prepares the context that the LLM needs to generate a meaningful
 \label{sec:gen_layer}
 This layer handles the interaction with the LLM and the construction of the prompt that drives driver generation. It includes two critical sub-systems:
 \begin{itemize}
-    \item \textbf{Prompt Construction:} We combine the \emph{extracted API context} (the structured function signatures, types, and class definitions produced by the Input Layer) with a set of \emph{fuzzing instructions}. These fuzzing instructions are predefined rules and constraints that describe what a valid libFuzzer fuzz driver must look like---specifically, the required \emph{fuzz test case structure}: the driver must implement the \texttt{LLVMFuzzerTestOneInput(const uint8\_t *data, size\_t size)} entry point, correctly consume the fuzzer-provided byte buffer, translate those bytes into valid API calls, and avoid trivial or undefined behavior. The instructions also encode safety constraints (e.g., do not call \texttt{exit()}, avoid infinite loops) to ensure the generated driver is compatible with the fuzzing engine.
+    \item \textbf{Prompt Construction:} We combine the \emph{extracted API context} (the structured function signatures, types, and class definitions produced by the Input Layer) with a set of \emph{fuzzing instructions}. These fuzzing instructions are predefined rules and constraints that describe what a valid libFuzzer fuzz driver must look like. Specifically, they define the required \emph{fuzz test case structure}: the driver must implement the \texttt{LLVMFuzzerTestOneInput(const uint8\_t *data, size\_t size)} entry point, correctly consume the fuzzer-provided byte buffer, translate those bytes into valid API calls, and avoid trivial or undefined behavior. The instructions also encode safety constraints (e.g., do not call \texttt{exit()}, avoid infinite loops) to ensure the generated driver is compatible with the fuzzing engine.
 
-    \item \textbf{Backend Abstraction:} We configured the \emph{environment}---the runtime configuration that determines which LLM backend serves the generation requests---to swap between different model backends. While cifuzz manages the overall workflow, we routed the generation requests to both local models (via Ollama) and cloud-hosted models (via Azure OpenAI) to compare performance across different architectures. This abstraction allows the same pipeline to operate in network-isolated environments (using local models) or leverage more powerful cloud models when network access is available.
+    \item \textbf{Backend Abstraction:} We configured the \emph{environment}, that is, the runtime configuration that determines which LLM backend serves the generation requests, to swap between different model backends. While cifuzz manages the overall workflow, we routed the generation requests to both local models (via Ollama) and cloud-hosted models (via Azure OpenAI) to compare performance across different architectures. This abstraction allows the same pipeline to operate in network-isolated environments (using local models) or leverage more powerful cloud models when network access is available.
 \end{itemize}
 
 \subsection{Execution Layer (Evaluation Pipeline)}
 \label{sec:exec_layer}
-The generated fuzz drivers---the C++ source files produced by the LLM in the Generation Layer---are useless if they do not compile and run correctly. This layer handles the automated compilation, execution, and evaluation pipeline:
+The generated fuzz drivers, that is, the C++ source files produced by the LLM in the Generation Layer, are useless if they do not compile and run correctly. This layer handles the automated compilation, execution, and evaluation pipeline:
 \begin{enumerate}
     \item \textbf{Compilation and Validation:} The generated driver source code is compiled against the target library using Clang. This step verifies that the LLM-produced code is syntactically valid and links correctly against the target API.
     \item \textbf{Sanitizer Instrumentation:} The driver is recompiled with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled. This detects memory errors, buffer overflows, and undefined behavior that might not cause an immediate crash but indicate incorrect API usage.

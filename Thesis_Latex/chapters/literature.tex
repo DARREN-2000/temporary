@@ -37,6 +37,21 @@ Researchers have systematically tested LLM code generation. Deng et al. found th
 
 C presents particular challenges for LLM-based code generation. Training data skews heavily toward Python, JavaScript, and other high-level languages. C's distinctive features, such as pointer arithmetic, manual memory management, preprocessor macros, and undefined behavior, are less well represented in training data. Empirical evaluations consistently show worse performance on C compared to Python \cite{LLMDriverGenEffectiveness2023}. This has direct implications for automotive applications where C remains the dominant language for embedded systems.
 
+\subsection{Low-Rank Adaptation (LoRA)}
+\label{sec:lit_lora}
+
+Fine-tuning a pre-trained LLM for a downstream task traditionally requires updating all model parameters, which demands the same memory and compute resources as the original training. Hu et al.\ proposed \emph{Low-Rank Adaptation} (LoRA) as a parameter-efficient alternative~\cite{Hu2021}.
+
+The key insight behind LoRA is that the weight updates during fine-tuning exhibit low intrinsic dimensionality. Instead of updating a full weight matrix $W \in \mathbb{R}^{d \times k}$, LoRA freezes $W$ and injects a trainable low-rank decomposition $\Delta W = B A$, where $B \in \mathbb{R}^{d \times r}$ and $A \in \mathbb{R}^{r \times k}$ with rank $r \ll \min(d,k)$. During the forward pass the modified output becomes:
+\[
+h = W x + \Delta W x = W x + B A x
+\]
+Only $A$ and $B$ are trained; the original weights $W$ remain frozen. This reduces the number of trainable parameters by several orders of magnitude. For example, with $d = k = 4096$ and $r = 16$, full fine-tuning updates $\approx$16.8\,M parameters per layer, whereas LoRA updates only $2 \times 4096 \times 16 = 131$\,K, a 128$\times$ reduction.
+
+LoRA is typically applied to the query and value projection matrices ($W_q$, $W_v$) of the Transformer attention layers, though it can be extended to all projection matrices ($W_k$, $W_o$) for greater expressiveness~\cite{Hu2021}. A scaling factor $\alpha / r$ is applied to $\Delta W$ to control the magnitude of the adaptation relative to the pre-trained weights.
+
+This approach has two practical advantages for our work. First, it enables fine-tuning on consumer-grade hardware: a 1.5B-parameter model can be adapted in hours on a single GPU with 16\,GB VRAM. Second, the LoRA adapters can be saved as lightweight files ($\sim$30\,MB) and loaded on top of the frozen base model at inference time, avoiding the need to distribute a separate full model checkpoint.
+
 \section{Foundations of AI-Guided Fuzzing Techniques}
 \label{sec:lit_fuzzing_foundations}
 
