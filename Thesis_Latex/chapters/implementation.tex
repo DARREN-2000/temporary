@@ -1,0 +1,450 @@
+% File: chapters/implementation.tex
+
+\chapter{Implementation}
+\label{chap:implementation}
+
+We turned the methodology from Chapter 3 into working code and systems over the course of this implementation. The three methodology phases defined in Chapter 3, baseline assessment, model evaluation, and fine-tuning, map to three corresponding development phases: local development, cloud integration, and LoRA fine-tuning. Each phase built on the previous one. The following sections cover our tool choices, the specific steps we followed, and the engineering decisions we made along the way.
+
+\section{Toolchain Selection and Rationale}
+\label{sec:impl_toolchain}
+
+Before writing any code, we needed to select the appropriate tools. Several factors guided the selection. Research reproducibility required tools with stable APIs and clear documentation. Industrial deployment required compatibility with CARIAD's existing infrastructure. Hardware specifications influenced which models could run locally with acceptable performance.
+
+\subsection{Fuzzing Infrastructure}
+
+For the fuzzing engine itself, we chose libFuzzer combined with Clang sanitizers. libFuzzer is the industry standard for coverage-guided fuzzing in C and C++ projects \cite{LibFuzzer2015}, though alternatives like AFL++ \cite{AFLPlusPlus} also have strong communities. libFuzzer integrates directly with the LLVM toolchain, which means compilation and fuzzing use the same infrastructure. Google uses libFuzzer for OSS-Fuzz \cite{OSSFuzzBugs2021}, so the documentation and community support are excellent.
+
+We compiled all targets with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled. ASan catches memory errors like buffer overflows, use-after-free, and memory leaks \cite{LibFuzzer2015}. UBSan catches undefined behavior like signed integer overflow and null pointer dereferences. These sanitizers add runtime overhead, but for security testing the tradeoff is acceptable, since detecting vulnerabilities takes priority over execution speed.
+
+For integration with our build systems, we used cifuzz from Code Intelligence. The tool wraps libFuzzer and provides additional functionality like corpus management, coverage reporting, and build system integration. The most relevant feature for our work was cifuzz spark, which handles the LLM integration. Spark takes a CMake target as input, extracts API information automatically, sends it to the configured LLM, and produces a fuzz driver ready for execution.
+
+Our choice of cifuzz was based on a systematic evaluation. We compared several alternatives including Google's ClusterFuzz \cite{OSSFuzzBugs2021} and standalone libFuzzer setups. Among these, cifuzz offered a good balance between ease of use and enterprise features. Its spark module specifically addressed our core research question by providing a clean interface between the fuzzing infrastructure and LLM backends.
+
+\subsection{LLM Infrastructure}
+
+We needed to run models locally for several reasons. First, evaluating many different models through paid APIs would have been cost-prohibitive. Second, some models are open-source and only available for local deployment. Third, understanding local deployment options was essential for the enterprise integration phase.
+
+We selected Ollama \cite{ollama} as our primary local inference server. Ollama simplifies model management. Installing a new model is one command: \texttt{ollama pull qwen2.5-coder:32b}. The server exposes an OpenAI-compatible API, which meant cifuzz spark worked without modification. Ollama handled quantized models well. Quantization compresses models to use reduced numerical precision (e.g., 4-bit instead of 16-bit weights), which let us run larger models on the available hardware.
+
+For models not available through Ollama, we used llama.cpp directly. This required more manual configuration but provided additional flexibility. Some models from Hugging Face came as split GGUF files that needed merging before use. We handled this with the following command:
+
+\begin{lstlisting}[language=bash, caption={Merging Split GGUF Model Files}]
+llama-gguf-split --merge qwen2.5-coder-14b-instruct-q5_k_m-00001-of-00002.gguf \
+                 qwen2.5-coder-14b-instruct-q5_k_m.gguf
+\end{lstlisting}
+
+Merging these split files added an extra step to our model preparation process.
+
+For cloud deployment in the enterprise phase, we configured Azure OpenAI \cite{azure_openai}. Azure provided GPT-4o through a managed endpoint. The authentication used API keys stored as GitHub secrets. We configured the following environment variables:
+
+\begin{lstlisting}[language=bash, caption={Azure OpenAI Configuration}]
+export CIFUZZ_LLM_API_URL="https://ny4mdomain.openai.azure.com"
+export CIFUZZ_LLM_AZURE_DEPLOYMENT_NAME="gpt-4o"
+export CIFUZZ_LLM_API_TOKEN="<api-key>"
+export CIFUZZ_LLM_MAX_TOKENS=40000
+\end{lstlisting}
+
+A token limit of 40,000 was necessary because fuzz driver generation requires extensive context. Prompts include header files, example code, and detailed instructions. Smaller token limits led to truncation and reduced output quality.
+
+\subsection{Development Environment}
+
+Local development happened on a MacBook Pro with an M1 Pro chip. For Linux container support on Apple Silicon, we chose Podman as our container runtime. Podman aligned well with the enterprise CI/CD runners, which also used Linux.
+
+\begin{lstlisting}[language=bash, caption={Podman Setup on macOS}]
+brew install podman
+podman machine init --cpus 4 --memory 8192
+podman machine start
+\end{lstlisting}
+
+Transitioning from Docker to Podman involved adapting several scripts to align with Podman's container networking model.
+
+For the enterprise environment, we used CARIAD's internal GitHub Enterprise instance with self-hosted runners. These runners used Buildah \cite{buildah} instead of Docker for container operations. Buildah is daemonless, which complies with security policies that govern long-running daemon processes.
+
+Our build toolchain used CMake for project configuration and Clang for compilation. We required CMake version 3.5 or higher because cifuzz integration depends on features from that version. The CMake configuration for enabling fuzzing required minimal setup:
+
+\begin{lstlisting}[language=cmake, caption={CMake Fuzzing Configuration}]
+cmake_minimum_required(VERSION 3.5)
+cmake_policy(VERSION 3.5)
+
+project(FuzzTarget)
+
+find_package(cifuzz NO_SYSTEM_ENVIRONMENT_PATH)
+enable_fuzz_testing()
+add_subdirectory(cifuzz-spark)
+\end{lstlisting}
+
+We also needed to update CMakeLists.txt files in subdirectories. Several target libraries used CMake configurations that needed updates for compatibility with our setup. The fix was consistent across all subdirectories:
+
+\begin{lstlisting}[language=cmake, caption={Subdirectory CMake Updates}]
+cmake_minimum_required(VERSION 3.10...3.22)
+cmake_policy(VERSION 3.10...3.22)
+\end{lstlisting}
+
+The LLM-assisted fuzzing workflow, conceptually introduced in Chapter 3, demonstrates how LLMs integrate into the fuzzing pipeline to automatically generate test cases from source code. Our implementation uses cifuzz spark to handle the integration between the LLM backends (either local models via Ollama or Azure OpenAI) and the libFuzzer execution environment.
+
+\section{Phase 1: Local LLM Evaluation Setup}
+\label{sec:impl_phase1}
+
+Phase 1 focused on understanding which models could generate useful fuzz drivers. The experiments in this phase target \textbf{RQ1} (Can LLMs generate compilable, executable fuzz drivers?) and \textbf{RQ2} (Does model size determine quality?). We did not assume any model would work well. Literature suggested mixed results for LLM code generation, and fuzz drivers are a specialized task.
+
+\subsection{Benchmarked Models}
+
+We evaluated 14 models spanning a wide range of sizes and architectures. The selection included both general-purpose models and code-specialized variants. Our goal was to understand whether model size, training data, or architecture had the greatest impact on fuzz driver quality.
+
+\textbf{Large Models (25 to 35 billion parameters):}
+\begin{itemize}
+    \item Qwen 2.5-Coder 32B
+    \item DeepSeek Coder 33B
+    \item CodeLlama 34B Instruct
+    \item WizardCoder 34B
+    \item Yi 34B
+    \item Gemma 3 27B
+\end{itemize}
+
+\textbf{Extra Large Models (above 40 billion parameters):}
+\begin{itemize}
+    \item Mixtral 46.7B (Mixture-of-Experts architecture, approximately 12.9B active parameters per inference)
+\end{itemize}
+
+\textbf{Medium Models (7 to 16 billion parameters):}
+\begin{itemize}
+    \item Qwen 2.5-Coder 7B and 14B
+    \item Phi-4 14B
+    \item DeepSeek Coder V2 Lite 16B
+    \item Gemma 3 9B
+\end{itemize}
+
+\textbf{Small Models (below 7 billion parameters):}
+\begin{itemize}
+    \item Qwen 2.5-Coder 1.5B
+    \item Gemma 3 4B
+\end{itemize}
+
+Code-specialized models like Qwen Coder, DeepSeek Coder, and CodeLlama were trained specifically on programming tasks. General-purpose models like Mixtral and Yi were included to investigate whether raw scale could compensate for lack of specialization. This allowed us to test a key hypothesis, whether a 46B general model outperforms a 7B code-specialized model. Results, discussed in Chapter 5, were surprising, as general-purpose models like Mixtral (46.7B) and Yi (34B) achieved 0\% code coverage, while the specialized Qwen 2.5-Coder (32B) and Gemma 3 (27B) consistently achieved over 43\% line coverage. Even some code-specialized models like CodeLlama (34B) did not produce working drivers, suggesting that specialization alone is not sufficient without adequate training on fuzz-driver-specific patterns.
+
+Installing these models required considerable disk space. The larger models exceeded 20~GB each in their quantized forms. We used 4-bit and 5-bit quantization to fit models into available VRAM while maintaining reasonable output quality.
+
+\subsection{Target Repositories}
+
+Consistent test targets were needed for fair model comparison. Our selection included open-source C++ libraries with varying complexity:
+
+\textbf{Primary Target: yaml-cpp}
+
+yaml-cpp is a YAML parsing library with approximately 35 source files and over 1000 API candidates that could potentially be fuzzed. We chose it as our primary benchmark because it has enough complexity to challenge the models while being well documented and actively maintained. The library also has existing fuzz targets in OSS-Fuzz, giving us a baseline for comparison.
+
+\textbf{Secondary Targets:}
+\begin{itemize}
+    \item \textbf{RapidJSON}: A JSON parsing library widely used in performance-critical applications. RapidJSON's CMake configuration needed adjustments for our setup, which we resolved by re-downloading a clean version of the source.
+    \item \textbf{pugixml}: XML processing library with similar parsing challenges to yaml-cpp.
+    \item \textbf{fmt}: Text formatting library with different API patterns than the parsers.
+    \item \textbf{spdlog}: Logging library with many configuration options.
+    \item \textbf{jsoncons}: Another JSON library for comparison with RapidJSON.
+\end{itemize}
+
+These libraries cover different domains but share the characteristic of being C++ with clean public APIs. They all have existing fuzz targets in OSS-Fuzz, which provided baselines for comparison.
+
+We also tested on several CARIAD internal libraries, though we cannot report those results in detail due to confidentiality constraints. The patterns we observed on open-source libraries were consistent with the results on internal ones.
+
+\subsection{Evaluation Environment}
+
+Hardware for local evaluation was a workstation with sufficient GPU memory for running 32B parameter models with 4-bit quantization. Larger models like Mixtral 46.7B required offloading to system RAM, which increased inference time.
+
+Each model's evaluation followed these steps:
+
+\begin{enumerate}
+    \item Start the model server (Ollama or llama.cpp)
+    \item Configure cifuzz spark environment variables
+    \item Run \texttt{cifuzz spark} on the target library
+    \item Attempt to compile the generated driver
+    \item If compilation succeeded, run the fuzzer for a fixed duration (60 seconds)
+    \item Record coverage metrics using llvm-cov
+\end{enumerate}
+
+We ran each model five times on yaml-cpp to account for stochastic output variation. Preliminary tests showed that variance in coverage results stabilized after three to four runs, so we chose five runs to provide an additional margin of confidence. Some models produced different outputs on identical prompts, making multiple runs necessary for reliable comparison. This variability was itself an interesting finding that we discuss further in Chapter 5.
+
+A full evaluation cycle for one model on one target took approximately 10 to 15 minutes. With 14 models and 6 primary targets, plus five runs per configuration for consistency checking, the complete Phase 1 evaluation required approximately two weeks of continuous testing.
+
+The general fuzzing workflow (as introduced in earlier chapters) forms the foundation of our evaluation methodology, from defining targets from source code, generating fuzz tests via LLM, executing them through the fuzzing engine (libFuzzer with sanitizers), detecting crashes, and either reporting findings or mutating inputs for continued testing. Each evaluation cycle involved generating a driver, checking compilation, running the fuzzer for 60 seconds, measuring coverage with llvm-cov, and storing results.
+
+\section{Phase 2: Model Optimization with LoRA Fine-Tuning}
+\label{sec:impl_phase2}
+
+After the initial evaluation showed promising results from Qwen 2.5-Coder models, we investigated whether fine-tuning could improve performance further. This phase addresses the optimization aspect of \textbf{RQ2}, asking whether smaller, fine-tuned models can outperform larger general-purpose models. The goal was to see if a small model, specifically trained for fuzz driver generation, could match or exceed larger ones.
+
+\subsection{Training Data Preparation}
+
+Most important for fine-tuning is the training data. High-quality examples of fuzz drivers paired with source code were essential. Previous work on LLM-based fuzzing like LLM4Fuzz \cite{llm4fuzz} and TitanFuzz \cite{TitanFuzz2022} has demonstrated that quality training data directly impacts generation success.
+
+To build our dataset, we extracted training examples from OSS-Fuzz \cite{OSSFuzzBugs2021}. Google has fuzz-tested hundreds of open-source projects through OSS-Fuzz, and the fuzz drivers are publicly available. We focused on C and C++ drivers because those matched our target domain.
+
+Our extraction process involved four steps:
+
+\begin{enumerate}
+    \item Clone the OSS-Fuzz repository
+    \item Identify projects with C/C++ fuzz drivers
+    \item For each driver, extract the header files it includes
+    \item Create input/output pairs: headers as input, driver as expected output
+\end{enumerate}
+
+We created two datasets:
+\begin{itemize}
+    \item \textbf{Small dataset}: 172 examples, focusing on quality over quantity
+    \item \textbf{Extended dataset}: 709 examples, broader coverage but more noise
+\end{itemize}
+
+These examples included drivers for libraries like FreeType, LibPNG, SQLite, and zlib, covering a range of API styles from simple functions to complex object-oriented interfaces. We deliberately included diverse examples to help the model generalize rather than memorize specific patterns.
+
+Quality control was important. We manually reviewed a sample of the extracted drivers to verify they were functional and not stub implementations. Approximately 15\% (106 out of the initial pool) of extracted drivers were discarded because they were incomplete or contained obvious errors.
+
+\subsection{LoRA Configuration and Training}
+
+We used Low-Rank Adaptation (LoRA) \cite{Hu2021} rather than full fine-tuning. Full fine-tuning updates all model weights, which requires enormous compute resources. LoRA adds small trainable matrices alongside the frozen base model. This reduces memory requirements by a large margin while achieving similar results on specialized tasks.
+
+Our LoRA configuration:
+
+\begin{lstlisting}[language=Python, caption={LoRA Configuration Parameters}]
+# LoRA Configuration
+LORA_RANK = 16          # Rank controls adaptation complexity
+LORA_ALPHA = 32         # Alpha is the scaling factor
+DROPOUT = 0.1           # Prevents overfitting
+TARGET_MODULES = ["q_proj", "v_proj", "k_proj", "o_proj"]
+DEVICE = "auto"         # Uses optimal hardware
+DTYPE = "float16"       # Memory-efficient precision
+\end{lstlisting}
+
+A rank of 16 was a balance between adaptation capacity and training speed. Higher ranks can capture more complex patterns but require more memory and training time. We tested ranks of 8, 16, and 32. Rank 16 produced the strongest output for our dataset size.
+
+We trained on the Qwen 2.5-Coder 1.5B base model. This is a small model that runs quickly on modest hardware. This size was chosen to investigate whether fine-tuning could make small models competitive with larger ones.
+
+Training used standard supervised fine-tuning:
+\begin{itemize}
+    \item Input: Header files and fuzzing instructions
+    \item Target: Complete fuzz driver
+    \item Learning rate: 2e-5 with cosine decay
+    \item Epochs: 3
+    \item Batch size: 4 (with gradient accumulation)
+\end{itemize}
+
+\subsection{Fine-Tuned Model Evaluation}
+
+After training, we evaluated the fine-tuned models on the same yaml-cpp benchmark used in Phase 1. The results showed measurable efficiency improvements:
+
+\begin{itemize}
+    \item \textbf{Generation time reduced by 33\%} compared to the base model
+    \item \textbf{Token usage reduced by 55\%} compared to the base model
+    \item Coverage remained comparable to the larger Qwen 2.5-Coder 32B model, which achieved 43\% line coverage (see Chapter 5 for detailed results)
+\end{itemize}
+
+Fine-tuned models generated more concise code. They learned the structure of fuzz drivers and did not waste tokens on unnecessary explanations or boilerplate. These efficiency gains meant that generating each driver took less time and fewer API tokens, which directly impacts operational costs.
+
+More training data did not always produce proportionally better results. The 709-example dataset achieved the best efficiency improvements (see Chapter 5 for detailed metrics), but it included some lower-quality drivers that may have introduced noise. While the extended dataset reduced generation time and token usage, the coverage quality did not improve proportionally. Quality matters more than quantity for fine-tuning specialized tasks.
+
+We also tested the fine-tuned models on RapidJSON and pugixml to check generalization. Performance was similar to yaml-cpp, suggesting the fine-tuning improved general fuzz driver generation rather than overfitting to specific libraries.
+
+\section{Phase 3: Enterprise CI/CD Integration}
+\label{sec:impl_phase3}
+
+Phase 3 focused on deploying the validated approach from Phases 1 and 2 into CARIAD's production CI/CD infrastructure using Azure OpenAI \cite{azure_openai} as the LLM backend. The central question for this phase was \textbf{RQ3}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? The transition from controlled local experiments with Ollama \cite{ollama} to enterprise deployment revealed additional infrastructure considerations that constituted the primary engineering focus of this phase.
+
+\subsection{Architectural Challenges}
+
+Our initial integration strategy appeared simple in concept. The working local pipeline used standard Linux tools, and enterprise runners operated in similar environments. However, the enterprise network security policies required careful architectural planning to maintain compliance.
+
+\textbf{Challenge 1: Network Isolation}
+
+CARIAD operates with a zero-trust security model. CI/CD runners are isolated from the public internet, and external connections require explicit approval. Integrating cloud-based AI services within this security framework required a tailored architectural approach.
+
+Our initial pipeline configuration was designed for direct connectivity and was subsequently adapted for the network isolation requirements. The Azure OpenAI requests were routed through the corporate firewall, which, as expected in a zero-trust environment, did not permit direct external API access.
+
+The resulting error message required investigation to diagnose:
+\begin{lstlisting}
+Error: fatal: unable to access 'https://git.hub.vwgroup.com/...': 
+Failed to connect to 127.0.0.1 port 9000 after 0 ms: Couldn't connect to server
+\end{lstlisting}
+
+Investigation revealed that the proxy configuration scope needed refinement to separate Azure-bound traffic from internal Git operations. The runner was directing Git traffic through the Azure proxy endpoint, which was configured exclusively for LLM API access.
+
+\textbf{Challenge 2: Container Networking}
+
+Runners use Buildah containers for isolation. Each build step runs in its own network namespace, providing strong security boundaries. External service access must be explicitly configured at the container level.
+
+We tried several approaches:
+
+Host network mode:
+\begin{lstlisting}[language=bash]
+buildah run --network host -v $(pwd):/project $containerid /bin/bash -c "cifuzz spark target"
+\end{lstlisting}
+This provided the container with host-level network access, though the firewall policy continued to govern external connections.
+
+Custom DNS entries:
+\begin{lstlisting}[language=bash]
+buildah run --add-host ny4mdomain.openai.azure.com:${OPENAI_IP} ...
+\end{lstlisting}
+This approach was not effective because the connectivity requirement originated from firewall policy rather than DNS resolution.
+
+\textbf{Challenge 3: Credential Management}
+
+Even with network connectivity established, API keys needed to be securely passed to the container. GitHub Actions secrets provided the storage, but injecting them into Buildah containers required explicit environment variable passing:
+
+\begin{lstlisting}[language=bash]
+buildah run \
+  --env CIFUZZ_LLM_API_URL \
+  --env CIFUZZ_LLM_AZURE_DEPLOYMENT_NAME \
+  --env CIFUZZ_LLM_MAX_TOKENS \
+  --env CIFUZZ_LLM_API_TOKEN \
+  -v $(pwd):/$PROJECT_FOLDER ${{ env.containerid }} \
+  /usr/bin/bash -c "cd /project/build && cifuzz spark target_name"
+\end{lstlisting}
+
+Each environment variable had to be passed explicitly. Careful validation of the configuration was necessary, as missing LLM credentials would cause the generation step to be skipped without halting the pipeline. We addressed this by adding pre-flight checks to verify all required variables before the LLM call.
+
+\subsection{Self-Hosted Runner Solution}
+
+Following our investigation, we determined that direct Azure OpenAI access required a network architecture aligned with the enterprise security model. We collaborated with the infrastructure team to implement an appropriate solution.
+
+\textbf{Azure Private Link Architecture}
+
+Our approved solution used Azure Private Link \cite{azure_private_link}. This creates a private endpoint for Azure services that appears inside the corporate network. Traffic to the LLM endpoint never crosses the public internet.
+
+From the runner's perspective, the Azure OpenAI endpoint has an internal IP address. The firewall allows internal traffic, so the LLM calls succeed.
+
+Setting up Private Link involved coordination with the infrastructure team, following the organization's established approval workflow:
+
+\begin{enumerate}
+    \item Request submission with business justification
+    \item Security review of the use case
+    \item Azure subscription configuration
+    \item DNS updates for private endpoint resolution
+    \item Network security group rules
+    \item Testing and validation
+\end{enumerate}
+
+We prepared a detailed business case including cost analysis (approximately \texteuro{}74 to \texteuro{}1,452 annually depending on usage) and security risk assessment. This documentation supported the approval process.
+
+\textbf{Working Pipeline Configuration}
+
+Once Private Link was operational, the pipeline worked reliably. The final GitHub Actions workflow (URLs anonymized for publication):
+
+\begin{lstlisting}[language=yaml, caption={GitHub Actions Workflow with Azure OpenAI Integration}]
+name: fuzz
+env:
+  PROJ_NAME: "INIFUZZ"
+  VERSION: "0.1"
+  ARTIFACTORY_CORPUS_URL: "https://jfrog.hub.vwgroup.com/artifactory/cifuzz-generic-internal/"
+
+jobs:
+  fuzz:
+    runs-on: [auto-buildah-base]
+    env:
+      JFROG_API_KEY: ${{ secrets.JFROG_API_KEY }}
+      ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+      PROJECT_FOLDER: "/project/"
+      CIFUZZ_LLM_API_URL: "https://ny4mdomain.openai.azure.com"
+      CIFUZZ_LLM_AZURE_DEPLOYMENT_NAME: "gpt-4o"
+      CIFUZZ_LLM_MAX_TOKENS: "40000"
+      CIFUZZ_LLM_API_TOKEN: ${{ secrets.CIFUZZ_LLM_API_TOKEN }}
+      
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Login to JFrog
+        run: buildah login -u $ARTIFACTORY_USER -p $JFROG_API_KEY jfrog.hub.vwgroup.com
+          
+      - name: Download corpus if exists
+        run: |
+          HTTP_STATUS=$(curl -u "$ARTIFACTORY_USER:$JFROG_API_KEY" \
+            -o /dev/null -w "%{http_code}" -s -I \
+            "${ARTIFACTORY_CORPUS_URL}${PROJ_NAME}_corpus.gz")
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            curl -u $ARTIFACTORY_USER:$JFROG_API_KEY \
+              "${ARTIFACTORY_CORPUS_URL}${PROJ_NAME}_corpus.gz" | tar -xz
+          fi
+          
+      - name: Get container
+        run: |
+          containerid=$(buildah from jfrog.hub.vwgroup.com/cifuzz-docker-internal/cifuzz:${VERSION})
+          echo "containerid=$containerid" >> $GITHUB_ENV
+          
+      - name: Build project
+        run: |
+          buildah run -v $(pwd):/$PROJECT_FOLDER ${{ env.containerid }} \
+            /usr/bin/bash -c "cd /project && mkdir build && cd build && cmake .. && make"
+            
+      - name: Generate fuzz tests with LLM
+        run: |
+          buildah run \
+            --env CIFUZZ_LLM_API_URL --env CIFUZZ_LLM_AZURE_DEPLOYMENT_NAME \
+            --env CIFUZZ_LLM_MAX_TOKENS --env CIFUZZ_LLM_API_TOKEN \
+            -v $(pwd):/$PROJECT_FOLDER ${{ env.containerid }} \
+            /usr/bin/bash -c "cd /project/build && cifuzz spark parser_target"
+            
+      - name: Rebuild with generated tests
+        run: |
+          buildah run -v $(pwd):/$PROJECT_FOLDER ${{ env.containerid }} \
+            /usr/bin/bash -c "cd /project/build && make"
+            
+      - name: Run fuzzing
+        run: |
+          buildah run -v $(pwd):/$PROJECT_FOLDER ${{ env.containerid }} \
+            /usr/bin/bash -c "cd /project/build && \
+              cifuzz run parser_target --libfuzzer-arg=-max_total_time=30"
+              
+      - name: Upload corpus
+        run: |
+          tar -czf ${PROJ_NAME}_corpus.gz .cifuzz-corpus
+          curl -u $ARTIFACTORY_USER:$JFROG_API_KEY \
+            -T ${PROJ_NAME}_corpus.gz "${ARTIFACTORY_CORPUS_URL}${PROJ_NAME}_corpus.gz"
+\end{lstlisting}
+
+Our pipeline includes corpus persistence through JFrog Artifactory. Each run downloads the previous corpus, runs fuzzing to extend it, and uploads the updated corpus. This way, coverage improvements accumulate over time rather than starting fresh each build.
+
+The network architecture required for this deployment is illustrated in Figure~\ref{fig:enterprise_network} (Chapter 6). As discussed in the subsequent Discussion chapter, the Azure Private Link setup enables secure communication between the CARIAD internal network and Azure OpenAI services without routing traffic through the public internet, while maintaining full security compliance. This architectural solution was the key component for enterprise deployment.
+
+\subsection{Operational Considerations}
+
+With the technical implementation complete, several operational concerns remained.
+
+\textbf{Cost Management}
+
+Azure OpenAI charges per token. Each fuzz driver generation uses approximately 3000 to 8000 tokens depending on the target complexity. We calculated costs for different usage scenarios:
+
+\begin{table}[htbp]
+\centering
+\caption{Azure OpenAI Cost Projections for Different Usage Scenarios}
+\label{tab:cost_scenarios_impl}
+\small
+\begin{tabular}{lcccc}
+\toprule
+Scenario & Targets/Day & Builds/Day & Annual Tokens & Annual Cost \\
+\midrule
+Light & 5 & 1 & 3.1M & \texteuro{}74 \\
+Moderate & 10 & 2 & 12.5M & \texteuro{}219 \\
+Heavy & 25 & 5 & 78M & \texteuro{}726 \\
+Enterprise & 50 & 10 & 156M & \texteuro{}1,452 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These costs are low in absolute terms. For context, even the enterprise usage scenario represents a modest investment compared to manual security testing efforts. However, the LLM-generated drivers supplement rather than replace expert security engineering work, so this comparison captures only the infrastructure cost component. A detailed economic analysis including human oversight costs appears in Chapter 5.
+
+\textbf{Failure Handling}
+
+LLM outputs are non-deterministic. Sometimes the generated driver does not compile. Sometimes it compiles but crashes immediately. The pipeline was designed to handle these cases gracefully.
+
+We added fallback logic, so if the LLM-generated driver fails, the pipeline falls back to any existing manually-written drivers. The build does not fail due to unsuccessful AI generation. Generated drivers that work are kept. Those that fail are logged for review but do not block the pipeline.
+
+\textbf{Security Review}
+
+Generated code running in CI/CD pipelines poses security considerations. What if the LLM generates malicious code? We addressed this concern in our security review:
+
+\begin{enumerate}
+    \item The code runs inside containers with limited privileges
+    \item ASan and UBSan catch memory-related errors and undefined behavior during execution
+    \item Generated code is compiled and executed, not given shell access
+    \item The LLM only sees public header files, not sensitive source code
+    \item All generated code is logged for audit purposes
+\end{enumerate}
+
+After reviewing these controls, the security team approved the architecture. They requested additional monitoring of token usage and periodic audits of generated code quality.
+
+The next chapter presents experimental results in detail, with quantitative analysis of model performance and coverage metrics across all evaluated configurations.

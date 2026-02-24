@@ -1,0 +1,110 @@
+% File: chapters/chapter3_methodology.tex
+
+\chapter{Methodology and Framework}
+\label{chap:methodology}
+
+In this chapter, I explain how the research was carried out, from early experiments to the final deployment at CARIAD SE between May and September 2025. We explain the conceptual foundations of our framework, the technical design that supports it, and the three-phase research strategy that guided our work from initial experiments to enterprise deployment.
+
+The methodology was primarily shaped by the need to rigorously evaluate the application of large language models within complex software security contexts. The research design had to adapt to the rapid advancements in generative AI, where new models and capabilities emerge continuously. Most importantly, the methodology aimed to produce generalizable empirical results that contribute to the broader scientific understanding of automated vulnerability discovery and guide future research directions.
+
+\section{Conceptual Framework: AI-Driven White-Box Fuzzing}
+\label{sec:meth_conceptual}
+
+The conceptual framework for this research combines established ideas from software security testing with new possibilities created by large language models. To explain our approach clearly, we first review the core problem and our proposed solution.
+
+\subsection{The Fuzz Driver Problem}
+Fuzzing is an effective technique for finding vulnerabilities, but it relies on a critical component: the fuzz driver. A fuzzer like libFuzzer generates raw inputs (byte streams). A fuzz driver is a C++ program that translates those inputs into meaningful API calls to the target library. It acts as the bridge between the random mutations of the fuzzer and the logic of the library.
+
+Writing effective drivers requires deep understanding of the API. An engineer must know what functions exist, what parameters they accept, what preconditions must be satisfied, and what edge cases might cause problems. This understanding represents specialized domain knowledge. Creating effective fuzz drivers requires significant expertise and time, making it a resource-intensive process that is difficult to scale manually against the high volume of modern software production.
+
+\subsection{Our Approach: Automated Generation}
+We investigated whether Large Language Models (LLMs) could automate this process. The conceptual idea is straightforward: feed an LLM a description of a target library API (header files, documentation) and ask it to generate a valid fuzz driver.
+
+If the model produces compilable, executable code that achieves meaningful coverage, we have partially automated what previously required human effort. This addresses the bottleneck directly. Instead of assigning a specialist to write each driver manually, we run an automated pipeline, review the output, and deploy it.
+
+We know LLMs have constraints. LLMs sometimes generate code that compiles but does not exercise interesting behavior. They sometimes misunderstand API contracts. They sometimes generate code with undefined behavior that crashes the fuzzer immediately. These are not theoretical concerns; we encountered all of them during our work.
+
+We recognized that imperfect automation still helps. If an LLM generates a driver that achieves 40\% coverage and saves 8 hours of expert time, that is progress. We do not need perfection. We need a solution that is "good enough" to save time overall.
+
+\section{Technical Architecture Design}
+\label{sec:meth_architecture}
+
+Moving from concept to working system required a robust technical design. Our system uses a layered architecture with three main components: \textbf{Input Analysis}, \textbf{Generation}, and \textbf{Execution}.
+
+\begin{figure}[htbp]
+    \centering
+    
+
+[Technical Architecture Diagram]
+
+    \includegraphics[width=0.85\textwidth]{bilder/architecture.png}
+    \caption{Technical Architecture Implementation. The workflow integrates the LLM as an automated frontend to the standard \textbf{Fuzzing Engine}, replacing manual driver development while maintaining the established execution pipeline.}
+    \label{fig:tech_architecture}
+\end{figure}
+
+As shown in Figure \ref{fig:tech_architecture}, the data flows from source code through the LLM to the final execution engine.
+
+\subsection{Input Layer (Automated Context Extraction)}
+The first step is preparing the context. Instead of writing custom parsers, we used the analysis capabilities of \textbf{cifuzz spark}. This tool automatically parses the project structure, identifying public headers and API surfaces relevant for testing. It handles the complex task of traversing the abstract syntax tree (AST) to extract function signatures and class definitions. This ensures the LLM receives accurate context about the code it needs to test, without requiring manual intervention or maintenance of regex scripts.
+
+\subsection{Generation Layer (LLM Interface)}
+This component handles the interaction with the LLM model. It includes two critical sub-systems:
+\begin{itemize}
+    \item \textbf{Prompt Engineering:} We combine the extracted API context with specific fuzzing instructions for the fuzz test case structure.
+    \item \textbf{Backend Abstraction:} We configured the environment to swap between different model backends. While `cifuzz` manages the workflow, we routed the generation requests to both local models (via Ollama) and cloud models (via Azure OpenAI) to compare performance across different architectures.
+\end{itemize}
+
+\subsection{Execution Layer (Evaluation Pipeline)}
+Generated drivers are useless if they do not run. This component handles the compilation and execution pipeline.
+\begin{enumerate}
+    \item \textbf{Validation:} We try to compile the driver against the target library using Clang.
+    \item \textbf{Sanitization:} We compile with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) to detect memory errors.
+    \item \textbf{Execution:} If compilation succeeds, the driver runs under \texttt{libFuzzer}. The system monitors coverage metrics and records any crashes.
+\end{enumerate}
+
+\section{Research Strategy: Three-Phase Approach}
+\label{sec:meth_strategy}
+
+Our research unfolded in three distinct phases, each addressing different aspects of the research questions defined in Chapter 1.
+
+\subsection{Phase 1: Local LLM Evaluation}
+We gathered 14 open-source LLM models ranging from 1.5B to 46.7B parameters and evaluated them on multiple C++ target libraries. This phase directly addresses **RQ1** and **RQ2**. Can LLMs generate useful fuzz drivers? Does model size matter? Which models work best?
+
+We chose open-source models specifically because automotive applications have intellectual property constraints. Sending proprietary code to external APIs is often problematic. Local models, run on available hardware, avoid this concern entirely.
+
+\subsection{Phase 2: Model Optimization with LoRA}
+Based on Phase 1 results, we selected a promising small model and applied Low Rank Adaptation (LoRA) fine-tuning. We curated a dataset of high-quality fuzz drivers from the Google OSS-Fuzz project to teach the model the specific structure of a good test harness.
+
+The goal was to adapt the model specifically for the fuzzing task while reducing computational cost. This phase addresses **RQ2** more directly: can smaller, fine-tuned models outperform larger general purpose models?
+
+\subsection{Phase 3: Enterprise CI/CD Integration}
+The final phase moved from controlled experiments to the real world. We integrated the solution into CARIAD's actual CI/CD infrastructure. This phase addresses **RQ3**: Can this approach work in a real corporate environment with real network security policies, cost constraints, and operational complexity?
+
+\begin{figure}[htbp]
+    \centering
+    
+
+[Enterprise Integration Architecture]
+
+    \includegraphics[width=\textwidth]{bilder/integration.png}
+    \caption{Enterprise Integration Strategy. This diagram illustrates the solution to the network isolation challenge using Azure Private Link to connect self-hosted runners to cloud LLM services.}
+    \label{fig:enterprise_integration}
+\end{figure}
+
+As illustrated in Figure \ref{fig:enterprise_integration}, this phase revealed challenges we had not anticipated during earlier work. The corporate firewall blocked external API calls, requiring us to re-architect the solution using Azure Private Link.
+
+\section{Evaluation Methodology}
+\label{sec:meth_evaluation}
+
+We evaluated generated fuzz drivers using quantitative metrics to ensure objectivity, focusing on both code quality and pipeline impact.
+
+\begin{itemize}
+    \item \textbf{Compilation Success:} Does the driver compile against the target library? This is the first and most critical filter.
+    \item \textbf{Runtime Behavior:} Does the driver execute without crashing immediately? We checked if the driver actually runs or just fails instantly.
+    \item \textbf{Code Coverage:} What percentage of the target library does the driver test? We measured this using standard tools (`llvm-cov`).
+    \item \textbf{Vulnerability Discovery (MTTV):} We measured the "Mean Time To Vulnerability"—simply put, how long the fuzzer needs to run before it finds a bug.
+    \item \textbf{Pipeline Latency (CI Overhead):} We measured how much extra time the AI adds to the build process. The system must stay within the 15-30 minute window developers expect.
+    \item \textbf{Cost and Efficiency:} We calculated the exact price of generating a driver. By tracking the number of tokens (words) sent to the AI, we determined the cost in euros to prove it is cheaper than human engineering.
+\end{itemize}
+
+For each target library, we also manually inspected a sample of generated drivers to understand failure modes. We documented cases where drivers compiled but did not work as intended. Finally, we conducted a cost analysis for enterprise deployment, modeling different scenarios to estimate annual expenses.

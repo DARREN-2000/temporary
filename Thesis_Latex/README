@@ -1,0 +1,6 @@
+The main file is "Thesis.tex".
+
+In order to compile your report, use the following commands:
+
+make       -- will generate a PDF file
+make clean -- cleans directory including PDF file

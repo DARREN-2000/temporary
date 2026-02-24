@@ -1,0 +1,160 @@
+% File: chapters/chapter2_literature.tex
+
+\chapter{Literature Review}
+\label{chap:literature_review}
+
+\section{Traditional AI Approaches in Software Testing}
+\label{sec:lit_traditional_ai}
+
+Automated software testing has been a research area for decades, and AI techniques have played various roles in its evolution. Understanding the historical context helps explain why LLM-based approaches represent a different class of methods.
+
+\textbf{Genetic algorithms} were among the earliest AI applications to testing. The basic idea was straightforward: treat test case generation as an optimization problem. Maintain a population of test cases, apply selection and mutation operations across generations, and let evolution guide toward more effective tests. Wang et al. documented how evolutionary testing dominated research from the late 1990s through the early 2010s \cite{MLFuzzReview2020}.
+
+This approach showed initial promise. Coverage could be formulated as a fitness function. Generate test cases that maximize coverage. Multi-objective optimization helped balance competing goals. Over time, limitations became apparent. Fitness function design proved challenging. Maximizing code coverage did not necessarily correlate with bug detection. Most fundamentally, genetic algorithms lacked semantic understanding. They could shuffle bytes and hope for improvements, but they could not understand what made certain inputs meaningful for a particular API.
+
+\textbf{Symbolic execution} offered a different approach based on constraint solving rather than random search. The technique treats program inputs as symbolic values and accumulates path constraints during execution. Solving these constraints yields concrete inputs guaranteed to exercise specific program paths. Microsoft's SAGE, deployed internally for security testing, demonstrated practical viability by finding vulnerabilities that conventional testing had missed \cite{SAGE2008}.
+
+Symbolic execution offers theoretical rigor. But it faces serious scalability problems. The number of paths through a program grows exponentially with the number of branch points. This is the path explosion problem. Yavuz's recent work on DESTINA addresses this through targeted execution strategies, but complete path coverage remains infeasible for realistic programs \cite{DESTINA2024}.
+
+\textbf{Machine learning entered testing} in supporting roles around 2015. A Sandia National Laboratories report surveyed early applications: defect prediction, test case prioritization, coverage estimation \cite{MLFuzzReviewSandia2019}. These applications used ML models to inform human decisions rather than generate tests directly. They were practical and useful but did not fundamentally change how tests were created.
+
+Neural networks enabled more ambitious applications. Pei et al. introduced DeepXplore for testing deep learning systems, defining neuron coverage as a testing adequacy criterion \cite{DeepXplore2017}. Odena et al. extended coverage-guided fuzzing to neural networks with TensorFuzz \cite{TensorFuzz2019}. These works showed that neural networks could participate actively in testing rather than merely supporting it.
+
+This context shows why LLM-based approaches represent a different class of methods. Previous AI techniques either optimized based on metrics (genetic algorithms, coverage-guided fuzzing) or reasoned about program structure (symbolic execution). LLMs do something different: they learn patterns from vast code repositories and can generate syntactically correct code following those patterns.
+
+\section{Large Language Models: Evolution and Code Generation}
+\label{sec:lit_llm_evolution}
+
+The Transformer architecture, introduced in 2017, enabled training on vastly larger datasets than previous approaches permitted. Scaling revealed that models trained on next-token prediction could perform diverse tasks.
+
+GPT-3 (2020) demonstrated this principle. With 175 billion parameters, it could write coherent text and syntactically valid code. The specific finding that mattered for software engineering: the model had learned patterns from code in its training data and could apply them to generate new code.
+
+Code-specific models followed. Codex, which powers GitHub Copilot, achieved 28.8\% success on the HumanEval benchmark initially and 70.2\% with multiple sampling attempts. GPT-4 further improved code generation with better contextual understanding and reduced subtle errors. Context windows expanded from 2K to 128K tokens, enabling inclusion of multiple source files, headers, and documentation in prompts.
+
+Open-source alternatives emerged as major counterparts. Meta's LLaMA 
+showed that competitive performance was achievable with smaller, publicly available models \cite{Touvron2023}. Code-specific variants like StarCoder and CodeLlama targeted programming tasks specifically. This mattered for automotive applications where intellectual property constraints make sending code to external services problematic.
+
+Researchers have systematically tested LLM code generation. Deng et al. found that models generated syntactically valid code at high rates but frequently contained semantic issues: code that compiled but exercised APIs incorrectly \cite{TitanFuzz2022}. Wang et al. observed similar patterns in mutation testing experiments, noting high success on simple cases with degrading performance as complexity increased \cite{LLMMutationTesting2024}.
+
+C presents particular challenges for LLM-based code generation. Training data skews heavily toward Python, JavaScript, and other high-level languages. C's distinctive features, such as pointer arithmetic, manual memory management, preprocessor macros, and undefined behavior, are less well represented in training data. Empirical evaluations consistently show worse performance on C compared to Python \cite{LLMDriverGenEffectiveness2023}. This has direct implications for automotive applications where C remains the dominant language for embedded systems.
+
+\section{Foundations of AI-Guided Fuzzing Techniques}
+\label{sec:lit_fuzzing_foundations}
+
+Fuzzing originated with Barton Miller's 1988 experiments at the University of Wisconsin, where students subjected UNIX utilities to streams of random input and found that approximately 25\% crashed or hung \cite{Miller1990}. This established fuzzing as a viable technique for uncovering reliability issues. Early fuzzing was entirely random, requiring no knowledge of target program structure. But simplicity had a cost: random inputs rarely satisfy validation checks and prevent exploration of deeper logic.
+
+Coverage-guided fuzzing represented a fundamental advance. AFL (American Fuzzy Lop), released in 2013, introduced lightweight instrumentation to track which code paths each input explored. Inputs discovering new coverage were retained and mutated further. Inputs revealing no new coverage were discarded. This feedback loop dramatically improved efficiency by directing search toward unexplored behavior \cite{AFLPlusPlus}.
+
+AFL spawned an ecosystem. AFL++ added performance optimizations and additional mutation strategies. LibFuzzer integrated coverage-guided fuzzing into the LLVM toolchain \cite{LibFuzzer2015}. Syzkaller adapted coverage-guided techniques for kernel testing \cite{Syzkaller2020}. Google's OSS-Fuzz project deployed these tools at scale, continuously fuzzing hundreds of open-source projects.
+
+Ding and Le Goues analyzed bugs found by OSS-Fuzz, documenting vulnerability classes that other testing methods had missed \cite{OSSFuzzBugs2021}. The technique works. The bottleneck is harness creation.
+
+Grammar-based fuzzing addressed structural validity problems. Random byte mutations rarely produce syntactically valid inputs for complex formats. A randomly mutated JSON file is almost certainly invalid JSON. Grammar-based fuzzers generate inputs according to specified grammars, ensuring structural validity while exploring variations. This proved particularly effective for protocol parsers and file format handlers.
+
+Despite these advances, challenges persist in fuzzing practice. Writing fuzz harnesses connecting fuzzers to target libraries remains manual and labor-intensive. Coverage plateaus occur when random mutation cannot discover paths beyond certain checkpoints. These limitations motivate AI-enhanced approaches that can reason about program structure.
+
+\section{AI-Enhanced Fuzzing: State of the Art}
+\label{sec:lit_ai_enhanced_fuzzing}
+
+Combining machine learning and fuzzing has led to a growing body of research. This section surveys the current state.
+
+\textbf{LLM-Based Test Case Generation} represents a fundamentally different approach. rather than mutating existing inputs, LLMs generate tests from specifications, documentation, or source code.
+
+Deng et al. introduced TitanFuzz, demonstrating that LLMs could generate effective fuzz targets for deep learning library APIs by prompting models with API documentation \cite{TitanFuzz2022}. TitanFuzz produced test cases achieving higher coverage than manually written tests for several libraries and discovered previously unknown bugs. This demonstrated that tests produced by LLMs can be applied in real projects.
+
+FuzzGPT extended this approach with focus on edge cases, observing that LLMs possess implicit knowledge of typical API usage patterns from training on vast code repositories \cite{FuzzGPT2023}. By prompting specifically for atypical or boundary case inputs, FuzzGPT discovered bugs that conventional fuzzers overlooked.
+
+Fuzz4All pursued a more general approach, targeting multiple programming languages and application domains while using LLMs to generate both test inputs and harness code \cite{Fuzz4All2023}.
+
+Zhang et al. directly evaluated LLM-generated fuzz drivers compared to manually written alternatives, finding that results varied significantly across libraries \cite{LLMDriverGenEffectiveness2023}. Some LLM drivers achieved 80 to 90 percent of manual driver coverage. Others reached only 50\%. Performance correlated with documentation quality and API complexity.
+
+Previous work worth noting includes HyLLfuzz, which combines LLM-generated seeds with mutation-based fuzzing \cite{HyLLfuzz2024}, and WhiteFox, which uses LLMs for targeted compiler fuzzing \cite{WhiteFox2023}. These are hybrid approaches attempting to combine LLM strengths while mitigating limitations.
+
+Across these studies, authors repeatedly note a gap between code that compiles and code that does something meaningful. LLMs produce code that compiles at high rates but may not exercise meaningful behavior.
+
+\section{CI/CD Pipeline Security Integration}
+\label{sec:lit_cicd_integration}
+
+Continuous Integration and Continuous Testing have become foundational practices for managing complexity while maintaining development velocity. The philosophy is straightforward: integrate code changes frequently, test automatically, deploy validated changes rapidly.
+
+The automotive industry has adapted these principles to domain-specific constraints. Formal release processes with human review precede deployment to production vehicles. Nevertheless, core principles apply: automate what can be automated, test early and often, maintain a continuously releasable codebase \cite{CiCdFuzzing2022}.
+
+This creates tension with thorough security testing. A well-optimized pipeline might complete build and basic testing in 15 to 30 minutes. Developers expect rapid feedback. Security testing, particularly fuzzing, requires extended execution to achieve meaningful coverage. A fuzzing campaign might run for hours or days. This timescale is incompatible with developer expectations \cite{CiCdFuzzing2022}.
+
+Enterprise environments add infrastructure complexity. Large organizations deploy systems for CI/CD across hybrid cloud architectures, balancing computational demands against security requirements. Build runners may execute in public cloud environments for scalability while sensitive operations stay in private networks isolated from external connections. Network policies restrict communication between zones.
+
+I should note that when we started this work, we underestimated how much this infrastructure complexity would matter. We thought the hard problem was generating good fuzz drivers with LLMs. The primary challenge lies in deploying these models within secure enterprise networks, where strict data privacy requirements and isolated infrastructure often restrict the theoretical benefits of Large Language Models.
+
+\section{Automotive Software Development and Safety Standards}
+\label{sec:lit_automotive_standards}
+
+Automotive software operates under regulatory constraints unlike most other domains. Safety standards like ISO 26262 require systematic identification and mitigation of safety risks throughout the vehicle lifecycle \cite{ISO26262}. Every failure mode must be analyzed. Fixes must be verified through testing. This fits safety engineering, where hazards are defined and the physical behavior is predictable.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[
+    box/.style={draw, rectangle, minimum width=3.5cm, minimum height=1.2cm, align=center, fill=white, thick, font=\footnotesize},
+    arrow/.style={->, >=stealth, thick}
+]
+% --- COORDINATE GRID ---
+\node[box] (brs) at (0, 0) {BRS\\(Business Req. Specs)};
+\node[box] (srs) at (1.5, -2) {SRS\\(System Req. Specs)};
+\node[box] (hld) at (3.0, -4) {HLD\\(High Level Design)};
+\node[box] (lld) at (4.5, -6) {LLD\\(Low Level Design)};
+\node[box] (coding) at (6.0, -8) {Coding};
+
+\node[box] (at) at (16, 0) {Acceptance Testing};
+\node[box] (st) at (14.5, -2) {System Testing};
+\node[box] (sit) at (13.0, -4) {System Int. Testing};
+\node[box] (ct) at (11.5, -6) {Component Testing};
+\node[box] (ut) at (10.0, -8) {Unit Testing};
+
+\node[box, fill=gray!10] (code) at (8.0, -10) {\textbf{CODE}};
+
+% --- FLOW ARROWS ---
+\draw[arrow] (brs) -- (srs);
+\draw[arrow] (srs) -- (hld);
+\draw[arrow] (hld) -- (lld);
+\draw[arrow] (lld) -- (coding);
+\draw[arrow] (coding) -- (code);
+
+\draw[arrow] (code) -- (ut);
+\draw[arrow] (ut) -- (ct);
+\draw[arrow] (ct) -- (sit);
+\draw[arrow] (sit) -- (st);
+\draw[arrow] (st) -- (at);
+
+% --- HORIZONTAL LINKS ---
+\draw[dashed, ->] (brs) -- (at);
+\draw[dashed, ->] (srs) -- (st);
+\draw[dashed, ->] (hld) -- (sit);
+\draw[dashed, ->] (lld) -- (ct);
+\draw[dashed, ->] (coding) -- (ut);
+
+\node[above=0.2cm of brs, font=\bfseries] {Verification Phase};
+\node[above=0.2cm of at, font=\bfseries] {Validation Phase};
+\end{tikzpicture}
+}
+\caption{The V-Model Development Lifecycle. The diagram illustrates the relationship between each development phase (left) and its corresponding testing phase (right), converging at the Code implementation.}
+\label{fig:v_model}
+\end{figure}
+
+Security engineering faces a different problem. Attackers are intelligent, creative, and unconstrained by specifications. UNECE Regulation 155 and ISO/SAE 21434 require cybersecurity management systems and risk assessment, but implementation requires different approaches than safety engineering \cite{ISO21434}. The expected behavior must be verified, but also the unexpected behavior must be tested for weaknesses.
+
+As illustrated in the V-Model (Figure \ref{fig:v_model}), which assumes design and testing are perfectly matched. But security breaks this assumption. Safety requires comprehensive coverage of specified behaviors. But, security requires exploration of unspecified attack surfaces. Both demand rigorous testing. Development cycles must accelerate while testing becomes more thorough. Under these conditions, AI-assisted fuzzing is no longer a theoretical idea but a practical need.
+
+\section{Research Gaps and Thesis Positioning}
+\label{sec:lit_research_gaps}
+
+Based on this review, several specific gaps can be identified.
+
+First, while previous work has evaluated LLM-based test generation on individual target libraries, comprehensive evaluation across diverse targets with different models and with explicit analysis of model scale versus specialization is limited. We address this through systematic evaluation of 14 models across multiple C++ libraries.
+
+Second, while optimization techniques like LoRA are well-established in general LLM domains, their application to fuzzing is underexplored \cite{Hu2021}. We investigate whether domain-specific fine-tuning of small models can match or exceed larger general purpose models.
+
+Third, academic research typically evaluates techniques in isolation. Production deployment in secure enterprise environments faces systemic engineering challenges, such as integrating non deterministic models into automated continuous integration pipelines, managing data privacy constraints without compromising model context, and addressing latency within closed networks. We focus on bridging this gap between theoretical evaluation and practical engineering deployment.
+
+Finally, while prior work examines success cases, systematic analysis of where generated drivers fail and detection mechanisms is limited.
+
+This thesis addresses these gaps through systematic evaluation and explicit attention to enterprise deployment challenges.
