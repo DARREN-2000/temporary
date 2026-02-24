@@ -165,17 +165,17 @@ The generated fuzz drivers---the C++ source files produced by the LLM in the Gen
 Our research unfolded in three distinct phases, each addressing different aspects of the research questions defined in Chapter 1.
 
 \subsection{Phase 1: Local LLM Evaluation}
-We gathered 14 open-source LLM models ranging from 1.5B to 46.7B parameters and evaluated them on multiple C++ target libraries. This phase directly addresses **RQ1** and **RQ2**. Can LLMs generate useful fuzz drivers? Does model size matter? Which models work best?
+We gathered 14 open-source LLM models ranging from 1.5B to 46.7B parameters and evaluated them on multiple C++ target libraries. This phase directly addresses \textbf{RQ1} and \textbf{RQ2}. Can LLMs generate useful fuzz drivers? Does model size matter? Which models work best?
 
 We chose open-source models specifically because automotive applications have intellectual property constraints. Sending proprietary code to external APIs is often problematic. Local models, run on available hardware, avoid this concern entirely.
 
 \subsection{Phase 2: Model Optimization with LoRA}
 Based on Phase 1 results, we selected a promising small model and applied Low Rank Adaptation (LoRA) fine-tuning. We curated a dataset of high-quality fuzz drivers from the Google OSS-Fuzz project to teach the model the specific structure of a good test harness.
 
-The goal was to adapt the model specifically for the fuzzing task while reducing computational cost. This phase addresses **RQ2** more directly: can smaller, fine-tuned models outperform larger general purpose models?
+The goal was to adapt the model specifically for the fuzzing task while reducing computational cost. This phase addresses \textbf{RQ2} more directly: can smaller, fine-tuned models outperform larger general purpose models?
 
 \subsection{Phase 3: Enterprise CI/CD Integration}
-The final phase moved from controlled experiments to the real world. We integrated the solution into CARIAD's actual CI/CD infrastructure. This phase addresses **RQ3**: Can this approach work in a real corporate environment with real network security policies, cost constraints, and operational complexity?
+The final phase moved from controlled experiments to the real world. We integrated the solution into CARIAD's actual CI/CD infrastructure. This phase addresses \textbf{RQ3}: Can this approach work in a real corporate environment with real network security policies, cost constraints, and operational complexity?
 
 \begin{figure}[htbp]
     \centering
@@ -198,7 +198,7 @@ We evaluated generated fuzz drivers using quantitative metrics to ensure objecti
 \begin{itemize}
     \item \textbf{Compilation Success:} Does the driver compile against the target library? This is the first and most critical filter.
     \item \textbf{Runtime Behavior:} Does the driver execute without crashing immediately? We checked if the driver actually runs or just fails instantly.
-    \item \textbf{Code Coverage:} What percentage of the target library does the driver test? We measured this using standard tools (`llvm-cov`).
+    \item \textbf{Code Coverage:} What percentage of the target library does the driver test? We measured this using standard tools (\texttt{llvm-cov}).
     \item \textbf{Vulnerability Discovery (MTTV):} We measured the "Mean Time To Vulnerability"—simply put, how long the fuzzer needs to run before it finds a bug.
     \item \textbf{Pipeline Latency (CI Overhead):} We measured how much extra time the AI adds to the build process. The system must stay within the 15-30 minute window developers expect.
     \item \textbf{Cost and Efficiency:} We calculated the exact price of generating a driver. By tracking the number of tokens (words) sent to the AI, we determined the cost in euros to prove it is cheaper than human engineering.
