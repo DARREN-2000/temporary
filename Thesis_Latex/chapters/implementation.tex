@@ -347,7 +347,7 @@ To guide the integration, we derived the following concrete requirements from CA
 \begin{itemize}
     \item \textbf{Performance requirements:}
     \begin{enumerate}
-        \item Driver generation must complete within the existing CI/CD feedback window (15--30 minutes per pipeline run).
+        \item Driver generation must complete within the CI/CD feedback window (targeted at 15 to 30 minutes, with up to 45 minutes acceptable for complex libraries).
         \item Fuzzing execution must not block the main build pipeline; it may run asynchronously.
         \item The system must support at least 10 target libraries per day without manual intervention.
     \end{enumerate}
