@@ -459,7 +459,7 @@ Once Private Link was operational, the pipeline worked reliably. Figure~\ref{fig
     \centering
     \resizebox{\textwidth}{!}{
     \begin{tikzpicture}[
-        step/.style={draw, rounded corners=6pt, rectangle, minimum width=3.5cm, minimum height=1cm, align=center, fill=orange!10, thick, font=\small},
+        procstep/.style={draw, rounded corners=6pt, rectangle, minimum width=3.5cm, minimum height=1cm, align=center, fill=orange!10, thick, font=\small},
         data/.style={draw, rectangle, minimum width=3cm, minimum height=0.8cm, align=center, fill=blue!8, thick, font=\small},
         decision/.style={draw, diamond, aspect=2, minimum width=2cm, align=center, fill=yellow!15, thick, font=\small},
         arrow/.style={->, >=stealth, thick},
@@ -469,31 +469,31 @@ Once Private Link was operational, the pipeline worked reliably. Figure~\ref{fig
     \node[data] (trigger) at (0, 0) {Git Push\\{\footnotesize(code commit)}};
 
     % --- Row 1 ---
-    \node[step] (checkout) at (0, -2) {Checkout\\Repository};
-    \node[step] (login) at (5, -2) {Login to\\JFrog Artifactory};
+    \node[procstep] (checkout) at (0, -2) {Checkout\\Repository};
+    \node[procstep] (login) at (5, -2) {Login to\\JFrog Artifactory};
 
     % --- Row 2 ---
-    \node[step] (corpus) at (5, -4) {Download\\Previous Corpus};
-    \node[step] (container) at (0, -4) {Pull cifuzz\\Container Image};
+    \node[procstep] (corpus) at (5, -4) {Download\\Previous Corpus};
+    \node[procstep] (container) at (0, -4) {Pull cifuzz\\Container Image};
 
     % --- Row 3 ---
-    \node[step] (build) at (2.5, -6) {Build Project\\{\footnotesize(CMake + Clang)}};
+    \node[procstep] (build) at (2.5, -6) {Build Project\\{\footnotesize(CMake + Clang)}};
 
     % --- Row 4: LLM ---
-    \node[step, fill=yellow!20] (spark) at (2.5, -8) {\textbf{cifuzz spark}\\{\footnotesize Generate Fuzz Driver}\\{\footnotesize via Azure OpenAI}};
+    \node[procstep, fill=yellow!20] (spark) at (2.5, -8) {\textbf{cifuzz spark}\\{\footnotesize Generate Fuzz Driver}\\{\footnotesize via Azure OpenAI}};
 
     % --- Row 5 ---
-    \node[step] (rebuild) at (2.5, -10) {Rebuild with\\Generated Driver};
+    \node[procstep] (rebuild) at (2.5, -10) {Rebuild with\\Generated Driver};
 
     % --- Row 6 ---
-    \node[step] (fuzz) at (2.5, -12) {Run libFuzzer\\{\footnotesize(30\,s, ASan+UBSan)}};
+    \node[procstep] (fuzz) at (2.5, -12) {Run libFuzzer\\{\footnotesize(30\,s, ASan+UBSan)}};
 
     % --- Row 7: outputs ---
     \node[data] (crashes) at (-1, -14) {Crash\\Reports};
     \node[data] (coverage) at (6, -14) {Coverage\\Data};
 
     % --- Row 8 ---
-    \node[step] (upload) at (2.5, -16) {Upload Updated\\Corpus to Artifactory};
+    \node[procstep] (upload) at (2.5, -16) {Upload Updated\\Corpus to Artifactory};
 
     % --- Arrows ---
     \draw[arrow] (trigger) -- (checkout);

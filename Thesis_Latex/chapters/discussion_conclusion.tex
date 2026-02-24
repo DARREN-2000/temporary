@@ -68,6 +68,8 @@ The answer is affirmative, though several conditions apply.
 
 The experiments demonstrated that specialized code models can generate fuzz drivers meeting these criteria. Results from Chapter 5 Section 5.2 show that the best-performing models achieved 43 to 45\% line coverage on yaml-cpp.
 
+It is important to contextualize this finding relative to prior work. Previous studies such as TitanFuzz~\cite{TitanFuzz2022} and Fuzz4All~\cite{Fuzz4All2023} have demonstrated that LLMs can generate fuzz targets for Python libraries and deep learning frameworks. The novel contribution of our work is threefold: (1) we demonstrate this capability specifically for C/C++ libraries with libFuzzer-style drivers, which impose stricter structural requirements than Python test cases; (2) we provide a systematic comparison across 14 models showing that model selection has a decisive impact on success; and (3) we validate the approach within an enterprise CI/CD pipeline under real network isolation and security constraints, which no prior work has reported.
+
 However, the qualifications matter. Not all models succeed. General-purpose models, even large ones, frequently did not produce usable output. Model selection matters. In practice, the question ``can LLMs do this'' should more precisely be ``which LLMs can do this, and under what conditions.''
 
 While respectable, these coverage numbers likely trail expert human performance. LLM-generated drivers are useful for initial security testing but should not be considered equivalent to carefully crafted manual drivers for critical applications. Their advantage lies in automation speed, not coverage depth.
@@ -84,7 +86,7 @@ This finding has practical implications. Organizations deploying LLM-based fuzzi
 
 Integration is feasible, but requires considerable infrastructure effort.
 
-The performance requirement was met. Driver generation completed within reasonable timeframes, and fuzzing execution can run asynchronously without blocking developer feedback.
+The performance requirement was met. As defined in Chapter~4 (Section~\ref{sec:impl_phase3}), the performance requirements specified that driver generation must complete within the 15 to 30 minute CI/CD feedback window and that fuzzing execution must not block the main build pipeline. Driver generation completed within 10 to 43 minutes depending on the model (see Table~\ref{tab:model_performance}), with the best models (Qwen~2.5-Coder 32B, Gemma~3 27B) completing in approximately 33 minutes. Fuzzing execution can run asynchronously without blocking developer feedback.
 
 The cost requirement was met. As detailed in Chapter 5 Section 5.4, enterprise deployment costs are minimal compared to manual security testing efforts or the cost of security incidents from undetected vulnerabilities.
 
@@ -165,45 +167,27 @@ These limitations do not invalidate our findings, but they define the scope with
 \subsection{Automotive Industry Impact}
 \label{sec:discussion_automotive}
 
-The automotive industry faces a particular combination of pressures that makes LLM-assisted fuzzing attractive.
+The automotive industry faces a particular combination of regulatory, complexity, and resource pressures that makes LLM-assisted fuzzing attractive.
 
-Regulatory requirements are tightening. UNECE Regulation 155 \cite{UNECER155} (United Nations Economic Commission for Europe cybersecurity regulation) mandates cybersecurity management systems for vehicle manufacturers. ISO/SAE 21434 \cite{ISO21434} (International Organization for Standardization and Society of Automotive Engineers standard for automotive cybersecurity management) requires systematic security engineering throughout the vehicle lifecycle. Manufacturers must demonstrate that they have addressed security risks. Fuzzing provides evidence of security testing that regulators recognize.
+Regulatory requirements are tightening. UNECE Regulation~155~\cite{UNECER155} mandates cybersecurity management systems for vehicle manufacturers. ISO/SAE~21434~\cite{ISO21434} requires systematic security engineering throughout the vehicle lifecycle. Fuzzing provides documented evidence of security testing that regulators recognize.
 
-Software complexity continues to grow. Modern vehicles contain millions of lines of code across networked ECUs. Manual security review cannot scale to this volume. Automated approaches are necessary to maintain coverage.
+Software complexity continues to grow. Modern vehicles contain millions of lines of code across networked ECUs. Manual security review cannot scale to this volume.
 
-Security engineering expertise is highly valued across industries. Automotive organizations benefit from tools that maximize the effectiveness of their security engineering teams. Tools that multiply the effectiveness of available engineers provide competitive advantage.
-
-LLM-assisted fuzzing addresses all three pressures. It provides documented security testing for compliance. It scales to large codebases. It enables more efficient use of specialized personnel.
-
-The cost analysis from Chapter 5 Section 5.4 reinforces this argument. At modest annual costs, even incremental improvements in security testing efficiency produce positive return on investment.
-
-Adoption considerations remain. Automotive organizations follow rigorous validation processes when adopting new tools for safety-adjacent applications. Validation requirements for tools used in ISO 26262 contexts create additional steps. The path from research prototype to certified production tool involves significant effort.
-
-We recommend a phased approach. Start with non safety-critical subsystems like infotainment or connectivity features. Build confidence and collect metrics. Gradually expand to more critical systems as the approach proves reliable.
+The cost analysis from Chapter~5 Section~\ref{sec:results_economics} shows that even at the enterprise usage level, annual costs remain under \texteuro{}1,500. We recommend a phased adoption approach: start with non safety-critical subsystems like infotainment or connectivity features, build confidence and collect metrics, then gradually expand to more critical systems as the approach proves reliable.
 
 
-\subsection{Enterprise CI/CD Challenges}
+\subsection{Enterprise CI/CD Deployment Patterns}
 \label{sec:discussion_enterprise_challenges}
 
-Our integration experience illustrates a broader consideration for enterprises adopting AI tools.
+Our integration experience at CARIAD (detailed in Chapter~4) illustrates deployment patterns applicable to other enterprises. We identify four main approaches for integrating LLM services into security-constrained environments:
 
-Modern AI services typically operate as cloud APIs. Organizations call external endpoints, send data, receive results. This model works well for many applications. It requires adaptation when security policies govern external communication.
+\textbf{Private deployment of models.} Running models on internal infrastructure avoids external network traffic entirely. This works for smaller models but requires dedicated compute resources. Organizations must weigh infrastructure costs against API costs.
 
-Large enterprises, particularly in regulated industries, operate on the assumption that internal networks are isolated from the internet. Data stays inside the perimeter. External services are accessed through carefully controlled gateways. This security model continues to evolve as cloud computing and AI services become integral to enterprise operations.
+\textbf{Cloud provider private connectivity.} Services like Azure Private Link \cite{azure_private_link}, AWS PrivateLink, and Google Cloud Private Service Connect create private paths to cloud services. These maintain security boundaries while enabling access, provided the cloud provider itself is trusted. As discussed in Chapter~4, our architecture relies on contractual trust (Microsoft Enterprise Agreement, SOC~2 Type~II, ISO~27001 certifications) rather than technical guarantees against a compromised provider. For organizations that cannot accept this trust assumption, on-premises model deployment (as evaluated in Phase~1) remains the alternative, though at higher infrastructure cost. Configuration requires coordination between cloud and enterprise network teams.
 
-We found that aligning AI deployment requirements with enterprise security models requires thoughtful architecture. Teams adopting AI tools must work with infrastructure teams to establish compliant access paths, which involves standard enterprise provisioning timelines.
+\textbf{Edge deployment.} Running models on local hardware avoids network dependencies entirely, suitable for latency-sensitive applications with infrequent model updates.
 
-We see several responses to this challenge in the broader industry:
-
-\textbf{Private deployment of models.} Running models on internal infrastructure avoids external network traffic entirely. This works for smaller models but requires large compute resources for larger ones. Our local experiments used a workstation with unified memory shared between CPU and GPU, which defines the range of supported model sizes. Organizations must weigh infrastructure costs (hardware, maintenance, power) against API costs when choosing deployment approaches.
-
-\textbf{Cloud provider private connectivity.} Services like Azure Private Link \cite{azure_private_link}, AWS PrivateLink, and Google Cloud Private Service Connect create private paths to cloud services. These maintain security boundaries while enabling access. Configuration requires coordination between cloud and enterprise network teams.
-
-\textbf{Edge deployment.} For latency-sensitive applications, running models on local hardware avoids network dependencies entirely. This suits scenarios where model updates are infrequent and inference needs are predictable.
-
-\textbf{Hybrid approaches.} Some organizations use private deployment for sensitive operations and cloud APIs for less sensitive ones. Managing multiple deployment modes adds complexity but provides flexibility.
-
-Our Azure Private Link solution represents one point in this design space. It preserved CARIAD's security model while enabling cloud AI access. Other organizations will make different tradeoffs based on their specific constraints.
+\textbf{Hybrid approaches.} Combining private deployment for sensitive operations with cloud APIs for less sensitive ones provides flexibility at the cost of additional complexity.
 
 
 \section{Future Research Directions}
@@ -230,24 +214,17 @@ Our work opens several directions for future research.
 \textbf{Security analysis of generated code.} LLM-generated code could contain vulnerabilities or backdoors. Analyzing the security properties of generated drivers, beyond their fuzzing effectiveness, matters for deployment in security-sensitive contexts.
 
 
-\section{Summary of Findings and Contributions}
+\section{Contributions}
 \label{sec:discussion_summary}
 
-This thesis makes several contributions to the understanding of LLM-assisted security testing in automotive contexts.
+This thesis makes the following contributions:
 
-\textbf{Empirical evaluation of model capabilities.} We systematically evaluated 14 LLMs for fuzz driver generation, establishing that specialized code models outperform larger general-purpose models for this task. This finding challenges common assumptions about model scaling.
-
-\textbf{Demonstration of fine-tuning effectiveness.} Our LoRA experiments showed that small models adapted to the fuzzing domain can match larger models at reduced cost. This provides a practical path for resource-constrained deployments.
-
-\textbf{Enterprise integration architecture.} We documented a complete architecture for integrating LLM-assisted fuzzing into secure enterprise CI/CD pipelines, including the Azure Private Link solution for network isolation challenges.
-
-\textbf{Cost analysis framework.} Our economic analysis in Chapter 5 Section 5.4 provides a template for organizations evaluating similar deployments, establishing that cost does not limit adoption.
-
-\textbf{Identification of infrastructure as a key consideration.} Our experience highlighted that network and security infrastructure, rather than model capability, often determines the timeline for deployment. This insight should guide planning for similar projects.
-
-\textbf{Open documentation of outcomes.} We reported not only successes but also which models did not produce usable output and why. This evidence helps others select appropriate models for their use cases.
-
-The practical impact extends beyond academic contribution. CARIAD can deploy the system we developed. Other automotive organizations can adapt our architecture to their environments. The specific numbers and experiences we report provide guidance for real-world adoption.
+\begin{enumerate}
+    \item \textbf{Empirical model evaluation:} A systematic comparison of 14 LLMs for C/C++ fuzz driver generation, establishing that code-specialized models outperform larger general-purpose models (Chapter~5, Sections~\ref{sec:results_successful}--\ref{sec:results_unsuccessful}).
+    \item \textbf{Fine-tuning for efficiency:} Demonstration that LoRA fine-tuning of a 1.5B model achieves 33\% faster generation and 55\% fewer tokens while maintaining driver quality (Chapter~5, Section~\ref{sec:results_optimization}).
+    \item \textbf{Enterprise integration architecture:} A documented end-to-end architecture for deploying LLM-assisted fuzzing in secure enterprise CI/CD pipelines using Azure Private Link (Chapter~4, Section~\ref{sec:impl_phase3}).
+    \item \textbf{Economic analysis:} A cost framework showing enterprise deployment costs remain below \texteuro{}1,500 annually (Chapter~5, Section~\ref{sec:results_economics}).
+\end{enumerate}
 
 
 \section{Conclusion}
