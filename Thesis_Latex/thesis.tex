@@ -335,10 +335,10 @@ jobs:
             /bin/bash -c "cd /project/build && cifuzz spark parser_target"
       - name: Rebuild with generated tests
         run: buildah run ... "cd /project/build && make"
-      - name: Run fuzzing (30s, ASan+UBSan)
+      - name: Run fuzzing (60s, ASan+UBSan)
         run: |
           buildah run ... "cifuzz run parser_target \
-            --libfuzzer-arg=-max_total_time=30"
+            --libfuzzer-arg=-max_total_time=60"
       - name: Upload updated corpus
         run: |
           tar -czf ${PROJ_NAME}_corpus.gz .cifuzz-corpus
