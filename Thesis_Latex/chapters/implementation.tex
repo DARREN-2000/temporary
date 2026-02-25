@@ -80,7 +80,7 @@ cmake_minimum_required(VERSION 3.10...3.22)
 cmake_policy(VERSION 3.10...3.22)
 \end{lstlisting}
 
-The LLM-assisted fuzzing workflow, conceptually introduced in Chapter 3, demonstrates how LLMs integrate into the fuzzing pipeline to automatically generate test cases from source code. Our implementation uses cifuzz spark to handle the integration between the LLM backends (either local models via Ollama or Azure OpenAI) and the libFuzzer execution environment.
+The LLM-assisted fuzzing workflow, conceptually introduced in Chapter~3, demonstrates how LLMs integrate into the fuzzing pipeline to automatically generate test cases from source code. Our implementation uses cifuzz spark to handle the integration between the LLM backends (either local models via Ollama or Azure OpenAI) and the libFuzzer execution environment.
 
 \section{Phase 1: Local LLM Evaluation Setup}
 \label{sec:impl_phase1}
@@ -120,7 +120,7 @@ We evaluated 14 models spanning a wide range of sizes and architectures. The sel
     \item Gemma 3 4B
 \end{itemize}
 
-Code-specialized models like Qwen Coder, DeepSeek Coder, and CodeLlama were trained specifically on programming tasks. General-purpose models like Mixtral and Yi were included to investigate whether raw scale could compensate for lack of specialization. This allowed us to test a key hypothesis, whether a 46B general model outperforms a 7B code-specialized model. Results, discussed in Chapter 5, were surprising, as general-purpose models like Mixtral (46.7B) and Yi (34B) achieved 0\% code coverage, while the specialized Qwen 2.5-Coder (32B) and Gemma 3 (27B) consistently achieved over 43\% line coverage. Even some code-specialized models like CodeLlama (34B) did not produce working drivers, suggesting that specialization alone is not sufficient without adequate training on fuzz-driver-specific patterns.
+Code-specialized models like Qwen Coder, DeepSeek Coder, and CodeLlama were trained specifically on programming tasks. General-purpose models like Mixtral and Yi were included to investigate whether raw scale could compensate for lack of specialization. This allowed us to test a key hypothesis, whether a 46B general model outperforms a 7B code-specialized model. Results, discussed in Chapter~5, were surprising, as general-purpose models like Mixtral (46.7B) and Yi (34B) achieved 0\% code coverage, while the specialized Qwen 2.5-Coder (32B) and Gemma 3 (27B) consistently achieved over 43\% line coverage. Even some code-specialized models like CodeLlama (34B) did not produce working drivers, suggesting that specialization alone is not sufficient without adequate training on fuzz-driver-specific patterns.
 
 Installing these models required considerable disk space. The larger models exceeded 20~GB each in their quantized forms. We used 4-bit and 5-bit quantization to fit models into available VRAM while maintaining reasonable output quality. A complete summary of all 14 evaluated models, including their parameter counts, quantization levels, architectures, and results, is provided in Table~\ref{tab:impl_model_summary} and in the appendix (Table~\ref{tab:appendix_all_models}).
 
@@ -188,7 +188,7 @@ Each model's evaluation followed these steps:
     \item Record coverage metrics using llvm-cov
 \end{enumerate}
 
-We ran each model five times on yaml-cpp to account for stochastic output variation. Preliminary tests showed that variance in coverage results stabilized after three to four runs, so we chose five runs to provide an additional margin of confidence. Some models produced different outputs on identical prompts, making multiple runs necessary for reliable comparison. This variability was itself an interesting finding that we discuss further in Chapter 5.
+We ran each model five times on yaml-cpp to account for stochastic output variation. Preliminary tests showed that variance in coverage results stabilized after three to four runs, so we chose five runs to provide an additional margin of confidence. Some models produced different outputs on identical prompts, making multiple runs necessary for reliable comparison. This variability was itself an interesting finding that we discuss further in Chapter~5.
 
 \begin{figure}[htbp]
     \centering
@@ -333,7 +333,7 @@ Coverage of the fine-tuned 1.5B models remained comparable to the larger Qwen~2.
 
 Fine-tuned models generated more concise code. They learned the structure of fuzz drivers and did not waste tokens on unnecessary explanations or boilerplate. These efficiency gains meant that generating each driver took less time and fewer API tokens, which directly impacts operational costs.
 
-More training data did not always produce proportionally better results. The 709-example dataset achieved the best efficiency improvements (see Chapter 5 for detailed metrics), but it included some lower-quality drivers that may have introduced noise. While the extended dataset reduced generation time and token usage, the coverage quality did not improve proportionally. Quality matters more than quantity for fine-tuning specialized tasks.
+More training data did not always produce proportionally better results. The 709-example dataset achieved the best efficiency improvements (see Chapter~5 for detailed metrics), but it included some lower-quality drivers that may have introduced noise. While the extended dataset reduced generation time and token usage, the coverage quality did not improve proportionally. Quality matters more than quantity for fine-tuning specialized tasks.
 
 We also tested the fine-tuned models on RapidJSON and pugixml to check generalization. Performance was similar to yaml-cpp, suggesting the fine-tuning improved general fuzz driver generation rather than overfitting to specific libraries.
 
@@ -547,7 +547,7 @@ Enterprise & 50 & 10 & 156M & \texteuro{}1,452 \\
 \end{tabular}
 \end{table}
 
-These costs are low in absolute terms. For context, even the enterprise usage scenario represents a modest investment compared to manual security testing efforts. However, the LLM-generated drivers supplement rather than replace expert security engineering work, so this comparison captures only the infrastructure cost component. A detailed economic analysis including human oversight costs appears in Chapter 5.
+These costs are low in absolute terms. For context, even the enterprise usage scenario represents a modest investment compared to manual security testing efforts. However, the LLM-generated drivers supplement rather than replace expert security engineering work, so this comparison captures only the infrastructure cost component. A detailed economic analysis including human oversight costs appears in Chapter~5.
 
 \textbf{Failure Handling}
 

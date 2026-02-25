@@ -3,7 +3,7 @@
 \chapter{Methodology and Framework}
 \label{chap:methodology}
 
-In this chapter, I explain how the research was carried out, from early experiments to the final deployment at CARIAD SE between May and September 2025. We explain the conceptual foundations of our framework, the technical design that supports it, and the three-phase research strategy that guided our work from initial experiments to enterprise deployment.
+In this chapter, we explain how the research was carried out, from early experiments to the final deployment at CARIAD SE between May and September 2025. We explain the conceptual foundations of our framework, the technical design that supports it, and the three-phase research strategy that guided our work from initial experiments to enterprise deployment.
 
 The methodology was primarily shaped by the need to rigorously evaluate the application of large language models within complex software security contexts. The research design had to adapt to the rapid advancements in generative AI, where new models and capabilities emerge continuously. Most importantly, the methodology aimed to produce generalizable empirical results that contribute to the broader scientific understanding of automated vulnerability discovery and guide future research directions.
 
@@ -162,7 +162,7 @@ The generated fuzz drivers, that is, the C++ source files produced by the LLM in
 \section{Research Strategy: Three-Phase Approach}
 \label{sec:meth_strategy}
 
-Our research unfolded in three distinct phases, each addressing different aspects of the research questions defined in Chapter 1.
+Our research unfolded in three distinct phases, each addressing different aspects of the research questions defined in Chapter~1.
 
 \subsection{Phase 1: Local LLM Evaluation}
 We gathered 14 open-source LLM models ranging from 1.5B to 46.7B parameters and evaluated them on multiple C++ target libraries. This phase directly addresses \textbf{RQ1} and \textbf{RQ2}. Can LLMs generate useful fuzz drivers? Does model size matter? Which models work best?
@@ -216,7 +216,7 @@ The final phase moved from controlled experiments to the real world. We integrat
     \label{fig:enterprise_integration}
 \end{figure}
 
-As illustrated in Figure \ref{fig:enterprise_integration}, this phase revealed challenges we had not anticipated during earlier work. The corporate firewall blocked external API calls, requiring us to re-architect the solution using Azure Private Link.
+As illustrated in Figure~\ref{fig:enterprise_integration}, this phase revealed challenges we had not anticipated during earlier work. The corporate firewall blocked external API calls, requiring us to re-architect the solution using Azure Private Link.
 
 \section{Evaluation Methodology}
 \label{sec:meth_evaluation}

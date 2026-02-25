@@ -106,7 +106,7 @@ This creates tension with thorough security testing. A well-optimized pipeline m
 
 Enterprise environments add infrastructure complexity. Large organizations deploy systems for CI/CD across hybrid cloud architectures, balancing computational demands against security requirements. Build runners may execute in public cloud environments for scalability while sensitive operations stay in private networks isolated from external connections. Network policies restrict communication between zones.
 
-I should note that when we started this work, we underestimated how much this infrastructure complexity would matter. We thought the hard problem was generating good fuzz drivers with LLMs. The primary challenge lies in deploying these models within secure enterprise networks, where strict data privacy requirements and isolated infrastructure often restrict the theoretical benefits of Large Language Models.
+We should note that when we started this work, we underestimated how much this infrastructure complexity would matter. We thought the hard problem was generating good fuzz drivers with LLMs. The primary challenge lies in deploying these models within secure enterprise networks, where strict data privacy requirements and isolated infrastructure often restrict the theoretical benefits of Large Language Models.
 
 \section{Automotive Software Development and Safety Standards}
 \label{sec:lit_automotive_standards}
@@ -165,7 +165,7 @@ Automotive software operates under regulatory constraints unlike most other doma
 
 Security engineering faces a different problem. Attackers are intelligent, creative, and unconstrained by specifications. UNECE Regulation 155 and ISO/SAE 21434 require cybersecurity management systems and risk assessment, but implementation requires different approaches than safety engineering \cite{ISO21434}. The expected behavior must be verified, but also the unexpected behavior must be tested for weaknesses.
 
-As illustrated in the V-Model (Figure \ref{fig:v_model}), which assumes design and testing are perfectly matched. But security breaks this assumption. Safety requires comprehensive coverage of specified behaviors. But, security requires exploration of unspecified attack surfaces. Both demand rigorous testing. Development cycles must accelerate while testing becomes more thorough. Under these conditions, AI-assisted fuzzing is no longer a theoretical idea but a practical need.
+As illustrated in the V-Model (Figure~\ref{fig:v_model}), the standard lifecycle assumes design and testing are perfectly matched. But security breaks this assumption. Safety requires comprehensive coverage of specified behaviors; security requires exploration of unspecified attack surfaces. Both demand rigorous testing. Development cycles must accelerate while testing becomes more thorough. Under these conditions, AI-assisted fuzzing is no longer a theoretical idea but a practical need.
 
 \section{Research Gaps and Thesis Positioning}
 \label{sec:lit_research_gaps}

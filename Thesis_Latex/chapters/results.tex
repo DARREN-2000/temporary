@@ -3,7 +3,7 @@
 \chapter{Experimental Results}
 \label{chap:results}
 
-Our three-phase research, conducted between May and September 2025 with infrastructure integration running in parallel with the initial local experiments, produced both expected and unexpected results. Some models generated working fuzz drivers while the majority did not. Fine-tuning improved efficiency but not coverage. Enterprise deployment was technically feasible but required more infrastructure work than anticipated. This chapter presents these findings in detail, organized by research phase, and maps them to the research questions from Chapter 1.
+Our three-phase research, conducted between May and September 2025 with infrastructure integration running in parallel with the initial local experiments, produced both expected and unexpected results. Some models generated working fuzz drivers while the majority did not. Fine-tuning improved efficiency but not coverage. Enterprise deployment was technically feasible but required more infrastructure work than anticipated. This chapter presents these findings in detail, organized by research phase, and maps them to the research questions from Chapter~1.
 
 
 \section{Experimental Setup}
@@ -299,7 +299,7 @@ The experiments produced several clear findings, along with some important cavea
 
 Model specialization matters more than size. Gemma 3 27B outperformed Yi 34B despite having fewer parameters. Code-specialized models outperformed larger general-purpose models consistently across our tests.
 
-Performance also varies across library types. Parsing libraries (yaml-cpp, jsoncons, pugixml) consistently produced the best coverage results, while utility libraries (glm, spdlog) proved more challenging. The fmt library revealed that smaller models can outperform larger ones on simpler APIs, with Phi-4 14B and Llama 3 achieving 100\% coverage where the larger Qwen 2.5-Coder 32B and Gemma 3 27B both achieved 0\%.
+Performance also varies across library types. Parsing libraries (yaml-cpp, jsoncons, pugixml) consistently produced the best coverage results, while utility libraries (glm, spdlog) proved more challenging. The fmt library revealed that smaller models can outperform larger ones on simpler APIs, with Phi-4 14B and Llama~3 achieving 100\% coverage where the larger Qwen~2.5-Coder 32B and Gemma~3 27B both achieved 0\%.
 
 Fine-tuning enables efficient deployment. The fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens compared to the base model, though it still did not match the coverage of larger specialized models.
 
