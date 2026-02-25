@@ -104,7 +104,7 @@ The majority of models failed at the compilation stage, producing code with synt
 
 We also tested DeepSeek~R1, a reasoning-focused model, outside the original 14-model benchmark. It was designed for reasoning tasks, but in our experiments, that capability did not translate to effective fuzz driver generation. Mixtral's 46.7 billion parameters exceeded the available hardware capacity, preventing completion of a full evaluation run.
 
-A clear pattern emerged from Table~\ref{tab:unsuccessful_models}. Code-specialized models outperformed larger general-purpose models by wide margins. Size alone does not determine quality for specialized tasks like fuzz driver generation. Furthermore, even among code-specialized models, only those with sufficient training on relevant code patterns (such as Qwen~2.5-Coder 32B) succeeded, while others (CodeLlama 34B, WizardCoder 34B) failed despite their code-focused training.
+A clear pattern emerged from Table~\ref{tab:unsuccessful_models}. The successful models (Qwen~2.5-Coder 32B, Gemma~3 27B, Phi-4 14B) share recent architectures and high-quality training data, but they span both code-specialized and general-purpose categories. Size alone does not determine quality for specialized tasks like fuzz driver generation. Furthermore, even among code-specialized models, only those with the right combination of architecture and training data (such as Qwen~2.5-Coder 32B) succeeded, while others (CodeLlama 34B, WizardCoder 34B) failed despite their code-focused training.
 
 
 \subsection{Cross-Library Validation}
@@ -297,11 +297,11 @@ The economic advantage appears clear, but there is an important caveat. Current 
 
 The experiments produced several clear findings, along with some important caveats.
 
-Model specialization matters more than size. Gemma 3 27B outperformed Yi 34B despite having fewer parameters. Code-specialized models outperformed larger general-purpose models consistently across our tests.
+Model architecture and training quality matter more than size alone. Gemma 3 27B outperformed Yi 34B despite having fewer parameters. However, the relationship between model type and success is nuanced: among the three successful models, Qwen~2.5-Coder 32B is explicitly code-specialized, while Gemma~3 27B and Phi-4 14B are general-purpose models with strong code capabilities. Conversely, several explicitly code-specialized models (CodeLlama 34B, WizardCoder 34B, DeepSeek Coder 33B) failed entirely. This suggests that neither size nor a code-specialization label alone determines fuzz driver quality; rather, the specific training data quality and model architecture are decisive.
 
 Performance also varies across library types. Parsing libraries (yaml-cpp, jsoncons, pugixml) consistently produced the best coverage results, while utility libraries (glm, spdlog) proved more challenging. The fmt library revealed that smaller models can outperform larger ones on simpler APIs, with Phi-4 14B and Llama~3 achieving 100\% coverage where the larger Qwen~2.5-Coder 32B and Gemma~3 27B both achieved 0\%.
 
-Fine-tuning enables efficient deployment. The fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens compared to the base model, though it still did not match the coverage of larger specialized models.
+Fine-tuning enables efficient deployment. The fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens compared to the base model, though it still did not match the coverage of the larger successful models (Qwen~2.5-Coder 32B, Gemma~3 27B).
 
 The economics appear favorable as well. Annual infrastructure costs range from \euro{}74 for light usage to \euro{}1,452 for full enterprise deployment. Manual security engineering involves higher personnel investment, though the two approaches serve complementary rather than interchangeable functions. The LLM automates initial driver creation while human expertise remains necessary for review and refinement.
 
@@ -309,6 +309,6 @@ Mapping these findings to our research questions:
 
 \textbf{RQ1 (Effectiveness)}: Can Large Language Models generate fuzz drivers for C++ code that compile successfully, execute without errors, and achieve meaningful code coverage? The results support this at least to some extent. Our best models achieved over 40\% coverage on yaml-cpp and up to 100\% on fmt, with drivers that compiled and executed correctly. Cross-library testing (Section~\ref{sec:results_cross_library}) confirmed these results generalize to other parsing libraries like jsoncons (45.64\%) and pugixml (34.77\%), though performance on non-parsing libraries was more variable. We consider 34 to 45\% coverage ``meaningful'' because it represents automated baseline coverage that would otherwise require 2 to 8 hours of manual engineering per target. While this falls short of expert human-written drivers (60 to 80\% coverage), the value lies in automation at scale, not matching human experts.
 
-\textbf{RQ2 (Optimization)}: Does model size determine fuzz driver quality, or can smaller models with domain-specific training match or exceed larger general-purpose models? Smaller specialized models consistently outperformed larger general-purpose models. Fine-tuning further improved efficiency, though not coverage.
+\textbf{RQ2 (Optimization)}: Does model size determine fuzz driver quality, or can smaller models with domain-specific training match or exceed larger general-purpose models? Size does not determine quality. The three successful models (Qwen~2.5-Coder 32B, Gemma~3 27B, Phi-4 14B) span different sizes and categories. Notably, several larger code-specialized models (CodeLlama 34B, WizardCoder 34B) failed entirely. Fine-tuning further improved efficiency, though not coverage.
 
 \textbf{RQ3 (Feasibility)}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? Integration proved feasible at costs under \euro{}1,500 annually, but the process required careful infrastructure planning (Azure Private Link) to meet the security requirements of regulated environments.

@@ -18,11 +18,11 @@ Most surprising was the inverse relationship between model size and performance.
 
 Why did the larger general-purpose models fail while smaller specialized ones succeeded? We analyzed the generated code outputs and identified a consistent pattern. The larger models generated code that appeared syntactically plausible but did not align with the structural requirements of the fuzz driver task. They would create elaborate test scaffolding, call APIs in reasonable sequences, but miss the essential structure that a libFuzzer driver requires. The \texttt{LLVMFuzzerTestOneInput} function signature was wrong. The input parsing was incorrect.
 
-Qwen 2.5-Coder succeeded because it was trained specifically on code generation tasks. It understood the structural patterns of fuzz drivers from its training data. The model had seen enough examples of the correct form to reproduce it reliably. This matters more than raw parameter count.
+Qwen 2.5-Coder succeeded because it was trained specifically on code generation tasks. It understood the structural patterns of fuzz drivers from its training data. The model had seen enough examples of the correct form to reproduce it reliably. Gemma~3 27B, while classified as a general-purpose model, also succeeded, likely due to its recent architecture and the breadth and quality of its training data, which included substantial code. This matters more than raw parameter count.
 
 The LoRA fine-tuning results reinforced this insight. A small 1.5 billion parameter model, after adaptation on high-quality OSS-Fuzz drivers, produced outputs matching the quality of much larger models while using markedly fewer resources. Specialized knowledge compensated for reduced parameter count.
 
-These findings challenge a common assumption in AI deployment. Organizations often select the largest model available, assuming a higher parameter count correlates with better results. Our data suggests this does not hold for specialized code generation tasks. A well-chosen smaller model, possibly with domain-specific fine-tuning, can match or exceed larger alternatives at a fraction of the cost.
+These findings challenge a common assumption in AI deployment. Organizations often select the largest model available, assuming a higher parameter count correlates with better results. Our data suggests this does not hold for specialized code generation tasks. The key factors appear to be training data quality, architectural recency, and sufficient (but not necessarily maximum) model size. A well-chosen model, possibly with domain-specific fine-tuning, can match or exceed larger alternatives at a fraction of the cost.
 
 What about the coverage numbers? The original thesis proposal considered that achieving even 40\% coverage while saving hours of expert time would constitute meaningful progress. By this standard, the automated approach succeeded. However, as discussed in Chapter~5, our examination of comparable manually-written fuzz drivers in OSS-Fuzz projects suggests expert-crafted drivers typically achieve 60 to 80\% line coverage for similar libraries, because they incorporate domain knowledge about edge cases that LLMs may miss.
 
@@ -124,11 +124,11 @@ While respectable, these coverage numbers likely trail expert human performance.
 
 \textbf{RQ2: Does model size determine fuzz driver quality, or can smaller models with domain-specific training match or exceed larger general-purpose models?}
 
-The data strongly supports the second hypothesis. Domain-specific training matters more than raw parameter count for this task.
+The data clearly demonstrates that size alone does not determine quality. However, the picture is more nuanced than a simple ``specialized vs.\ general-purpose'' dichotomy.
 
-Evidence from Chapter~5, Section~\ref{sec:results_successful}, indicates that code-specialized models succeeded where larger general-purpose models did not produce usable output. Our LoRA fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens while producing usable fuzz drivers (see Section~\ref{sec:results_optimization}). These specialized models understood what a fuzz driver should look like because they had seen relevant examples during training.
+Evidence from Chapter~5, Section~\ref{sec:results_successful}, indicates that the three successful models span both categories: Qwen~2.5-Coder 32B is explicitly code-specialized, while Gemma~3 27B and Phi-4 14B are general-purpose models with strong code capabilities. Meanwhile, several explicitly code-specialized models (CodeLlama 34B, WizardCoder 34B, DeepSeek Coder 33B) failed entirely. Our LoRA fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens while producing usable fuzz drivers (see Section~\ref{sec:results_optimization}), demonstrating that domain-specific fine-tuning can compensate for reduced model size.
 
-This finding has practical implications. Organizations deploying LLM-based fuzzing do not need expensive API access to the largest available models. A well-chosen mid-sized model, or a fine-tuned smaller model, provides better results at lower cost.
+This finding has practical implications. Organizations deploying LLM-based fuzzing should focus on models with recent architectures and high-quality training data rather than selecting solely based on size or code-specialization labels. Fine-tuning smaller models offers a cost-effective alternative when the target task is well-defined.
 
 \textbf{RQ3: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements?}
 
@@ -280,7 +280,7 @@ This thesis makes the following contributions:
 
 This work began with a direct question, can Large Language Models automate fuzz driver generation for automotive software? After research, implementation, and deployment effort at CARIAD spanning May through September 2025, the answer is a qualified yes.
 
-Not all models work for this task. General-purpose models, even large ones, frequently did not produce usable output. Specialized code models like Qwen 2.5-Coder succeeded where others did not. Model selection is a key design decision with measurable impact on output quality.
+Not all models work for this task. General-purpose models without sufficient code training, even large ones, frequently did not produce usable output. But neither did all code-specialized models: CodeLlama and WizardCoder, both explicitly code-focused, also failed. The successful models (Qwen 2.5-Coder, Gemma~3, Phi-4) share recent architectures and high-quality training data. Model selection is a key design decision with measurable impact on output quality.
 
 Fine-tuning small models proved more effective than expected. Our LoRA-adapted 1.5B model achieved measurable efficiency gains (detailed in Chapter~5) while producing usable fuzz drivers. For organizations with compute constraints or cost sensitivity, this approach deserves consideration.
 

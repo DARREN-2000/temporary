@@ -1,3 +1,31 @@
-% Aufgabenstellung page removed — replace with official text if required by your program.
-% \addchap*{Aufgabenstellung zur Masterarbeit}
-% [Insert official Aufgabenstellung text here]
+% Aufgabenstellung page
+% If your program requires the official Aufgabenstellung, replace the text below
+% with the official version provided by your examination office.
+\addchap*{Aufgabenstellung zur Masterarbeit}
+
+\textbf{Thema:} AI Usage in CI/CD/CT Pipelines for Compute Platforms in Automotive
+
+\vspace{0.5cm}
+
+\textbf{Aufgabenstellung:}
+
+Modern automotive software systems exceed 100 million lines of code per vehicle, creating significant challenges for security testing at scale. Fuzz testing is an effective technique for discovering software vulnerabilities, but writing fuzz drivers requires deep API knowledge and considerable manual effort. This thesis investigates whether Large Language Models (LLMs) can automate fuzz driver generation for C/C++ automotive libraries and whether the resulting approach is viable for enterprise CI/CD pipelines.
+
+The following tasks shall be addressed:
+
+\begin{enumerate}
+    \item \textbf{Literature Review:} Survey the state of the art in LLM-based code generation, fuzz testing techniques, and CI/CD pipeline security integration. Identify research gaps for automotive applications.
+
+    \item \textbf{Framework Design:} Design a technical framework for automated LLM-based fuzz driver generation, comprising automated API context extraction, prompt construction, and coverage-based evaluation.
+
+    \item \textbf{Empirical Evaluation:} Systematically evaluate multiple open-source LLMs (varying in size, architecture, and specialization) on their ability to generate compilable, executable, and coverage-achieving fuzz drivers for C++ libraries.
+
+    \item \textbf{Model Optimization:} Investigate whether domain-specific fine-tuning (LoRA) of smaller models can match or exceed larger general-purpose models in fuzz driver quality and efficiency.
+
+    \item \textbf{Enterprise Integration:} Deploy and validate the approach within a real automotive enterprise CI/CD environment (CARIAD SE), addressing network isolation, security compliance, and cost constraints.
+
+    \item \textbf{Analysis and Discussion:} Analyze the results with respect to effectiveness, optimization potential, and enterprise feasibility. Discuss limitations, implications for practice, and future research directions.
+\end{enumerate}
+
+\vspace{0.5cm}
+\noindent\textbf{Bearbeitungszeitraum:} Mai 2025 -- September 2025

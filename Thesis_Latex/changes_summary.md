@@ -488,3 +488,71 @@ See `diagrams_mermaid.md` for:
 1. Complete Mermaid code for all 6 diagrams
 2. Step-by-step export instructions (render at mermaid.live → export as high-res PNG)
 3. Exact LaTeX replacement code for each figure (which lines to replace in which file)
+
+---
+
+## Content Accuracy Audit (Latest Session)
+
+### Issue: Gemma 3 and Phi-4 Model Classification
+
+**Problem:** Gemma 3 (all sizes) and Phi-4 were classified as "Code-specialized" in all tables and prose. This is factually incorrect:
+- **Gemma 3** is Google's general-purpose model family (not CodeGemma, which is the code-specific variant)
+- **Phi-4** is Microsoft's general-purpose reasoning model (not CodePhi)
+
+An examiner who checks the original model documentation would immediately catch this error.
+
+| Before | After |
+|--------|-------|
+| Gemma 3 27B: "Code-specialized" in all tables | Gemma 3 27B: "General-purpose" |
+| Gemma 3 9B/4B: "Code-specialized" | Gemma 3 9B/4B: "General-purpose" |
+| Phi-4 14B: "Code-specialized" | Phi-4 14B: "General-purpose" |
+| Narrative: "code-specialized models outperform general-purpose" | Narrative: "model architecture and training quality matter more than size or specialization label" |
+
+**Files changed:** `abstract.tex`, `implementation.tex` (table + prose), `results.tex` (summary + RQ2), `discussion_conclusion.tex` (interpretation + RQ2 + conclusion)
+
+**Impact on thesis argument:** The revised argument is actually STRONGER and more defensible:
+- Before: "code-specialized > general-purpose" (contradicted by data: CodeLlama/WizardCoder are code-specialized but failed)
+- After: "training data quality + architectural recency > size or specialization label" (fully consistent with all data)
+
+---
+
+### Issue: Missing Citations for Factual Claims
+
+| Claim | Before | After |
+|-------|--------|-------|
+| Tesla OTA updates (intro L13) | No citation | Added `\cite{TeslaOTA2019}` + bib entry |
+| Chrysler 1.4M recall (intro L22) | No citation for recall number | Added `\cite{Greenberg2015}` + bib entry (Wired article + NHTSA number) |
+
+---
+
+### Issue: Inconsistent "saves 8 hours" Claim
+
+| Location | Before | After |
+|----------|--------|-------|
+| methodology.tex L27 | "saves 8 hours" | "saves 2 to 8 hours" (consistent with range used elsewhere) |
+
+---
+
+### Issue: "15-30 minute window" Without Source
+
+| Location | Before | After |
+|----------|--------|-------|
+| methodology.tex L231 | "15-30 minute window developers expect" (no source) | References Chapter 4 requirements: "CARIAD's CI/CD feedback window (see Chapter~4, Section~\ref{sec:impl_phase3})" |
+
+---
+
+### Issue: Last Remaining Em-Dash
+
+| Location | Before | After |
+|----------|--------|-------|
+| methodology.tex L230 | "Vulnerability"—simply put | "Vulnerability, that is," |
+
+---
+
+### Issue: Aufgabenstellung Placeholder
+
+| Before | After |
+|--------|-------|
+| Commented-out placeholder "Hier kommt die Aufgabenstellung hin" | Proper Aufgabenstellung with thesis topic, 6 tasks, and Bearbeitungszeitraum. User should replace with official version if required. |
+
+**File changed:** `demoFile_aufgabe.tex`

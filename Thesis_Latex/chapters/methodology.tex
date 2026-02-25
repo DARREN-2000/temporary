@@ -24,7 +24,7 @@ If the model produces compilable, executable code that achieves meaningful cover
 
 We know LLMs have constraints. LLMs sometimes generate code that compiles but does not exercise interesting behavior. They sometimes misunderstand API contracts. They sometimes generate code with undefined behavior that crashes the fuzzer immediately. These are not theoretical concerns; we encountered all of them during our work.
 
-We recognized that imperfect automation still helps. If an LLM generates a driver that achieves 40\% coverage and saves 8 hours of expert time, that is progress. We do not need perfection. We need a solution that is "good enough" to save time overall.
+We recognized that imperfect automation still helps. If an LLM generates a driver that achieves 40\% coverage and saves 2 to 8 hours of expert time, that is progress. We do not need perfection. We need a solution that is "good enough" to save time overall.
 
 \section{Technical Architecture Design}
 \label{sec:meth_architecture}
@@ -227,8 +227,8 @@ We evaluated generated fuzz drivers using quantitative metrics to ensure objecti
     \item \textbf{Compilation Success:} Does the driver compile against the target library? This is the first and most critical filter.
     \item \textbf{Runtime Behavior:} Does the driver execute without crashing immediately? We checked if the driver actually runs or just fails instantly.
     \item \textbf{Code Coverage:} What percentage of the target library does the driver test? We measured this using standard tools (\texttt{llvm-cov}).
-    \item \textbf{Vulnerability Discovery (MTTV):} We measured the "Mean Time To Vulnerability"—simply put, how long the fuzzer needs to run before it finds a bug.
-    \item \textbf{Pipeline Latency (CI Overhead):} We measured how much extra time the AI adds to the build process. The system must stay within the 15-30 minute window developers expect.
+    \item \textbf{Vulnerability Discovery (MTTV):} We measured the Mean Time To Vulnerability, that is, how long the fuzzer needs to run before it finds a bug.
+    \item \textbf{Pipeline Latency (CI Overhead):} We measured how much extra time the AI adds to the build process. The system must stay within CARIAD's CI/CD feedback window (see Chapter~4, Section~\ref{sec:impl_phase3} for the specific performance requirements).
     \item \textbf{Cost and Efficiency:} We calculated the exact price of generating a driver. By tracking the number of tokens (words) sent to the AI, we determined the cost in euros to prove it is cheaper than human engineering.
 \end{itemize}
 
