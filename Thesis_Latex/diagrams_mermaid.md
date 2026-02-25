@@ -68,7 +68,7 @@ flowchart TD
 ## Figure 1.2 — The Automotive CI/CD Pipeline
 
 ```mermaid
-flowchart TD
+flowchart LR
     %% ===== DATA (rectangular) =====
     COMMIT["Commit /<br/>Source Tree"]
     ARTIFACT["Build Artifact<br/><i>(Binary / Library)</i>"]
@@ -85,17 +85,8 @@ flowchart TD
     MONITOR(["Monitor<br/><i>(Telemetry / Logging)</i>"])
 
     %% ===== FLOW (alternating data → process → data) =====
-    COMMIT --> BUILD
-    BUILD --> ARTIFACT
-    ARTIFACT --> TEST
-    TEST --> TRESULTS
-    TRESULTS --> SECVAL
-    SECVAL --> SECREPORT
-    SECREPORT --> DEPLOY
-    DEPLOY --> RELEASE
-    RELEASE --> MONITOR
-    MONITOR --> TELEMETRY
-    TELEMETRY -->|feedback loop| COMMIT
+    COMMIT --> BUILD --> ARTIFACT --> TEST --> TRESULTS --> SECVAL --> SECREPORT --> DEPLOY --> RELEASE --> MONITOR --> TELEMETRY
+    TELEMETRY -.->|feedback loop| COMMIT
 
     %% ===== STYLING =====
     style COMMIT fill:#dce6f1,stroke:#333,stroke-width:2px
@@ -114,7 +105,7 @@ flowchart TD
 
 **Caption:** The Automotive CI/CD Pipeline. Data artifacts are shown in rectangular boxes; processing steps are shown in rounded boxes. Security validation (highlighted) is where fuzzing integrates into the pipeline. The feedback loop from telemetry to the source tree represents the continuous improvement cycle.
 
-**How to use:** Export as PNG from [mermaid.live](https://mermaid.live) and replace the TikZ block at `chapters/introduction.tex` lines 103–158 with:
+**How to use:** Export as PNG from [mermaid.live](https://mermaid.live) and replace the TikZ block at `chapters/introduction.tex` lines 104–152 with:
 ```latex
 \begin{figure}[htbp]
     \centering

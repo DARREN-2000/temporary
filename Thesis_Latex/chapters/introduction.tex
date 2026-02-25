@@ -32,7 +32,7 @@ Security is different. The adversary is intelligent, creative, and unconstrained
 
 \begin{figure}[htbp]
     \centering
-    \resizebox{\textwidth}{!}{
+    \adjustbox{max width=0.95\textwidth, max height=0.55\textheight}{%
     \begin{tikzpicture}[
         databox/.style={draw, rectangle, minimum width=3.8cm, minimum height=1cm, align=center, fill=blue!8, thick, font=\small},
         procbox/.style={draw, rounded corners=8pt, rectangle, minimum width=3.8cm, minimum height=1cm, align=center, fill=orange!12, thick, font=\small},
@@ -103,47 +103,38 @@ The core principles remain: automate where possible, test early and often, and m
 
 \begin{figure}[htbp]
     \centering
-    \resizebox{\textwidth}{!}{
+    \adjustbox{max width=0.95\textwidth, max height=0.55\textheight}{%
     \begin{tikzpicture}[
-        databox/.style={draw, rectangle, minimum width=3.5cm, minimum height=1cm, align=center, fill=blue!8, thick, font=\small},
-        procbox/.style={draw, rounded corners=8pt, rectangle, minimum width=3.5cm, minimum height=1cm, align=center, fill=orange!12, thick, font=\small},
+        databox/.style={draw, rectangle, minimum width=3.2cm, minimum height=0.9cm, align=center, fill=blue!8, thick, font=\small},
+        procbox/.style={draw, rounded corners=8pt, rectangle, minimum width=3.2cm, minimum height=0.9cm, align=center, fill=orange!12, thick, font=\small},
         arrow/.style={->, >=stealth, thick},
-        every node/.style={inner sep=6pt}
+        every node/.style={inner sep=5pt}
     ]
-    % --- ROW 1: Initial data ---
-    \node[databox] (commit) at (0,0) {Commit /\\Source Tree};
+    % Zigzag layout: process+data pairs side by side, alternating left/right
+    % Row 0: Commit (center top)
+    \node[databox] (commit) at (3.5, 0) {Commit /\\Source Tree};
 
-    % --- ROW 2: Build process ---
-    \node[procbox] (build) at (0,-2) {Build\\{\footnotesize(CMake / Clang)}};
+    % Row 1: Build (left) → Artifact (right)
+    \node[procbox] (build) at (0, -2) {Build\\{\footnotesize(CMake / Clang)}};
+    \node[databox] (artifact) at (7, -2) {Build Artifact\\{\footnotesize(Binary / Library)}};
 
-    % --- ROW 3: Build output ---
-    \node[databox] (artifact) at (0,-4) {Build Artifact\\{\footnotesize(Binary / Library)}};
+    % Row 2: Test (right) → Results (left)
+    \node[procbox] (test) at (7, -4) {Test Execution\\{\footnotesize(Unit / Integration)}};
+    \node[databox] (testresults) at (0, -4) {Test Results};
 
-    % --- ROW 4: Test process ---
-    \node[procbox] (test) at (0,-6) {Test Execution\\{\footnotesize(Unit / Integration)}};
+    % Row 3: Security Validation (left, highlighted) → Report (right)
+    \node[procbox, fill=yellow!20] (secval) at (0, -6) {\textbf{Security Validation}\\{\footnotesize(Fuzzing / SAST / DAST)}};
+    \node[databox] (secreport) at (7, -6) {Security Report /\\Findings};
 
-    % --- ROW 5: Test output ---
-    \node[databox] (testresults) at (0,-8) {Test Results};
+    % Row 4: Deploy (right) → Release (left)
+    \node[procbox] (deploy) at (7, -8) {Deploy\\{\footnotesize(Staging / Production)}};
+    \node[databox] (release) at (0, -8) {Deployed Release};
 
-    % --- ROW 6: Security validation (where fuzzing fits) ---
-    \node[procbox, fill=yellow!20] (secval) at (0,-10) {\textbf{Security Validation}\\{\footnotesize(Fuzzing / SAST / DAST)}};
+    % Row 5: Monitor (left) → Telemetry (right)
+    \node[procbox] (monitor) at (0, -10) {Monitor\\{\footnotesize(Telemetry / Logging)}};
+    \node[databox] (telemetry) at (7, -10) {Telemetry /\\Incident Data};
 
-    % --- ROW 7: Security output ---
-    \node[databox] (secreport) at (0,-12) {Security Report /\\Findings};
-
-    % --- ROW 8: Deploy ---
-    \node[procbox] (deploy) at (0,-14) {Deploy\\{\footnotesize(Staging / Production)}};
-
-    % --- ROW 9: Release ---
-    \node[databox] (release) at (0,-16) {Deployed Release};
-
-    % --- ROW 10: Monitor ---
-    \node[procbox] (monitor) at (0,-18) {Monitor\\{\footnotesize(Telemetry / Logging)}};
-
-    % --- ROW 11: Feedback ---
-    \node[databox] (telemetry) at (0,-20) {Telemetry /\\Incident Data};
-
-    % --- ARROWS (all data→process→data, alternating) ---
+    % Arrows following the zigzag flow
     \draw[arrow] (commit) -- (build);
     \draw[arrow] (build) -- (artifact);
     \draw[arrow] (artifact) -- (test);
@@ -155,10 +146,10 @@ The core principles remain: automate where possible, test early and often, and m
     \draw[arrow] (release) -- (monitor);
     \draw[arrow] (monitor) -- (telemetry);
 
-    % --- Feedback loop ---
-    \draw[arrow] (telemetry.east) -- ++(2.5,0) |- (commit.east);
+    % Feedback loop
+    \draw[arrow, dashed] (telemetry.south) -- ++(0,-0.6) -| node[font=\footnotesize, pos=0.25, below]{Feedback} (commit.south);
 
-    \end{tikzpicture}
+    \end{tikzpicture}%
     }
     \caption{The Automotive CI/CD Pipeline. Data artifacts are shown in rectangular boxes; processing steps are shown in rounded boxes. Security validation (highlighted) is where fuzzing integrates into the pipeline. The feedback loop from telemetry to the source tree represents the continuous improvement cycle.}
     \label{fig:cicd_pipeline}
