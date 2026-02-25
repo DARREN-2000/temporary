@@ -268,7 +268,7 @@ Our work opens several directions for future research.
 This thesis makes the following contributions:
 
 \begin{enumerate}
-    \item \textbf{Empirical model evaluation:} A systematic comparison of 14 LLMs for C/C++ fuzz driver generation, establishing that code-specialized models outperform larger general-purpose models (Chapter~5, Sections~\ref{sec:results_successful}--\ref{sec:results_unsuccessful}).
+    \item \textbf{Empirical model evaluation:} A systematic comparison of 14 LLMs for C/C++ fuzz driver generation, establishing that model architecture and training quality matter more than size or specialization label (Chapter~5, Sections~\ref{sec:results_successful}--\ref{sec:results_unsuccessful}).
     \item \textbf{Fine-tuning for efficiency:} Demonstration that LoRA fine-tuning of a 1.5B model achieves 33\% faster generation and 55\% fewer tokens while maintaining driver quality (Chapter~5, Section~\ref{sec:results_optimization}).
     \item \textbf{Enterprise integration architecture:} A documented end-to-end architecture for deploying LLM-assisted fuzzing in secure enterprise CI/CD pipelines using Azure Private Link (Chapter~4, Section~\ref{sec:impl_phase3}).
     \item \textbf{Economic analysis:} A cost framework showing enterprise deployment costs remain below \euro{}1,500 annually (Chapter~5, Section~\ref{sec:results_economics}).
