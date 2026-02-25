@@ -194,49 +194,63 @@ We ran each model five times on yaml-cpp to account for stochastic output variat
     \centering
     \resizebox{\textwidth}{!}{
     \begin{tikzpicture}[
-        comp/.style={draw, rectangle, rounded corners=4pt, minimum width=3.2cm, minimum height=1cm, align=center, fill=blue!8, thick, font=\small},
-        data/.style={draw, rectangle, minimum width=2.8cm, minimum height=0.8cm, align=center, fill=green!10, thick, font=\small},
+        comp/.style={draw, rectangle, rounded corners=6pt, minimum width=3.5cm, minimum height=1.2cm, align=center, fill=blue!8, thick, font=\small},
+        data/.style={draw, rectangle, minimum width=3cm, minimum height=1cm, align=center, fill=green!10, thick, font=\small},
         arrow/.style={->, >=stealth, thick},
         darrow/.style={<->, >=stealth, thick, dashed},
-        note/.style={font=\footnotesize\itshape, text width=3cm, align=center}
+        elabel/.style={font=\footnotesize, fill=white, inner sep=2pt, align=center}
     ]
-    % --- Components ---
+
+    % --- Row 1: LLM Servers + Target Library ---
     \node[comp] (ollama) at (0, 0) {\textbf{Ollama}\\{\footnotesize Local LLM Server}};
-    \node[comp] (llamacpp) at (0, -2.5) {\textbf{llama.cpp}\\{\footnotesize Alternative Backend}};
-    \node[comp] (cifuzz) at (5.5, -1.25) {\textbf{cifuzz spark}\\{\footnotesize Driver Generation}};
-    \node[comp] (cmake) at (11, 0) {\textbf{CMake + Clang}\\{\footnotesize Build System}};
-    \node[comp] (libfuzzer) at (11, -2.5) {\textbf{libFuzzer}\\{\footnotesize Fuzzing Engine}};
-    \node[comp] (llvmcov) at (11, -5) {\textbf{llvm-cov}\\{\footnotesize Coverage Tool}};
-    \node[comp] (podman) at (5.5, -5) {\textbf{Podman}\\{\footnotesize Container Runtime}};
+    \node[comp] (llamacpp) at (6, 0) {\textbf{llama.cpp}\\{\footnotesize Alternative Backend}};
+    \node[data] (target) at (12, 0) {C++ Target Library\\{\footnotesize(yaml-cpp, etc.)}};
 
-    % --- Data artifacts ---
-    \node[data] (target) at (5.5, 2) {C++ Target Library\\{\footnotesize(yaml-cpp, etc.)}};
-    \node[data] (driver) at (8, -1.25) {Generated\\Fuzz Driver};
-    \node[data] (binary) at (14, -1.25) {Instrumented\\Binary};
-    \node[data] (coverage) at (14, -5) {Coverage\\Report};
+    % --- Row 2: cifuzz spark ---
+    \node[comp] (cifuzz) at (6, -3.5) {\textbf{cifuzz spark}\\{\footnotesize Driver Generation}};
 
-    % --- Arrows ---
-    \draw[arrow] (ollama) -- node[above, font=\footnotesize]{OpenAI API} (cifuzz);
-    \draw[arrow] (llamacpp) -- node[below, font=\footnotesize]{OpenAI API} (cifuzz);
-    \draw[arrow] (target) -- (cifuzz);
-    \draw[arrow] (cifuzz) -- (driver);
-    \draw[arrow] (driver) -- (cmake);
-    \draw[arrow] (cmake) -- (binary);
-    \draw[arrow] (binary) -- (libfuzzer);
-    \draw[arrow] (libfuzzer) -- (llvmcov);
-    \draw[arrow] (llvmcov) -- (coverage);
+    % --- Row 3: Generated Driver ---
+    \node[data] (driver) at (6, -7) {Generated Fuzz Driver\\{\footnotesize(C++ source code)}};
+
+    % --- Row 4: Build ---
+    \node[comp] (cmake) at (6, -10.5) {\textbf{CMake + Clang}\\{\footnotesize Build System}};
+
+    % --- Row 5: Instrumented Binary ---
+    \node[data] (binary) at (6, -14) {Instrumented Binary};
+
+    % --- Row 6: Fuzzing Engine ---
+    \node[comp] (libfuzzer) at (6, -17.5) {\textbf{libFuzzer}\\{\footnotesize Fuzzing Engine}};
+
+    % --- Row 7: Coverage Measurement ---
+    \node[comp] (llvmcov) at (0, -17.5) {\textbf{llvm-cov}\\{\footnotesize Coverage Tool}};
+    \node[data] (coverage) at (0, -14) {Coverage Report};
+
+    % --- Podman container runtime label ---
+    \node[comp, fill=gray!8] (podman) at (12, -10.5) {\textbf{Podman}\\{\footnotesize Container Runtime}};
+
+    % --- Arrows (top-down flow) ---
+    \draw[arrow] (ollama) -- node[elabel, right, pos=0.5]{OpenAI API} (cifuzz);
+    \draw[arrow] (llamacpp) -- node[elabel, right, pos=0.5]{OpenAI API} (cifuzz);
+    \draw[arrow] (target) -- node[elabel, right, pos=0.5]{Header files} (cifuzz);
+    \draw[arrow] (cifuzz) -- node[elabel, right]{C++ source} (driver);
+    \draw[arrow] (driver) -- node[elabel, right]{Compile} (cmake);
+    \draw[arrow] (cmake) -- node[elabel, right]{Link} (binary);
+    \draw[arrow] (binary) -- node[elabel, right]{Execute} (libfuzzer);
+    \draw[arrow] (libfuzzer) -- node[elabel, above]{Coverage data} (llvmcov);
+    \draw[arrow] (llvmcov) -- node[elabel, right]{Report} (coverage);
+
+    % --- Podman manages ---
+    \draw[darrow] (podman) -- node[elabel, above]{manages} (cmake);
+    \draw[darrow] (podman) |- node[elabel, pos=0.25, above]{manages} (libfuzzer);
+    \draw[darrow] (podman) |- node[elabel, pos=0.25, above]{manages} (cifuzz);
 
     % Container boundary
-    \draw[dashed, thick, gray] (3.2, -6.5) rectangle (15.5, 3);
-    \node[font=\footnotesize\bfseries, gray] at (9.3, -6.8) {Podman Container};
-
-    \draw[darrow] (podman) -- (cifuzz);
-    \draw[darrow] (podman) -- (cmake);
-    \draw[darrow] (podman) -- (libfuzzer);
+    \draw[dashed, thick, gray!60] (-2.5, -2) rectangle (14, -19);
+    \node[font=\footnotesize\bfseries, gray] at (5.75, -19.4) {Podman Container Environment};
 
     \end{tikzpicture}
     }
-    \caption{Evaluation Environment Component Diagram. Components (rounded boxes) interact via defined interfaces. Ollama or llama.cpp serve the LLM; cifuzz spark orchestrates driver generation; CMake/Clang builds the driver; libFuzzer executes it; llvm-cov measures coverage. All build and fuzzing components run inside a Podman container.}
+    \caption{Evaluation Environment Component Diagram. Components (rounded boxes) interact via defined interfaces. Ollama or llama.cpp serve the LLM; cifuzz spark orchestrates driver generation; CMake/Clang builds the driver; libFuzzer executes it; llvm-cov measures coverage. All build and fuzzing components run inside a Podman container. The top-down flow shows the data transformation pipeline from source code to coverage report.}
     \label{fig:eval_environment}
 \end{figure}
 

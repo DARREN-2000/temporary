@@ -252,12 +252,12 @@ The TikZ versions are already embedded in the LaTeX files and compile directly. 
 ## Figure 4.1 — Evaluation Environment Component Diagram
 
 ```mermaid
-flowchart LR
+flowchart TD
     %% ===== DATA (rectangular) =====
     TGT["C++ Target Library<br/><i>(yaml-cpp, etc.)</i>"]
-    DRV["Generated<br/>Fuzz Driver"]
-    BIN["Instrumented<br/>Binary"]
-    COV["Coverage<br/>Report"]
+    DRV["Generated Fuzz Driver<br/><i>(C++ source code)</i>"]
+    BIN["Instrumented Binary"]
+    COV["Coverage Report"]
 
     %% ===== COMPONENTS (rounded / stadium) =====
     OLL(["<b>Ollama</b><br/><i>Local LLM Server</i>"])
@@ -268,20 +268,20 @@ flowchart LR
     LCV(["<b>llvm-cov</b><br/><i>Coverage Tool</i>"])
     POD(["<b>Podman</b><br/><i>Container Runtime</i>"])
 
-    %% ===== FLOW =====
-    OLL -->|OpenAI API| CIF
-    LCP -->|OpenAI API| CIF
-    TGT --> CIF
-    CIF --> DRV
-    DRV --> CMK
-    CMK --> BIN
-    BIN --> LFZ
-    LFZ --> LCV
-    LCV --> COV
+    %% ===== FLOW (top-down) =====
+    OLL -->|"OpenAI API"| CIF
+    LCP -->|"OpenAI API"| CIF
+    TGT -->|"Header files"| CIF
+    CIF -->|"C++ source"| DRV
+    DRV -->|"Compile"| CMK
+    CMK -->|"Link"| BIN
+    BIN -->|"Execute"| LFZ
+    LFZ -->|"Coverage data"| LCV
+    LCV -->|"Report"| COV
 
-    POD -.->|manages| CIF
-    POD -.->|manages| CMK
-    POD -.->|manages| LFZ
+    POD -.->|"manages"| CIF
+    POD -.->|"manages"| CMK
+    POD -.->|"manages"| LFZ
 
     %% ===== STYLING =====
     style TGT fill:#d4edda,stroke:#333,stroke-width:2px
@@ -298,9 +298,9 @@ flowchart LR
     style POD fill:#e8e8e8,stroke:#666,stroke-width:2px,stroke-dasharray:5
 ```
 
-**Caption:** Evaluation Environment Component Diagram. Components (rounded boxes) interact via defined interfaces. Ollama or llama.cpp serve the LLM; cifuzz spark orchestrates driver generation; CMake/Clang builds the driver; libFuzzer executes it; llvm-cov measures coverage. All build and fuzzing components run inside a Podman container.
+**Caption:** Evaluation Environment Component Diagram. Components (rounded boxes) interact via defined interfaces. Ollama or llama.cpp serve the LLM; cifuzz spark orchestrates driver generation; CMake/Clang builds the driver; libFuzzer executes it; llvm-cov measures coverage. All build and fuzzing components run inside a Podman container. The top-down flow shows the data transformation pipeline from source code to coverage report.
 
-**How to use:** Export as PNG from [mermaid.live](https://mermaid.live) and replace the TikZ block at `chapters/implementation.tex` lines 193–241 with:
+**How to use:** Export as PNG from [mermaid.live](https://mermaid.live) and replace the TikZ block at `chapters/implementation.tex` lines 193–256 with:
 ```latex
 \begin{figure}[htbp]
     \centering
@@ -492,7 +492,7 @@ flowchart TD
 | 1 | Fig 1.2 — Fuzzing Process | introduction.tex | ✅ | ✅ | data=rect, process=rounded, top-down |
 | 2 | Fig 3.1 — Technical Architecture | methodology.tex | ✅ | ✅ | data=rect, process=rounded, top-down, layers marked |
 | 3 | Fig 3.2 — Enterprise Integration | methodology.tex | ✅ | ✅ | components=rounded, data=rect, left-right |
-| 4 | Fig 4.1 — Eval Environment | implementation.tex | ✅ | ✅ | components=rounded, data=rect, left-right |
+| 4 | Fig 4.1 — Eval Environment | implementation.tex | ✅ | ✅ | components=rounded, data=rect, top-down |
 | 5 | Fig 4.2 — CI/CD Workflow | implementation.tex | ✅ | ✅ | data=rect, process=rounded, top-down |
 | 6 | Fig 6.1 — Network Architecture | discussion_conclusion.tex | ✅ | ✅ | components=rounded, data=rect, top-down, edges labeled |
 
