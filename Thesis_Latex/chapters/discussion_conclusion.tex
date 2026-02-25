@@ -200,7 +200,7 @@ Beyond technical limitations, our methodology has boundaries that constrain gene
 
 \textbf{Single organization context.} The enterprise integration work happened at CARIAD. Their network architecture, security policies, and tooling differ from other organizations. The specific solutions we developed (Azure Private Link, self-hosted runners) may not transfer directly to other environments.
 
-\textbf{Limited manual driver comparison.} We compared against OSS-Fuzz drivers where available, but did not commission expert written drivers specifically for comparison. Recent research on LLM-assisted fuzzing \cite{efficient_finetuning} suggests that efficient fine-tuning can improve parameter efficiency by a large margin. The human baseline is somewhat indirect.
+\textbf{Limited manual driver comparison.} We compared against OSS-Fuzz drivers where available, but did not commission expert written drivers specifically for comparison. Recent research on parameter-efficient fine-tuning \cite{efficient_finetuning} suggests that such techniques can improve parameter efficiency by a large margin, but their direct impact on fuzz driver quality remains underexplored. The human baseline is somewhat indirect.
 
 \textbf{No user study.} We did not evaluate how developers interact with generated drivers in practice. Do they trust the output? Do they modify it before use? These human factors affect practical deployment but were outside our scope.
 

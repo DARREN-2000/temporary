@@ -390,7 +390,7 @@ flowchart TD
     BLD(["Build Project<br/><i>(CMake + Clang)</i>"])
     SPK(["<b>cifuzz spark</b><br/><i>Generate Fuzz Driver</i><br/><i>via Azure OpenAI</i>"])
     RB(["Rebuild with<br/>Generated Driver"])
-    FZ(["Run libFuzzer<br/><i>(30s, ASan+UBSan)</i>"])
+    FZ(["Run libFuzzer<br/><i>(60s, ASan+UBSan)</i>"])
     UL(["Upload Updated<br/>Corpus to Artifactory"])
 
     %% ===== FLOW =====
