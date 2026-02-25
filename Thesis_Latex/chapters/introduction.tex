@@ -6,15 +6,15 @@
 \section{Background and Motivation}
 \label{sec:background_motivation}
 
-Automotive software has changed fundamentally in the last 15 years. When I first read about vehicle cybersecurity, I was surprised to learn that a modern car runs over 100 million lines of code. Not thousands. Not millions. Over 100 million. Distributed across more than 100 Electronic Control Units (ECUs). This number, which appears in industry reports \cite{Charette2009, Broy2006}, illustrates a complete shift in how we think about vehicles.
+Automotive software has changed fundamentally in the last 15 years. Industry reports indicate that a modern car runs over 100 million lines of code, distributed across more than 100 Electronic Control Units (ECUs) \cite{Charette2009, Broy2006}. This scale illustrates a complete shift in how vehicles are engineered.
 
 This shift came from somewhere. Vehicles used to be mechanical systems. An engine controller managed fuel injection. An ABS system prevented wheel lockup. These systems mostly operated independently. A skilled engineer could understand the complete electronic architecture within weeks. That is gone now.
 
-Today, vehicles are software platforms that happen to have wheels. Tesla demonstrated this most clearly. When Tesla updates a vehicle over the air, customers receive new features, better performance, and improved safety. All without visiting a service center. Traditional automakers watched this happen and realized something fundamental had changed. Software now determines competitive advantage. It determines how fast a car accelerates. It determines what features customers receive. Mechanical engineering no longer drives differentiation.
+Today, vehicles are software-defined platforms. Tesla demonstrated this most clearly. When Tesla updates a vehicle over the air, customers receive new features, better performance, and improved safety, all without visiting a service center. Traditional automakers observed this shift and recognized that software now determines competitive advantage, from acceleration performance to customer-facing features. Mechanical engineering alone no longer drives differentiation.
 
 This transformation created a problem. Software is complex. A single vehicle contains code spanning multiple programming paradigms, different safety criticality levels, and various execution environments. Code that is safety-critical on AUTOSAR~\cite{autosar} platforms follows entirely different development rules than infotainment applications running on Linux. Real-time control systems operating at microsecond intervals coexist with cloud-connected services. This diversity makes testing exponentially harder.
 
-Consider a Level 2 automated driving system. Perception algorithms process camera, radar, and lidar data. Planning modules compute safe trajectories. Control systems translate trajectories into steering and throttle commands. Each layer requires different technical expertise: computer vision, machine learning, control theory, real-time systems. Integration alone consumes enormous effort. When you add legacy code to this, code written years ago with minimal documentation, understanding what the software actually does becomes detective work.
+Consider a Level 2 automated driving system. Perception algorithms process camera, radar, and lidar data. Planning modules compute safe trajectories. Control systems translate trajectories into steering and throttle commands. Each layer requires different technical expertise: computer vision, machine learning, control theory, real-time systems. Integration alone consumes enormous effort. When legacy code is added to this, code written years ago with minimal documentation, understanding what the software actually does becomes detective work.
 
 \subsection{Security Challenges in Modern Systems}
 \label{sec:security_challenges}
@@ -97,9 +97,9 @@ Once the fuzz driver and seed inputs are supplied, the automated fuzzing engine 
 
 Modern software development has embraced a philosophy: integrate code frequently, test automatically, deploy rapidly. The reasoning is sound. Small, incremental changes are easier to understand and debug than large infrequent releases. Automated testing catches regressions before they spread. Fast feedback loops let developers address problems while context is fresh \cite{Humble2010, Fowler2006}.
 
-The automotive industry has adopted these principles, adapting them to domain-specific constraints. You do not casually push untested code to vehicles traveling at highway speeds. Automotive continuous integration pipelines typically feed into formal release processes with human review and additional validation before software reaches production vehicles.
+The automotive industry has adopted these principles, adapting them to domain-specific constraints. Untested code cannot be casually pushed to vehicles traveling at highway speeds. Automotive continuous integration pipelines typically feed into formal release processes with human review and additional validation before software reaches production vehicles.
 
-But the core principles hold: automate what you can, test early and often, maintain a continuously releasable codebase \cite{CiCdFuzzing2022}.
+The core principles remain: automate where possible, test early and often, and maintain a continuously releasable codebase \cite{CiCdFuzzing2022}.
 
 \begin{figure}[htbp]
     \centering

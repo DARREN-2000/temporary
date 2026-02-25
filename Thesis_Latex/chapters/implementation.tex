@@ -254,7 +254,7 @@ We ran each model five times on yaml-cpp to account for stochastic output variat
     \label{fig:eval_environment}
 \end{figure}
 
-A full evaluation cycle for one model on one target took approximately 10 to 15 minutes. With 14 models and 6 primary targets, plus five runs per configuration for consistency checking, the complete Phase 1 evaluation required approximately two weeks of continuous testing.
+A full evaluation cycle for one model on one target took approximately 10 to 45 minutes, depending on model size and token generation speed (see Table~\ref{tab:model_performance} in Chapter~5 for detailed timings). With 14 models and 6 primary targets, plus five runs per configuration for consistency checking, the complete Phase 1 evaluation required approximately two weeks of continuous testing.
 
 The general fuzzing workflow (as introduced in earlier chapters) forms the foundation of our evaluation methodology, from defining targets from source code, generating fuzz tests via LLM, executing them through the fuzzing engine (libFuzzer with sanitizers), detecting crashes, and either reporting findings or mutating inputs for continued testing. Each evaluation cycle involved generating a driver, checking compilation, running the fuzzer for 60 seconds, measuring coverage with llvm-cov, and storing results.
 
@@ -367,7 +367,7 @@ To guide the integration, we derived the following concrete requirements from CA
     \end{enumerate}
     \item \textbf{Cost requirements:}
     \begin{enumerate}
-        \item Annual infrastructure cost must remain below \texteuro{}2,000 for moderate usage.
+        \item Annual infrastructure cost must remain below \euro{}2,000 for moderate usage.
         \item The solution must not require dedicated GPU hardware on the CI/CD runners.
         \item Token consumption must be predictable and auditable.
     \end{enumerate}
@@ -463,7 +463,7 @@ Setting up Private Link involved coordination with the infrastructure team, foll
     \item Testing and validation
 \end{enumerate}
 
-We prepared a detailed business case including cost analysis (approximately \texteuro{}74 to \texteuro{}1,452 annually depending on usage) and security risk assessment. This documentation supported the approval process.
+We prepared a detailed business case including cost analysis (approximately \euro{}74 to \euro{}1,452 annually depending on usage) and security risk assessment. This documentation supported the approval process.
 
 \textbf{Working Pipeline Configuration}
 
@@ -553,10 +553,10 @@ Azure OpenAI charges per token. Each fuzz driver generation uses approximately 3
 \toprule
 Scenario & Targets/Day & Builds/Day & Annual Tokens & Annual Cost \\
 \midrule
-Light & 5 & 1 & 3.1M & \texteuro{}74 \\
-Moderate & 10 & 2 & 12.5M & \texteuro{}219 \\
-Heavy & 25 & 5 & 78M & \texteuro{}726 \\
-Enterprise & 50 & 10 & 156M & \texteuro{}1,452 \\
+Light & 5 & 1 & 3.1M & \euro{}74 \\
+Moderate & 10 & 2 & 12.5M & \euro{}219 \\
+Heavy & 25 & 5 & 78M & \euro{}726 \\
+Enterprise & 50 & 10 & 156M & \euro{}1,452 \\
 \bottomrule
 \end{tabular}
 \end{table}

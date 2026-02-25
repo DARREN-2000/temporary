@@ -54,7 +54,7 @@ Phi-4 14B & 34.26\% & 36m 36s & 71.5k & 2,220 & 1 \\
 
 The ``Successful Tests'' column requires explanation, as this metric counts tests that discovered actual bugs or edge cases, not tests that simply compiled and ran. Most generated tests exercised valid code paths without finding vulnerabilities, which is expected behavior, not failure. The high number of unique test cases with few ``successful'' findings reflects that fuzzing is a volume-based process where many tests are generated with the expectation that a subset will discover issues. It is important to note that all three models listed in Table~\ref{tab:model_performance} produced drivers that compiled and ran successfully. The remaining eleven models (discussed in Section~\ref{sec:results_unsuccessful}) failed at the generation stage: their outputs either did not compile due to syntax errors, missing includes, or incorrect API usage, or crashed immediately at runtime due to invalid function calls. These models are therefore not included in Table~\ref{tab:model_performance} because they did not reach the fuzzing stage.
 
-Branch coverage measures the percentage of conditional branches (if/else, switch cases) executed during testing. It is the standard metric for evaluating fuzz driver quality. Gemma 3 27B achieved the highest coverage at 45.06\%, slightly outperforming the larger Qwen 2.5-Coder 32B, which reached 43.08\%. This was unexpected. The smaller model outperformed the larger one while using fewer tokens. We initially suspected measurement error, but the results held across multiple runs with consistent reproducibility.
+Line coverage measures the percentage of source code lines executed during testing. It is the standard metric we use throughout this thesis for evaluating fuzz driver quality (measured via \texttt{llvm-cov}). Gemma~3 27B achieved the highest coverage at 45.06\%, slightly outperforming the larger Qwen~2.5-Coder 32B, which reached 43.08\%. This was unexpected. The smaller model outperformed the larger one while using fewer tokens. We initially suspected measurement error, but the results held across multiple runs with consistent reproducibility.
 
 That said, these numbers require context. While 45\% coverage represents a meaningful automated achievement, we examined several comparable manually-written fuzz drivers in the OSS-Fuzz corpus for yaml-cpp and similar parsing libraries (pugixml, RapidJSON, libxml2). These expert-crafted drivers typically achieve 60 to 80\% line coverage, based on coverage reports available through the OSS-Fuzz project dashboards\footnote{\url{https://introspector.oss-fuzz.com/}}. Our best AI-generated driver falls short of expert human work in absolute coverage terms. The value proposition is not matching expert coverage levels but automating fuzz driver creation, a task that would otherwise require considerable manual effort.
 
@@ -244,7 +244,7 @@ The efficiency gains from fine-tuning directly impact deployment feasibility in 
 \section{Economic Analysis and Resource Metrics}
 \label{sec:results_economics}
 
-Beyond technical performance, successful enterprise deployment requires favorable economics. This section addresses the cost component of \textbf{RQ3}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? As defined in Chapter~4 (Section~\ref{sec:impl_phase3}), the performance requirements include completing driver generation within the 15 to 30 minute CI/CD feedback window, the cost requirements cap annual infrastructure spending below \texteuro{}2,000, and the security requirements mandate that no proprietary source code leaves the corporate network. We analyzed both direct infrastructure costs and opportunity costs relative to manual approaches.
+Beyond technical performance, successful enterprise deployment requires favorable economics. This section addresses the cost component of \textbf{RQ3}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? As defined in Chapter~4 (Section~\ref{sec:impl_phase3}), the performance requirements include completing driver generation within the 15 to 30 minute CI/CD feedback window, the cost requirements cap annual infrastructure spending below \euro{}2,000, and the security requirements mandate that no proprietary source code leaves the corporate network. We analyzed both direct infrastructure costs and opportunity costs relative to manual approaches.
 
 We analyzed costs in detail because the question is not only ``does this work?'' but ``is this economically viable for real deployment?''
 
@@ -262,15 +262,15 @@ Based on Azure OpenAI pricing as of July 2025 (the time of our experiments):
 \toprule
 Usage Level & Daily Cost & Monthly Cost & Annual Cost & Use Case \\
 \midrule
-Light & \texteuro{}0.28 & \texteuro{}6.16 & \texteuro{}73.92 & Development/testing \\
-Moderate & \texteuro{}0.83 & \texteuro{}18.26 & \texteuro{}219.12 & Small team production \\
-Heavy & \texteuro{}2.75 & \texteuro{}60.50 & \texteuro{}726.00 & Full enterprise deployment \\
-Enterprise & \texteuro{}5.50 & \texteuro{}121.00 & \texteuro{}1,452.00 & Complete automation \\
+Light & \euro{}0.28 & \euro{}6.16 & \euro{}73.92 & Development/testing \\
+Moderate & \euro{}0.83 & \euro{}18.26 & \euro{}219.12 & Small team production \\
+Heavy & \euro{}2.75 & \euro{}60.50 & \euro{}726.00 & Full enterprise deployment \\
+Enterprise & \euro{}5.50 & \euro{}121.00 & \euro{}1,452.00 & Complete automation \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Even at the enterprise level with complete automation, annual costs stay under \texteuro{}1,500. This is minimal compared to manual security testing approaches. However, this represents only the direct infrastructure costs.
+Even at the enterprise level with complete automation, annual costs stay under \euro{}1,500. This is minimal compared to manual security testing approaches. However, this represents only the direct infrastructure costs.
 
 
 \subsection{Comparison with Manual Testing}
@@ -278,14 +278,14 @@ Even at the enterprise level with complete automation, annual costs stay under \
 
 Industry estimates for manual fuzz driver development:
 \begin{itemize}
-    \item Senior security engineer hourly rate: \texteuro{}80 to 120 (based on published industry benchmarks)
+    \item Senior security engineer hourly rate: \euro{}80 to 120 (based on published industry benchmarks)
     \item Time to write an effective fuzz driver: 2 to 8 hours per target (lower end for well-documented parsing APIs, upper end for complex C++ libraries with heavy template usage)
     \item Annual cost for security engineering resources: varies by market and seniority
 \end{itemize}
 
 The AI-driven approach offers:
 \begin{itemize}
-    \item Infrastructure cost: \texteuro{}219-\texteuro{}1,452 annually
+    \item Infrastructure cost: \euro{}219-\euro{}1,452 annually
     \item Estimated time savings: 75 to 94\% reduction in initial driver creation time (based on comparison of approximately 30 minutes automated generation vs. 2 to 8 hours of manual writing per target)
 \end{itemize}
 
@@ -303,7 +303,7 @@ Performance also varies across library types. Parsing libraries (yaml-cpp, jsonc
 
 Fine-tuning enables efficient deployment. The fine-tuned 1.5B model achieved 33\% faster generation and 55\% fewer tokens compared to the base model, though it still did not match the coverage of larger specialized models.
 
-The economics appear favorable as well. Annual infrastructure costs range from \texteuro{}74 for light usage to \texteuro{}1,452 for full enterprise deployment. Manual security engineering involves higher personnel investment, though the two approaches serve complementary rather than interchangeable functions. The LLM automates initial driver creation while human expertise remains necessary for review and refinement.
+The economics appear favorable as well. Annual infrastructure costs range from \euro{}74 for light usage to \euro{}1,452 for full enterprise deployment. Manual security engineering involves higher personnel investment, though the two approaches serve complementary rather than interchangeable functions. The LLM automates initial driver creation while human expertise remains necessary for review and refinement.
 
 Mapping these findings to our research questions:
 
@@ -311,4 +311,4 @@ Mapping these findings to our research questions:
 
 \textbf{RQ2 (Optimization)}: Does model size determine fuzz driver quality, or can smaller models with domain-specific training match or exceed larger general-purpose models? Smaller specialized models consistently outperformed larger general-purpose models. Fine-tuning further improved efficiency, though not coverage.
 
-\textbf{RQ3 (Feasibility)}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? Integration proved feasible at costs under \texteuro{}1,500 annually, but the process required careful infrastructure planning (Azure Private Link) to meet the security requirements of regulated environments.
+\textbf{RQ3 (Feasibility)}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? Integration proved feasible at costs under \euro{}1,500 annually, but the process required careful infrastructure planning (Azure Private Link) to meet the security requirements of regulated environments.
