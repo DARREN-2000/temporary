@@ -1,16 +1,12 @@
 \chapter*{Abstract}
 
-Modern automotive software exceeds 100 million lines of code per vehicle, making thorough security testing essential under ISO~26262 and UNECE~WP.29 regulations. Fuzz testing is effective at discovering software vulnerabilities, but writing fuzz drivers requires deep API knowledge, a capability that many development teams lack.
+Modern automotive software exceeds 100 million lines of code per vehicle, making security testing essential under ISO~26262 and UNECE~WP.29. Fuzz testing effectively discovers vulnerabilities, but writing fuzz drivers requires deep API knowledge that many teams lack. This thesis investigates whether Large Language Models~(LLMs) can automate fuzz driver generation for C/C++ libraries and whether the approach is viable for enterprise CI/CD pipelines.
 
-This thesis investigates whether Large Language Models (LLMs) can automate fuzz driver generation for C/C++ automotive libraries and whether the approach is viable for enterprise CI/CD pipelines.
+We evaluated 14~LLMs (1.5B--46.7B parameters) on \texttt{yaml-cpp} and additional C++ targets. The results were counterintuitive: larger models did not perform better. General-purpose models such as Yi~(34B) produced non-functional drivers, and Mixtral~(46.7B) could not be evaluated due to hardware constraints. In contrast, Gemma~3~(27B) achieved 45.06\% line coverage and Qwen~2.5-Coder~(32B) reached 43.08\%. Several code-specialized models including CodeLlama~(34B) also failed, showing that neither size nor specialization label alone predicts success.
 
-We evaluated 14 open-source LLMs ranging from 1.5 to 46.7 billion parameters on the \texttt{yaml-cpp} library and additional C++ targets. The results revealed a counterintuitive pattern: larger models did not perform better. General-purpose models such as Yi (34B) failed to produce functional fuzz drivers, and Mixtral (46.7B) could not be fully evaluated due to hardware constraints. In contrast, Gemma~3 (27B) achieved approximately 45\% line coverage, and the code-specialized Qwen~2.5-Coder (32B) reached approximately 43\%. Notably, several explicitly code-specialized models such as CodeLlama (34B) also failed, demonstrating that neither model size nor a code-specialization label alone predicts success for this task.
+Fine-tuning a compact 1.5B model with Low-Rank Adaptation~(LoRA) on OSS-Fuzz drivers reduced generation time by~33\% and token usage by~55\% while maintaining quality. Enterprise deployment at CARIAD~SE revealed that infrastructure challenges, such as corporate firewalls blocking API calls from isolated CI runners, required architectural solutions (Azure Private Link, self-hosted runners). An economic analysis estimates annual deployment cost at approximately~\euro{}1,500.
 
-To address resource constraints, we fine-tuned a compact 1.5B-parameter model using Low-Rank Adaptation (LoRA) on fuzz drivers extracted from Google's OSS-Fuzz project. Fine-tuning reduced generation time by 33\% and token usage by 55\% while maintaining driver quality, making deployment in resource-constrained environments practical.
+Overall, LLM-based fuzz driver generation is technically viable and cost-effective for automotive security when models are chosen carefully and infrastructure is adapted to enterprise constraints.
 
-Enterprise integration at CARIAD~SE revealed that infrastructure challenges can rival the technical ones. Corporate firewalls blocked external API calls from isolated CI/CD runners, requiring an architectural solution based on Azure Private Link and self-hosted runners. This experience demonstrates that production deployment depends as much on infrastructure planning as on model quality.
-
-An economic analysis shows that full enterprise deployment costs approximately \euro{}1,500 annually, a modest investment compared to the cost of manual security engineering. Overall, LLM-based fuzz driver generation is both technically viable and cost-effective for automotive security, provided the model is chosen carefully and infrastructure is adapted to enterprise constraints.
-
-\vspace{1cm}
+\vspace{0.5cm}
 \noindent \textbf{Keywords:} Large Language Models, Fuzz Testing, Automotive Security, CI/CD Integration, LoRA Fine-Tuning, ISO~26262, Code Coverage.

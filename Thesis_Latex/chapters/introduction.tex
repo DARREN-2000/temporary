@@ -103,8 +103,64 @@ The core principles remain: automate where possible, test early and often, and m
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{bilder/cicd.png}
-    \caption{The Automotive CI/CD Pipeline. The diagram illustrates the stages from code commit through deployment, highlighting where security validation typically occurs.}
+    \resizebox{\textwidth}{!}{
+    \begin{tikzpicture}[
+        databox/.style={draw, rectangle, minimum width=3.5cm, minimum height=1cm, align=center, fill=blue!8, thick, font=\small},
+        procbox/.style={draw, rounded corners=8pt, rectangle, minimum width=3.5cm, minimum height=1cm, align=center, fill=orange!12, thick, font=\small},
+        arrow/.style={->, >=stealth, thick},
+        every node/.style={inner sep=6pt}
+    ]
+    % --- ROW 1: Initial data ---
+    \node[databox] (commit) at (0,0) {Commit /\\Source Tree};
+
+    % --- ROW 2: Build process ---
+    \node[procbox] (build) at (0,-2) {Build\\{\footnotesize(CMake / Clang)}};
+
+    % --- ROW 3: Build output ---
+    \node[databox] (artifact) at (0,-4) {Build Artifact\\{\footnotesize(Binary / Library)}};
+
+    % --- ROW 4: Test process ---
+    \node[procbox] (test) at (0,-6) {Test Execution\\{\footnotesize(Unit / Integration)}};
+
+    % --- ROW 5: Test output ---
+    \node[databox] (testresults) at (0,-8) {Test Results};
+
+    % --- ROW 6: Security validation (where fuzzing fits) ---
+    \node[procbox, fill=yellow!20] (secval) at (0,-10) {\textbf{Security Validation}\\{\footnotesize(Fuzzing / SAST / DAST)}};
+
+    % --- ROW 7: Security output ---
+    \node[databox] (secreport) at (0,-12) {Security Report /\\Findings};
+
+    % --- ROW 8: Deploy ---
+    \node[procbox] (deploy) at (0,-14) {Deploy\\{\footnotesize(Staging / Production)}};
+
+    % --- ROW 9: Release ---
+    \node[databox] (release) at (0,-16) {Deployed Release};
+
+    % --- ROW 10: Monitor ---
+    \node[procbox] (monitor) at (0,-18) {Monitor\\{\footnotesize(Telemetry / Logging)}};
+
+    % --- ROW 11: Feedback ---
+    \node[databox] (telemetry) at (0,-20) {Telemetry /\\Incident Data};
+
+    % --- ARROWS (all data→process→data, alternating) ---
+    \draw[arrow] (commit) -- (build);
+    \draw[arrow] (build) -- (artifact);
+    \draw[arrow] (artifact) -- (test);
+    \draw[arrow] (test) -- (testresults);
+    \draw[arrow] (testresults) -- (secval);
+    \draw[arrow] (secval) -- (secreport);
+    \draw[arrow] (secreport) -- (deploy);
+    \draw[arrow] (deploy) -- (release);
+    \draw[arrow] (release) -- (monitor);
+    \draw[arrow] (monitor) -- (telemetry);
+
+    % --- Feedback loop ---
+    \draw[arrow] (telemetry.east) -- ++(2.5,0) |- (commit.east);
+
+    \end{tikzpicture}
+    }
+    \caption{The Automotive CI/CD Pipeline. Data artifacts are shown in rectangular boxes; processing steps are shown in rounded boxes. Security validation (highlighted) is where fuzzing integrates into the pipeline. The feedback loop from telemetry to the source tree represents the continuous improvement cycle.}
     \label{fig:cicd_pipeline}
 \end{figure}
 

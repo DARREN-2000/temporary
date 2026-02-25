@@ -11,7 +11,7 @@ These are Mermaid versions of the thesis diagrams. You can render them at [merma
 
 ---
 
-## Figure 1.2 — The Fuzzing Process
+## Figure 1.1 — The Fuzzing Process
 
 ```mermaid
 flowchart TD
@@ -62,6 +62,67 @@ flowchart TD
 ```
 
 **Caption:** The Fuzzing Process. Data artifacts are shown in rectangular boxes; processing steps are shown in rounded boxes. The manual creation of fuzz drivers (highlighted in red) is the bottleneck this thesis aims to automate.
+
+---
+
+## Figure 1.2 — The Automotive CI/CD Pipeline
+
+```mermaid
+flowchart TD
+    %% ===== DATA (rectangular) =====
+    COMMIT["Commit /<br/>Source Tree"]
+    ARTIFACT["Build Artifact<br/><i>(Binary / Library)</i>"]
+    TRESULTS["Test Results"]
+    SECREPORT["Security Report /<br/>Findings"]
+    RELEASE["Deployed Release"]
+    TELEMETRY["Telemetry /<br/>Incident Data"]
+
+    %% ===== PROCESSING (rounded / stadium) =====
+    BUILD(["Build<br/><i>(CMake / Clang)</i>"])
+    TEST(["Test Execution<br/><i>(Unit / Integration)</i>"])
+    SECVAL(["<b>Security Validation</b><br/><i>(Fuzzing / SAST / DAST)</i>"])
+    DEPLOY(["Deploy<br/><i>(Staging / Production)</i>"])
+    MONITOR(["Monitor<br/><i>(Telemetry / Logging)</i>"])
+
+    %% ===== FLOW (alternating data → process → data) =====
+    COMMIT --> BUILD
+    BUILD --> ARTIFACT
+    ARTIFACT --> TEST
+    TEST --> TRESULTS
+    TRESULTS --> SECVAL
+    SECVAL --> SECREPORT
+    SECREPORT --> DEPLOY
+    DEPLOY --> RELEASE
+    RELEASE --> MONITOR
+    MONITOR --> TELEMETRY
+    TELEMETRY -->|feedback loop| COMMIT
+
+    %% ===== STYLING =====
+    style COMMIT fill:#dce6f1,stroke:#333,stroke-width:2px
+    style ARTIFACT fill:#dce6f1,stroke:#333,stroke-width:2px
+    style TRESULTS fill:#dce6f1,stroke:#333,stroke-width:2px
+    style SECREPORT fill:#dce6f1,stroke:#333,stroke-width:2px
+    style RELEASE fill:#dce6f1,stroke:#333,stroke-width:2px
+    style TELEMETRY fill:#dce6f1,stroke:#333,stroke-width:2px
+
+    style BUILD fill:#fde8cd,stroke:#333,stroke-width:2px
+    style TEST fill:#fde8cd,stroke:#333,stroke-width:2px
+    style SECVAL fill:#fff3cd,stroke:#856404,stroke-width:2px
+    style DEPLOY fill:#fde8cd,stroke:#333,stroke-width:2px
+    style MONITOR fill:#fde8cd,stroke:#333,stroke-width:2px
+```
+
+**Caption:** The Automotive CI/CD Pipeline. Data artifacts are shown in rectangular boxes; processing steps are shown in rounded boxes. Security validation (highlighted) is where fuzzing integrates into the pipeline. The feedback loop from telemetry to the source tree represents the continuous improvement cycle.
+
+**How to use:** Export as PNG from [mermaid.live](https://mermaid.live) and replace the TikZ block at `chapters/introduction.tex` lines 103–158 with:
+```latex
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{bilder/cicd_pipeline_mermaid.png}
+    \caption{The Automotive CI/CD Pipeline. Data artifacts are shown in rectangular boxes; processing steps are shown in rounded boxes. Security validation (highlighted) is where fuzzing integrates into the pipeline. The feedback loop from telemetry to the source tree represents the continuous improvement cycle.}
+    \label{fig:cicd_pipeline}
+\end{figure}
+```
 
 ---
 
@@ -191,9 +252,9 @@ The TikZ versions are already embedded in the LaTeX files and compile directly. 
 
 ## Exact Lines to Change to Switch from TikZ to Mermaid
 
-### Figure 1.2 (Fuzzing Process) — in `chapters/introduction.tex`
+### Figure 1.1 (Fuzzing Process) — in `chapters/introduction.tex`
 
-**What to do:** Export the Mermaid diagram above as `bilder/fuzzing_mermaid.png`, then replace lines 33–88 of `chapters/introduction.tex`.
+**What to do:** Export the Mermaid diagram above as `bilder/fuzzing_mermaid.png`, then replace lines 33–87 of `chapters/introduction.tex`.
 
 **Replace this entire TikZ block (lines 33–88):**
 ```latex
@@ -489,12 +550,13 @@ flowchart TD
 
 | # | Figure | File | TikZ | Mermaid | Notation |
 |---|--------|------|------|---------|----------|
-| 1 | Fig 1.2 — Fuzzing Process | introduction.tex | ✅ | ✅ | data=rect, process=rounded, top-down |
-| 2 | Fig 3.1 — Technical Architecture | methodology.tex | ✅ | ✅ | data=rect, process=rounded, top-down, layers marked |
-| 3 | Fig 3.2 — Enterprise Integration | methodology.tex | ✅ | ✅ | components=rounded, data=rect, left-right |
-| 4 | Fig 4.1 — Eval Environment | implementation.tex | ✅ | ✅ | components=rounded, data=rect, top-down |
-| 5 | Fig 4.2 — CI/CD Workflow | implementation.tex | ✅ | ✅ | data=rect, process=rounded, top-down |
-| 6 | Fig 6.1 — Network Architecture | discussion_conclusion.tex | ✅ | ✅ | components=rounded, data=rect, top-down, edges labeled |
+| 1 | Fig 1.1 — Fuzzing Process | introduction.tex | ✅ | ✅ | data=rect, process=rounded, top-down |
+| 2 | Fig 1.2 — Automotive CI/CD Pipeline | introduction.tex | ✅ | ✅ | data=rect, process=rounded, top-down |
+| 3 | Fig 3.1 — Technical Architecture | methodology.tex | ✅ | ✅ | data=rect, process=rounded, top-down, layers marked |
+| 4 | Fig 3.2 — Enterprise Integration | methodology.tex | ✅ | ✅ | components=rounded, data=rect, left-right |
+| 5 | Fig 4.1 — Eval Environment | implementation.tex | ✅ | ✅ | components=rounded, data=rect, top-down |
+| 6 | Fig 4.2 — CI/CD Workflow | implementation.tex | ✅ | ✅ | data=rect, process=rounded, top-down |
+| 7 | Fig 6.1 — Network Architecture | discussion_conclusion.tex | ✅ | ✅ | components=rounded, data=rect, top-down, edges labeled |
 
 All diagrams use the same notation:
 - **Rectangular boxes** = Data artifacts / data stores

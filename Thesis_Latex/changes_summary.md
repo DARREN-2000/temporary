@@ -4,6 +4,67 @@ This document lists every professor comment, what was in the original thesis, an
 
 ---
 
+## Latest Changes (Session 8)
+
+### Figure 1.2 (CI/CD Pipeline) redesigned
+**Issue:** Figure 1.2 used a PNG image (`bilder/cicd.png`) that did NOT follow the professor's data/process notation rule. Boxes were directly connected without alternating data→process→data.
+
+| Before | After |
+|--------|-------|
+| PNG image with equal-looking boxes (Source Code → Build → Test → Deploy → Monitor) — violates "no two process boxes directly connected" rule | TikZ diagram with 11 nodes alternating data (rectangular) and process (rounded): Commit → Build → Artifact → Test → Results → Security Validation → Report → Deploy → Release → Monitor → Telemetry, with feedback loop |
+| Small, hard to read | Full `\textwidth`, top-down layout, readable |
+| No color semantics | Security Validation step highlighted in yellow |
+| **File:** `chapters/introduction.tex` lines 103–158 | Same location, replaced with TikZ code |
+
+### Abstract shortened to fit one page
+**Issue:** Abstract was ~340 words and spilled to next page.
+
+| Before | After |
+|--------|-------|
+| ~340 words, 5 paragraphs with verbose phrasing | ~230 words, 4 paragraphs, tightened language |
+| "approximately 45%" and "approximately 43%" | Exact numbers: "45.06%" and "43.08%" (matching Table 5.1) |
+| `\vspace{1cm}` before keywords | `\vspace{0.5cm}` for tighter spacing |
+| **File:** `chapters/abstract.tex` | Complete rewrite |
+
+### Gemma 3 and Phi-4 model reclassification
+**Issue:** Gemma 3 is Google's general-purpose model, NOT a code-specialized model. Phi-4 is Microsoft's general-purpose reasoning model.
+
+| Before | After |
+|--------|-------|
+| Gemma 3 listed as "Code-specialized" in tables and prose | Reclassified to "General-purpose" everywhere |
+| Phi-4 listed as "Code-specialized" | Reclassified to "General-purpose" |
+| Thesis argued "code-specialized > general-purpose" | Revised to "training quality and architecture matter more than size or specialization label" |
+| **Files:** `implementation.tex`, `results.tex`, `discussion_conclusion.tex`, `abstract.tex`, `thesis.tex` (appendix) | All tables and prose updated |
+
+### Missing citations added
+| Claim | Before | After |
+|-------|--------|-------|
+| Tesla OTA updates | No citation | `\cite{TeslaOTA2019}` — Electrek, 2019 |
+| Chrysler 1.4M recall | No citation | `\cite{Greenberg2015}` — Wired + NHTSA |
+
+### Submission blockers fixed (prior sessions)
+| Issue | Status |
+|-------|--------|
+| Aufgabenstellung placeholder | ✅ Replaced with proper content |
+| "Figure 3.3.3" / "Figure 6.1.2" | ✅ Not present in current code |
+| Euro symbol rendering | ✅ Using `\euro{}` from `eurosym` package |
+| Abbreviations header | ✅ `\markboth{List of Abbreviations}{List of Abbreviations}` added |
+| Informal tone / "you" | ✅ All removed |
+| Branch/line coverage | ✅ Consistently "line coverage" |
+| Timing 10-15 min vs actual 33 min | ✅ Changed to "10-45 min depending on model size" |
+
+### Mermaid diagrams
+All 7 diagrams now have both TikZ (in .tex files) and Mermaid (in `diagrams_mermaid.md`):
+- Fig 1.1 — Fuzzing Process
+- Fig 1.2 — Automotive CI/CD Pipeline (NEW)
+- Fig 3.1 — Technical Architecture
+- Fig 3.2 — Enterprise Integration
+- Fig 4.1 — Evaluation Environment
+- Fig 4.2 — CI/CD Workflow
+- Fig 6.1 — Network Architecture
+
+---
+
 ## Chapter 1 — Introduction
 
 ### Comment 1: Figure 1.2 diagram notation
