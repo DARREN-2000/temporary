@@ -33,7 +33,7 @@ Moving from concept to working system required a robust technical design. Our sy
 
 \begin{figure}[htbp]
     \centering
-    \adjustbox{max width=0.95\textwidth, max height=0.6\textheight}{%
+    \adjustbox{max width=0.95\textwidth, max height=0.75\textheight}{%
     \begin{tikzpicture}[
         databox/.style={draw, rectangle, minimum width=4cm, minimum height=0.9cm, align=center, fill=blue!8, thick, font=\small},
         newdatabox/.style={draw, rectangle, minimum width=4cm, minimum height=0.9cm, align=center, fill=green!15, thick, font=\small},
@@ -48,40 +48,40 @@ Moving from concept to working system required a robust technical design. Our sy
     \node[databox] (srccode) at (0, 0) {Source Code\\{\footnotesize(C/C++ project)}};
     \node[databox] (headers) at (5.5, 0) {Public Header Files\\{\footnotesize(\texttt{.h} / \texttt{.hpp})}};
 
-    \node[newprocbox] (ctxextract) at (2.75, -2) {\textbf{Automated Context}\\
+    \node[newprocbox] (ctxextract) at (2.75, -1.6) {\textbf{Automated Context}\\
     \textbf{Extraction}\\{\footnotesize(cifuzz spark \cite{cifuzzspark})}};
 
-    \node[newdatabox] (apictx) at (2.75, -4.2) {Extracted API Context\\{\footnotesize(signatures, types, classes)}};
+    \node[newdatabox] (apictx) at (2.75, -3.4) {Extracted API Context\\{\footnotesize(signatures, types, classes)}};
 
     % ============ GENERATION LAYER ============
-    \node[newdatabox] (fuzzinstr) at (-2.5, -6.4) {Fuzzing Instructions\\{\footnotesize(libFuzzer harness rules,}\\{\footnotesize safety constraints)}};
+    \node[newdatabox] (fuzzinstr) at (-2.5, -5.2) {Fuzzing Instructions\\{\footnotesize(libFuzzer harness rules,}\\{\footnotesize safety constraints)}};
 
-    \node[newprocbox] (promptbuild) at (2.75, -6.8) {\textbf{Prompt Construction}\\{\footnotesize(API context + instructions)}};
+    \node[newprocbox] (promptbuild) at (2.75, -5.5) {\textbf{Prompt Construction}\\{\footnotesize(API context + instructions)}};
 
-    \node[newdatabox] (prompt) at (2.75, -9) {Assembled Prompt};
+    \node[newdatabox] (prompt) at (2.75, -7.3) {Assembled Prompt};
 
-    \node[databox] (llmmodel) at (8, -9) {LLM Model\\{\footnotesize(local via Ollama /}\\{\footnotesize cloud via Azure OpenAI)}};
+    \node[databox] (llmmodel) at (8, -7.3) {LLM Model\\{\footnotesize(local via Ollama /}\\{\footnotesize cloud via Azure OpenAI)}};
 
-    \node[newprocbox] (llmgen) at (5.5, -11) {\textbf{LLM-Based Driver}\\
+    \node[newprocbox] (llmgen) at (5.5, -9) {\textbf{LLM-Based Driver}\\
     \textbf{Generation}};
 
-    \node[newdatabox] (gendriver) at (5.5, -13) {Generated Fuzz Driver\\{\footnotesize(C++ source code)}};
+    \node[newdatabox] (gendriver) at (5.5, -10.7) {Generated Fuzz Driver\\{\footnotesize(C++ source code)}};
 
     % ============ EXECUTION LAYER ============
-    \node[procbox] (compile) at (2.5, -15) {\textbf{Compilation}\\{\footnotesize(Clang + ASan/UBSan)}};
+    \node[procbox] (compile) at (2.5, -12.3) {\textbf{Compilation}\\{\footnotesize(Clang + ASan/UBSan)}};
 
-    \node[databox] (binary) at (2.5, -17) {Instrumented Binary};
+    \node[databox] (binary) at (2.5, -13.9) {Instrumented Binary};
 
-    \node[databox] (seedinputs) at (8.5, -17) {Seed Inputs};
+    \node[databox] (seedinputs) at (8.5, -13.9) {Seed Inputs};
 
-    \node[procbox] (fuzzexec) at (5.5, -19) {\textbf{Fuzzing Execution}\\{\footnotesize(libFuzzer)}};
+    \node[procbox] (fuzzexec) at (5.5, -15.5) {\textbf{Fuzzing Execution}\\{\footnotesize(libFuzzer)}};
 
-    \node[databox] (covdata) at (8.5, -21) {Coverage Data};
-    \node[databox] (crashdata) at (2.5, -21) {Crash Reports};
+    \node[databox] (covdata) at (8.5, -17.1) {Coverage Data};
+    \node[databox] (crashdata) at (2.5, -17.1) {Crash Reports};
 
-    \node[newprocbox] (coveval) at (8.5, -23) {\textbf{Coverage Evaluation}\\{\footnotesize(quality gate)}};
+    \node[newprocbox] (coveval) at (8.5, -18.7) {\textbf{Coverage Evaluation}\\{\footnotesize(quality gate)}};
 
-    \node[newdatabox] (covreport) at (8.5, -25) {Coverage Report\\{\footnotesize(pass / fail)}};
+    \node[newdatabox] (covreport) at (8.5, -20.3) {Coverage Report\\{\footnotesize(pass / fail)}};
 
     % ============ ARROWS ============
     % Input layer
@@ -179,7 +179,7 @@ The final phase moved from controlled experiments to the real world. We integrat
 
 \begin{figure}[htbp]
     \centering
-    \adjustbox{max width=0.95\textwidth, max height=0.45\textheight}{%
+    \adjustbox{max width=0.95\textwidth, max height=0.55\textheight}{%
     \begin{tikzpicture}[
         comp/.style={draw, rectangle, rounded corners=6pt, minimum width=3.5cm, minimum height=1cm, align=center, fill=blue!8, thick, font=\small},
         datastore/.style={draw, rectangle, minimum width=3.5cm, minimum height=1cm, align=center, fill=green!10, thick, font=\small},

@@ -192,7 +192,7 @@ We ran each model five times on yaml-cpp to account for stochastic output variat
 
 \begin{figure}[htbp]
     \centering
-    \adjustbox{max width=0.95\textwidth, max height=0.55\textheight}{%
+    \adjustbox{max width=0.95\textwidth, max height=0.65\textheight}{%
     \begin{tikzpicture}[
         comp/.style={draw, rectangle, rounded corners=6pt, minimum width=3.5cm, minimum height=1.2cm, align=center, fill=blue!8, thick, font=\small},
         data/.style={draw, rectangle, minimum width=3cm, minimum height=1cm, align=center, fill=green!10, thick, font=\small},
@@ -207,26 +207,26 @@ We ran each model five times on yaml-cpp to account for stochastic output variat
     \node[data] (target) at (12, 0) {C++ Target Library\\{\footnotesize(yaml-cpp, etc.)}};
 
     % --- Row 2: cifuzz spark ---
-    \node[comp] (cifuzz) at (6, -3.5) {\textbf{cifuzz spark}\\{\footnotesize Driver Generation}};
+    \node[comp] (cifuzz) at (6, -2.5) {\textbf{cifuzz spark}\\{\footnotesize Driver Generation}};
 
     % --- Row 3: Generated Driver ---
-    \node[data] (driver) at (6, -7) {Generated Fuzz Driver\\{\footnotesize(C++ source code)}};
+    \node[data] (driver) at (6, -5) {Generated Fuzz Driver\\{\footnotesize(C++ source code)}};
 
     % --- Row 4: Build ---
-    \node[comp] (cmake) at (6, -10.5) {\textbf{CMake + Clang}\\{\footnotesize Build System}};
+    \node[comp] (cmake) at (6, -7.5) {\textbf{CMake + Clang}\\{\footnotesize Build System}};
 
     % --- Row 5: Instrumented Binary ---
-    \node[data] (binary) at (6, -14) {Instrumented Binary};
+    \node[data] (binary) at (6, -10) {Instrumented Binary};
 
     % --- Row 6: Fuzzing Engine ---
-    \node[comp] (libfuzzer) at (6, -17.5) {\textbf{libFuzzer}\\{\footnotesize Fuzzing Engine}};
+    \node[comp] (libfuzzer) at (6, -12.5) {\textbf{libFuzzer}\\{\footnotesize Fuzzing Engine}};
 
     % --- Row 7: Coverage Measurement ---
-    \node[comp] (llvmcov) at (0, -17.5) {\textbf{llvm-cov}\\{\footnotesize Coverage Tool}};
-    \node[data] (coverage) at (0, -14) {Coverage Report};
+    \node[comp] (llvmcov) at (0, -12.5) {\textbf{llvm-cov}\\{\footnotesize Coverage Tool}};
+    \node[data] (coverage) at (0, -10) {Coverage Report};
 
     % --- Podman container runtime label ---
-    \node[comp, fill=gray!8] (podman) at (12, -10.5) {\textbf{Podman}\\{\footnotesize Container Runtime}};
+    \node[comp, fill=gray!8] (podman) at (12, -7.5) {\textbf{Podman}\\{\footnotesize Container Runtime}};
 
     % --- Arrows (top-down flow) ---
     \draw[arrow] (ollama) -- node[elabel, right, pos=0.5]{OpenAI API} (cifuzz);
@@ -245,8 +245,8 @@ We ran each model five times on yaml-cpp to account for stochastic output variat
     \draw[darrow] (podman) |- node[elabel, pos=0.25, above]{manages} (cifuzz);
 
     % Container boundary
-    \draw[dashed, thick, gray!60] (-2.5, -2) rectangle (14, -19);
-    \node[font=\footnotesize\bfseries, gray] at (5.75, -19.4) {Podman Container Environment};
+    \draw[dashed, thick, gray!60] (-2.5, -1.5) rectangle (14, -14);
+    \node[font=\footnotesize\bfseries, gray] at (5.75, -14.4) {Podman Container Environment};
 
     \end{tikzpicture}
     }
@@ -471,7 +471,7 @@ Once Private Link was operational, the pipeline worked reliably. Figure~\ref{fig
 
 \begin{figure}[htbp]
     \centering
-    \adjustbox{max width=0.95\textwidth, max height=0.55\textheight}{%
+    \adjustbox{max width=0.95\textwidth, max height=0.65\textheight}{%
     \begin{tikzpicture}[
         procstep/.style={draw, rounded corners=6pt, rectangle, minimum width=3.5cm, minimum height=1cm, align=center, fill=orange!10, thick, font=\small},
         data/.style={draw, rectangle, minimum width=3cm, minimum height=0.8cm, align=center, fill=blue!8, thick, font=\small},
@@ -483,31 +483,31 @@ Once Private Link was operational, the pipeline worked reliably. Figure~\ref{fig
     \node[data] (trigger) at (0, 0) {Git Push\\{\footnotesize(code commit)}};
 
     % --- Row 1 ---
-    \node[procstep] (checkout) at (0, -2) {Checkout\\Repository};
-    \node[procstep] (login) at (5, -2) {Login to\\JFrog Artifactory};
+    \node[procstep] (checkout) at (0, -1.6) {Checkout\\Repository};
+    \node[procstep] (login) at (5, -1.6) {Login to\\JFrog Artifactory};
 
     % --- Row 2 ---
-    \node[procstep] (corpus) at (5, -4) {Download\\Previous Corpus};
-    \node[procstep] (container) at (0, -4) {Pull cifuzz\\Container Image};
+    \node[procstep] (corpus) at (5, -3.2) {Download\\Previous Corpus};
+    \node[procstep] (container) at (0, -3.2) {Pull cifuzz\\Container Image};
 
     % --- Row 3 ---
-    \node[procstep] (build) at (2.5, -6) {Build Project\\{\footnotesize(CMake + Clang)}};
+    \node[procstep] (build) at (2.5, -4.8) {Build Project\\{\footnotesize(CMake + Clang)}};
 
     % --- Row 4: LLM ---
-    \node[procstep, fill=yellow!20] (spark) at (2.5, -8) {\textbf{cifuzz spark}\\{\footnotesize Generate Fuzz Driver}\\{\footnotesize via Azure OpenAI}};
+    \node[procstep, fill=yellow!20] (spark) at (2.5, -6.4) {\textbf{cifuzz spark}\\{\footnotesize Generate Fuzz Driver}\\{\footnotesize via Azure OpenAI}};
 
     % --- Row 5 ---
-    \node[procstep] (rebuild) at (2.5, -10) {Rebuild with\\Generated Driver};
+    \node[procstep] (rebuild) at (2.5, -8) {Rebuild with\\Generated Driver};
 
     % --- Row 6 ---
-    \node[procstep] (fuzz) at (2.5, -12) {Run libFuzzer\\{\footnotesize(60\,s, ASan+UBSan)}};
+    \node[procstep] (fuzz) at (2.5, -9.6) {Run libFuzzer\\{\footnotesize(60\,s, ASan+UBSan)}};
 
     % --- Row 7: outputs ---
-    \node[data] (crashes) at (-1, -14) {Crash\\Reports};
-    \node[data] (coverage) at (6, -14) {Coverage\\Data};
+    \node[data] (crashes) at (-1, -11.2) {Crash\\Reports};
+    \node[data] (coverage) at (6, -11.2) {Coverage\\Data};
 
     % --- Row 8 ---
-    \node[procstep] (upload) at (2.5, -16) {Upload Updated\\Corpus to Artifactory};
+    \node[procstep] (upload) at (2.5, -12.8) {Upload Updated\\Corpus to Artifactory};
 
     % --- Arrows ---
     \draw[arrow] (trigger) -- (checkout);
