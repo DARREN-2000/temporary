@@ -377,6 +377,132 @@ flowchart TD
 
 ---
 
+## Figure 3.2 — Enterprise Integration Strategy
+
+```mermaid
+flowchart LR
+    %% ===== COMPONENTS =====
+    subgraph CARIAD["CARIAD Network"]
+        RUNNER(["Self-hosted<br/>CI/CD Runner"])
+    end
+
+    subgraph Azure["Azure Cloud"]
+        PL(["Azure<br/>Private Link"])
+        LLM(["Azure OpenAI<br/>LLM Service"])
+    end
+
+    FW["Corporate<br/>Firewall"]
+
+    %% ===== FLOW =====
+    RUNNER -->|API request| FW
+    FW -->|Private connection| PL
+    PL -->|LLM prompt| LLM
+    LLM -->|Generated fuzz driver| PL
+    PL -->|Generated fuzz driver| FW
+    FW -->|Generated fuzz driver| RUNNER
+
+    %% ===== STYLING =====
+    style RUNNER fill:#fde8cd,stroke:#333,stroke-width:2px
+    style FW fill:#f8d0d0,stroke:#c00,stroke-width:2px
+    style PL fill:#fde8cd,stroke:#333,stroke-width:2px
+    style LLM fill:#fde8cd,stroke:#333,stroke-width:2px
+    style CARIAD fill:#dce6f1,stroke:#336,stroke-width:1px,stroke-dasharray:5
+    style Azure fill:#fff3cd,stroke:#886,stroke-width:1px,stroke-dasharray:5
+```
+
+**Caption:** Enterprise Integration Strategy. The self-hosted CI/CD runner communicates with Azure OpenAI through a Private Link endpoint, routing traffic through the corporate firewall over a private connection without traversing the public internet.
+
+**How to use:** Export as PNG from [mermaid.live](https://mermaid.live) and replace the TikZ block at `chapters/methodology.tex` lines 180–213 with:
+```latex
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{bilder/integration_mermaid.png}
+    \caption{Enterprise Integration Strategy. The self-hosted CI/CD runner communicates with Azure OpenAI through a Private Link endpoint, routing traffic through the corporate firewall over a private connection without traversing the public internet.}
+    \label{fig:enterprise_integration}
+\end{figure}
+```
+
+---
+
+## Figure 6.1 — Enterprise Network Architecture with Azure Private Link
+
+```mermaid
+flowchart TD
+    %% ===== CORPORATE NETWORK =====
+    subgraph Corporate["Corporate Network (CARIAD)"]
+        direction TB
+        CODE["Source Code<br/>Repository"]
+        RUNNER(["GitHub Actions<br/>Self-hosted Runner"])
+        CODE -->|"Source code +<br/>public headers"| RUNNER
+    end
+
+    %% ===== SECURITY BOUNDARY =====
+    FW["Corporate<br/>Firewall"]
+    INTERNET(("Public<br/>Internet"))
+
+    %% ===== AZURE CLOUD =====
+    subgraph Azure["Azure Cloud"]
+        direction TB
+        PL(["Azure Private Link<br/>Endpoint"])
+        LLM(["Azure OpenAI<br/>LLM Service"])
+    end
+
+    %% ===== FORWARD PATH =====
+    RUNNER -->|"API request<br/>(headers + fuzzing instructions)"| FW
+    FW -->|"Private connection<br/>(encrypted)"| PL
+    PL -->|"LLM prompt<br/>(API context + instructions)"| LLM
+
+    %% ===== RETURN PATH =====
+    LLM -->|"Generated fuzz driver<br/>(C++ source code)"| PL
+    PL -->|"Generated fuzz driver"| FW
+    FW -->|"Generated fuzz driver"| RUNNER
+
+    %% ===== BLOCKED PATH =====
+    FW -.-x|"Not used"| INTERNET
+
+    %% ===== STYLING =====
+    style CODE fill:#d4edda,stroke:#333,stroke-width:2px
+    style RUNNER fill:#fde8cd,stroke:#333,stroke-width:2px
+    style FW fill:#f8d0d0,stroke:#c00,stroke-width:2px
+    style INTERNET fill:#e8e8e8,stroke:#666,stroke-width:2px,stroke-dasharray:5
+    style PL fill:#fde8cd,stroke:#333,stroke-width:2px
+    style LLM fill:#fde8cd,stroke:#333,stroke-width:2px
+    style Corporate fill:#dce6f1,stroke:#336,stroke-width:1px,stroke-dasharray:5
+    style Azure fill:#fff3cd,stroke:#886,stroke-width:1px,stroke-dasharray:5
+```
+
+**Caption:** Enterprise Network Architecture with Azure Private Link. All edges are labeled with the data exchanged between components. Traffic flows through a private connection and never traverses the public internet.
+
+**How to use:** Export as PNG from [mermaid.live](https://mermaid.live) and replace the TikZ block at `chapters/discussion_conclusion.tex` lines 47–95 with:
+```latex
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{bilder/network_architecture_mermaid.png}
+    \caption{Enterprise Network Architecture with Azure Private Link. Processing components are shown in rounded boxes; data stores in rectangular boxes. All edges are labeled with the data exchanged between components. Traffic flows through a private connection and never traverses the public internet.}
+    \label{fig:enterprise_network}
+\end{figure}
+```
+
+---
+
+## Complete Diagram Inventory
+
+| # | Figure | File | TikZ | Mermaid | Notation |
+|---|--------|------|------|---------|----------|
+| 1 | Fig 1.2 — Fuzzing Process | introduction.tex | ✅ | ✅ | data=rect, process=rounded, top-down |
+| 2 | Fig 3.1 — Technical Architecture | methodology.tex | ✅ | ✅ | data=rect, process=rounded, top-down, layers marked |
+| 3 | Fig 3.2 — Enterprise Integration | methodology.tex | ✅ | ✅ | components=rounded, data=rect, left-right |
+| 4 | Fig 4.1 — Eval Environment | implementation.tex | ✅ | ✅ | components=rounded, data=rect, left-right |
+| 5 | Fig 4.2 — CI/CD Workflow | implementation.tex | ✅ | ✅ | data=rect, process=rounded, top-down |
+| 6 | Fig 6.1 — Network Architecture | discussion_conclusion.tex | ✅ | ✅ | components=rounded, data=rect, top-down, edges labeled |
+
+All diagrams use the same notation:
+- **Rectangular boxes** = Data artifacts / data stores
+- **Rounded boxes** = Processing steps / components
+- No two data boxes directly connected (mediated by a process)
+- No two process boxes directly connected (mediated by data)
+- Top-down layout where possible for maximum size
+
 ### Important Notes
 - Keep the `\caption` and `\label` exactly as shown — other parts of the thesis reference these labels
 - Make sure the PNG is high resolution (at least 300 DPI or use the 4x export option in mermaid.live)

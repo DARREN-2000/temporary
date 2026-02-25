@@ -45,10 +45,58 @@ We collaborated with CARIAD's infrastructure team to provision Azure Private Lin
 The architecture of this solution is illustrated in Figure~\ref{fig:enterprise_network}, which shows how the Azure Private Link creates a secure tunnel between the CARIAD internal network and Azure OpenAI services, routing traffic through a private connection rather than the public internet while maintaining security compliance.
 
 \begin{figure}[htbp]
-\centering
-\caption{Enterprise Network Architecture with Azure Private Link}
-\label{fig:enterprise_network}
-\includegraphics[width=\linewidth]{bilder/figure6_1_network_architecture.png}
+    \centering
+    \resizebox{\textwidth}{!}{
+    \begin{tikzpicture}[
+        comp/.style={draw, rectangle, rounded corners=6pt, minimum width=3.5cm, minimum height=1.2cm, align=center, fill=blue!8, thick, font=\small},
+        datastore/.style={draw, rectangle, minimum width=3.5cm, minimum height=1.2cm, align=center, fill=green!10, thick, font=\small},
+        fw/.style={draw, rectangle, minimum width=3cm, minimum height=1.2cm, align=center, fill=red!8, thick, font=\small},
+        internet/.style={draw, circle, minimum size=1.8cm, align=center, fill=gray!10, thick, font=\small, dashed},
+        arrow/.style={->, >=stealth, thick},
+        darrow/.style={<->, >=stealth, thick},
+        blocked/.style={->, >=stealth, thick, dashed, gray},
+        edgelabel/.style={font=\footnotesize, fill=white, inner sep=1pt}
+    ]
+
+    % --- Corporate Network ---
+    \node[datastore] (code) at (0, 0) {Source Code\\Repository};
+    \node[comp] (runner) at (0, -3) {GitHub Actions\\Self-hosted Runner};
+
+    % --- Security Boundary ---
+    \node[fw] (firewall) at (0, -6.5) {Corporate\\Firewall};
+
+    % --- Public Internet (not used) ---
+    \node[internet] (internet) at (-5, -6.5) {Public\\Internet};
+
+    % --- Azure Cloud ---
+    \node[comp] (privatelink) at (0, -10) {Azure Private Link\\Endpoint};
+    \node[comp] (llm) at (0, -13) {Azure OpenAI\\LLM Service};
+
+    % --- Forward path (left side arrows) ---
+    \draw[arrow] (code) -- node[edgelabel, right]{Source code + public headers} (runner);
+    \draw[arrow] (runner) -- node[edgelabel, right]{API request\\{\footnotesize(headers + fuzzing instructions)}} (firewall);
+    \draw[arrow] (firewall) -- node[edgelabel, right]{Private connection\\{\footnotesize(encrypted, no public internet)}} (privatelink);
+    \draw[arrow] (privatelink) -- node[edgelabel, right]{LLM prompt\\{\footnotesize(API context + instructions)}} (llm);
+
+    % --- Return path (right side arrows) ---
+    \draw[arrow] (llm.east) -- ++(2,0) |- node[edgelabel, pos=0.25, right]{Generated fuzz driver\\{\footnotesize(C++ source code)}} (privatelink.east);
+    \draw[arrow] (privatelink.west) -- ++(-2,0) |- node[edgelabel, pos=0.25, left]{Generated fuzz driver} (firewall.west);
+    \draw[arrow] (firewall.west) -- ++(-2,0) |- node[edgelabel, pos=0.25, left]{Generated fuzz driver} (runner.west);
+
+    % --- Blocked path to internet ---
+    \draw[blocked] (firewall) -- node[edgelabel, above]{Not used} (internet);
+
+    % --- Subgraph boundaries ---
+    \draw[thick, dashed, blue!50] (-4.5, 1.2) rectangle (4.5, -4.2);
+    \node[font=\footnotesize\bfseries, blue!60] at (0, 1.5) {Corporate Network (CARIAD)};
+
+    \draw[thick, dashed, orange!50] (-3.5, -8.5) rectangle (3.5, -14.5);
+    \node[font=\footnotesize\bfseries, orange!60] at (0, -8.2) {Azure Cloud};
+
+    \end{tikzpicture}
+    }
+    \caption{Enterprise Network Architecture with Azure Private Link. Processing components are shown in rounded boxes; data stores in rectangular boxes. All edges are labeled with the data exchanged between components. Traffic flows through a private connection and never traverses the public internet.}
+    \label{fig:enterprise_network}
 \end{figure}
 
 Setting up Private Link involved organizational coordination, including approval processes, security reviews, configuration testing, and documentation, which are standard steps for enterprise deployments in regulated industries. The technical configuration itself was manageable once approvals were obtained, requiring approximately one month from initial request to operational deployment.

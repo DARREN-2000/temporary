@@ -179,8 +179,40 @@ The final phase moved from controlled experiments to the real world. We integrat
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{bilder/integration.png}
-    \caption{Enterprise Integration Strategy. This diagram illustrates the solution to the network isolation challenge using Azure Private Link to connect self-hosted runners to cloud LLM services.}
+    \resizebox{\textwidth}{!}{
+    \begin{tikzpicture}[
+        comp/.style={draw, rectangle, rounded corners=6pt, minimum width=3.5cm, minimum height=1cm, align=center, fill=blue!8, thick, font=\small},
+        datastore/.style={draw, rectangle, minimum width=3.5cm, minimum height=1cm, align=center, fill=green!10, thick, font=\small},
+        fw/.style={draw, rectangle, minimum width=3cm, minimum height=1cm, align=center, fill=red!8, thick, font=\small},
+        arrow/.style={->, >=stealth, thick},
+        blocked/.style={->, >=stealth, thick, dashed, gray},
+        edgelabel/.style={font=\footnotesize, fill=white, inner sep=1pt}
+    ]
+
+    % --- Corporate side ---
+    \node[comp] (runner) at (0, 0) {Self-hosted\\CI/CD Runner};
+    \node[fw] (firewall) at (5, 0) {Corporate\\Firewall};
+
+    % --- Azure side ---
+    \node[comp] (privatelink) at (10, 0) {Azure\\Private Link};
+    \node[comp] (llm) at (15, 0) {Azure OpenAI\\LLM Service};
+
+    % --- Arrows ---
+    \draw[arrow] (runner) -- node[edgelabel, above]{API request} (firewall);
+    \draw[arrow] (firewall) -- node[edgelabel, above]{Private\\connection} (privatelink);
+    \draw[arrow] (privatelink) -- node[edgelabel, above]{LLM prompt} (llm);
+    \draw[arrow] (llm.south) -- ++(0,-0.8) -| node[edgelabel, pos=0.25, below]{Generated fuzz driver} (runner.south);
+
+    % --- Boundaries ---
+    \draw[thick, dashed, blue!50] (-2, 1.5) rectangle (2, -2);
+    \node[font=\footnotesize\bfseries, blue!60] at (0, 1.8) {CARIAD Network};
+
+    \draw[thick, dashed, orange!50] (8, 1.5) rectangle (17, -2);
+    \node[font=\footnotesize\bfseries, orange!60] at (12.5, 1.8) {Azure Cloud};
+
+    \end{tikzpicture}
+    }
+    \caption{Enterprise Integration Strategy. The self-hosted CI/CD runner communicates with Azure OpenAI through a Private Link endpoint, routing traffic through the corporate firewall over a private connection without traversing the public internet.}
     \label{fig:enterprise_integration}
 \end{figure}
 
