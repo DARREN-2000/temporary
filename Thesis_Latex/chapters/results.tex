@@ -56,7 +56,7 @@ The ``Successful Tests'' column requires explanation, as this metric counts test
 
 Line coverage measures the percentage of source code lines executed during testing. It is the standard metric we use throughout this thesis for evaluating fuzz driver quality (measured via \texttt{llvm-cov}). Gemma~3 27B achieved the highest coverage at 45.06\%, slightly outperforming the larger Qwen~2.5-Coder 32B, which reached 43.08\%. This was unexpected. The smaller model outperformed the larger one while using fewer tokens. We initially suspected measurement error, but the results held across multiple runs with consistent reproducibility.
 
-That said, these numbers require context. While 45\% coverage represents a meaningful automated achievement, we examined several comparable manually-written fuzz drivers in the OSS-Fuzz corpus for yaml-cpp and similar parsing libraries (pugixml, RapidJSON, libxml2). These expert-crafted drivers typically achieve 60 to 80\% line coverage, based on coverage reports available through the OSS-Fuzz project dashboards\footnote{\url{https://introspector.oss-fuzz.com/}}. Our best AI-generated driver falls short of expert human work in absolute coverage terms. The value proposition is not matching expert coverage levels but automating fuzz driver creation, a task that would otherwise require considerable manual effort.
+That said, these numbers require context. While 45\% coverage represents a meaningful automated achievement, we examined several comparable manually-written fuzz drivers in the OSS-Fuzz corpus for yaml-cpp and similar parsing libraries (pugixml, RapidJSON, libxml2). These expert-crafted drivers typically achieve 60 to 80\% line coverage, based on coverage reports available through the OSS-Fuzz project dashboards\footnote{\url{https://introspector.oss-fuzz.com/}}. Our best AI-generated driver falls short of expert human work in absolute coverage terms. The value proposition is not matching expert coverage levels but automating fuzz driver creation, a task that would otherwise require 2 to 8 hours of manual engineering per target (see Section~\ref{sec:results_cost_manual}).
 
 Phi-4 14B showed lower coverage at 34.26\% despite generating more unique test cases (2,220 vs 2,050). It required significantly more tokens, 71.5k compared to Gemma's 40.2k, making it considerably less efficient for production use. More test cases do not necessarily mean better coverage.
 
@@ -234,7 +234,7 @@ With 709 examples, the extended dataset produced the largest improvements with 3
 
 Training data quality and quantity both matter, though quality appears more important. The 709-example dataset outperformed the 172-example dataset, but the improvement was incremental rather than dramatic. More diverse examples help the model generalize, but there are diminishing returns.
 
-One key insight is that a fine-tuned small model can match larger models while using markedly fewer computational resources. This makes enterprise deployment practical, as it does not require expensive GPU infrastructure to run effective fuzz driver generation.
+One key insight is that a fine-tuned small model can match larger models while using markedly fewer computational resources. This makes enterprise deployment practical, as it does not require dedicated GPU infrastructure (typically \$10,000+ per GPU unit) to run effective fuzz driver generation.
 
 However, we should note the limitations. The fine-tuned 1.5B model still does not match the coverage achieved by the larger Qwen 32B or Gemma 27B models. What it offers is efficiency, acceptable coverage at much lower cost and resource requirements.
 
@@ -270,7 +270,7 @@ Enterprise & \euro{}5.50 & \euro{}121.00 & \euro{}1,452.00 & Complete automation
 \end{tabular}
 \end{table}
 
-Even at the enterprise level with complete automation, annual costs stay under \euro{}1,500. This is minimal compared to manual security testing approaches. However, this represents only the direct infrastructure costs.
+Even at the enterprise level with complete automation, annual costs stay under \euro{}1,500, which is less than 2\% of a single security engineer's annual salary (approximately \euro{}80,000 to \euro{}120,000 at industry rates). However, this represents only the direct infrastructure costs.
 
 
 \subsection{Comparison with Manual Testing}

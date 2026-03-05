@@ -87,7 +87,7 @@ Security is different. The adversary is intelligent, creative, and unconstrained
     \label{fig:fuzzing_concept}
 \end{figure}
 
-The fuzzing architecture begins with the human element. The developer writes the initial source code and possesses the critical domain knowledge required to understand the intended software logic. Because an automated system cannot inherently know what specific areas to target, the developer must manually define the testing scope and create the fuzz driver, a small program that translates raw fuzzer inputs into meaningful API calls. This manual creation step requires significant effort and specialized expertise, representing the primary bottleneck that this research aims to automate.
+The fuzzing architecture begins with the human element. The developer writes the initial source code and possesses the critical domain knowledge required to understand the intended software logic. Because an automated system cannot inherently know what specific areas to target, the developer must manually define the testing scope and create the fuzz driver, a small program that translates raw fuzzer inputs into meaningful API calls. This manual creation step typically requires 2 to 8 hours of specialized engineering time per target library~\cite{OSSFuzzBugs2021}, representing the primary bottleneck that this research aims to automate.
 
 Once the fuzz driver and seed inputs are supplied, the automated fuzzing engine takes control. As illustrated in Figure~\ref{fig:fuzzing_concept}, the engine continuously executes the fuzz driver against the target software, feeding it generated inputs while actively monitoring for unexpected behavior. If a crash is detected, the engine extracts the crash data, and a vulnerability report is generated. Conversely, if the execution completes without error, the engine collects coverage data to understand which code paths were reached. An input mutation step then creates slightly altered variations of the previous inputs. These mutated inputs are fed back into the execution loop, driving a continuous cycle of automated vulnerability discovery.
 
@@ -193,7 +193,7 @@ This is the fundamental question. A driver that fails to compile is useless. One
 
 \textbf{RQ2 (Optimization): Does model size determine fuzz driver quality, or can smaller models with domain-specific training match or exceed larger general purpose models?}
 
-Everyone in machine learning hears that bigger models are better. Models with more parameters consistently outperform smaller ones on standard benchmarks \cite{Jiang2023}. The largest models show impressive capabilities across diverse tasks. They are also expensive, require substantial compute, and often have rate limits. But domain-specific tuning offers an alternative path \cite{Hu2021}. Instead of relying on the general knowledge of massive models, we adapt smaller models to specific tasks.
+Everyone in machine learning hears that bigger models are better. Models with more parameters consistently outperform smaller ones on standard benchmarks \cite{Jiang2023}. The largest models show impressive capabilities across diverse tasks. They are also expensive (cloud API costs of \$0.01--\$0.06 per 1k tokens, or dedicated GPU hardware costing \$10,000+ per unit), and often have rate limits. But domain-specific tuning offers an alternative path \cite{Hu2021}. Instead of relying on the general knowledge of massive models, we adapt smaller models to specific tasks.
 
 We wanted to know: which approach wins for fuzz driver generation?
 
