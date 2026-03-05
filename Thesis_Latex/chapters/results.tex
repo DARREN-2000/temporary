@@ -56,7 +56,7 @@ The ``Successful Tests'' column requires explanation, as this metric counts test
 
 Line coverage measures the percentage of source code lines executed during testing. It is the standard metric we use throughout this thesis for evaluating fuzz driver quality (measured via \texttt{llvm-cov}). Gemma~3 27B achieved the highest coverage at 45.06\%, slightly outperforming the larger Qwen~2.5-Coder 32B, which reached 43.08\%. This was unexpected. The smaller model outperformed the larger one while using fewer tokens. We initially suspected measurement error, but the results held across multiple runs with consistent reproducibility.
 
-That said, these numbers require context. While 45\% coverage represents a meaningful automated achievement, we examined several comparable manually-written fuzz drivers in the OSS-Fuzz corpus for yaml-cpp and similar parsing libraries (pugixml, RapidJSON, libxml2). These expert-crafted drivers typically achieve 60 to 80\% line coverage, based on coverage reports available through the OSS-Fuzz project dashboards\footnote{\url{https://introspector.oss-fuzz.com/}}. Our best AI-generated driver falls short of expert human work in absolute coverage terms. The value proposition is not matching expert coverage levels but automating fuzz driver creation, a task that would otherwise require 2 to 8 hours of manual engineering per target (see Section~\ref{sec:results_cost_manual}).
+That said, these numbers require context. While 45\% coverage represents a meaningful automated achievement, we examined several comparable manually-written fuzz drivers in the OSS-Fuzz corpus for yaml-cpp and similar parsing libraries (pugixml, RapidJSON, libxml2). These expert-crafted drivers typically achieve 60 to 80\% line coverage, based on coverage reports available through the OSS-Fuzz project dashboards\footnote{\url{https://introspector.oss-fuzz.com/}}. Our best AI-generated driver (Gemma~3 at 45.06\%) reaches approximately 56 to 75\% of the expert-level range, falling 15 to 35 percentage points short. The value proposition is not matching expert coverage levels but automating fuzz driver creation, a task that would otherwise require 2 to 8 hours of manual engineering per target (see Section~\ref{sec:results_cost_manual}).
 
 Phi-4 14B showed lower coverage at 34.26\% despite generating more unique test cases (2,220 vs 2,050). It required significantly more tokens, 71.5k compared to Gemma's 40.2k, making it considerably less efficient for production use. More test cases do not necessarily mean better coverage.
 
@@ -270,7 +270,7 @@ Enterprise & \euro{}5.50 & \euro{}121.00 & \euro{}1,452.00 & Complete automation
 \end{tabular}
 \end{table}
 
-Even at the enterprise level with complete automation, annual costs stay under \euro{}1,500, which is less than 2\% of a single security engineer's annual salary (approximately \euro{}80,000 to \euro{}120,000 at industry rates). However, this represents only the direct infrastructure costs.
+Even at the enterprise level with complete automation, annual costs stay under \euro{}1,500 (Table~\ref{tab:cost_scenarios}), which is less than 2\% of a single security engineer's annual salary (approximately \euro{}80,000 to \euro{}120,000 at industry rates). To put this in perspective: the enterprise-level annual cost of \euro{}1,452 is comparable to two days of engineering labor, yet the automated pipeline can generate and evaluate drivers continuously throughout the year. However, this represents only the direct infrastructure costs.
 
 
 \subsection{Comparison with Manual Testing}
@@ -278,7 +278,7 @@ Even at the enterprise level with complete automation, annual costs stay under \
 
 Industry estimates for manual fuzz driver development:
 \begin{itemize}
-    \item Senior security engineer hourly rate: \euro{}80 to 120 (based on published industry benchmarks)
+    \item Senior security engineer hourly rate: \euro{}80 to \euro{}120 per hour (based on published industry benchmarks for Western European markets)
     \item Time to write an effective fuzz driver: 2 to 8 hours per target (lower end for well-documented parsing APIs, upper end for complex C++ libraries with heavy template usage)
     \item Annual cost for security engineering resources: varies by market and seniority
 \end{itemize}
