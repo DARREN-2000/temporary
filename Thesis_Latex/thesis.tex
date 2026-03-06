@@ -300,12 +300,12 @@ Listing~\ref{lst:appendix_yml} shows the complete GitHub Actions workflow config
 \begin{lstlisting}[language=yaml, caption={Complete GitHub Actions Workflow with Azure OpenAI Integration}, label={lst:appendix_yml}]
 name: fuzz
 env:
-  PROJ_NAME: "INIFUZZ"
+  PROJ_NAME: "<project-name>"
   VERSION: "0.1"
   ARTIFACTORY_CORPUS_URL: "https://<corporate-artifactory>.example.com/..."
 jobs:
   fuzz:
-    runs-on: [auto-buildah-base]
+    runs-on: [<self-hosted-runner>]
     env:
       JFROG_API_KEY: ${{ secrets.JFROG_API_KEY }}
       ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}

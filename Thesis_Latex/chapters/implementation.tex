@@ -294,7 +294,7 @@ Quality control was important. We manually reviewed a sample of the extracted dr
 
 \subsection{LoRA Configuration and Training}
 
-We used Low-Rank Adaptation (LoRA) \cite{Hu2021} rather than full fine-tuning. Full fine-tuning updates all model weights, which requires enormous compute resources. LoRA adds small trainable matrices alongside the frozen base model. This reduces memory requirements by a large margin while achieving similar results on specialized tasks.
+We used Low-Rank Adaptation (LoRA) \cite{Hu2021} rather than full fine-tuning. Full fine-tuning updates all model weights, which for a 7B-parameter model requires multiple high-end GPUs and days of training. LoRA adds small trainable matrices alongside the frozen base model. For our 1.5B model, this reduced the number of trainable parameters from 1.5 billion to approximately 4.7 million (a 99.7\% reduction), enabling training on a single consumer GPU while achieving similar results on specialized tasks.
 
 Our LoRA configuration:
 
