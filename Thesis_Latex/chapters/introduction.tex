@@ -92,7 +92,7 @@ The fuzzing architecture begins with the human element. The developer writes the
 Once the fuzz driver and seed inputs are supplied, the automated fuzzing engine takes control. As illustrated in Figure~\ref{fig:fuzzing_concept}, the engine continuously executes the fuzz driver against the target software, feeding it generated inputs while actively monitoring for unexpected behavior. If a crash is detected, the engine extracts the crash data, and a vulnerability report is generated. Conversely, if the execution completes without error, the engine collects coverage data to understand which code paths were reached. An input mutation step then creates slightly altered variations of the previous inputs. These mutated inputs are fed back into the execution loop, driving a continuous cycle of automated vulnerability discovery.
 
 
-\subsection{CI/CD Pipeline Context}
+\subsection{CI/CD/CT Pipeline Context}
 \label{sec:cicd_context}
 
 Modern software development has embraced a philosophy: integrate code frequently, test automatically, deploy rapidly. The reasoning is sound. Small, incremental changes are easier to understand and debug than large infrequent releases. Automated testing catches regressions before they spread. Fast feedback loops let developers address problems while context is fresh \cite{Humble2010, Fowler2006}.
@@ -151,7 +151,7 @@ The core principles remain: automate where possible, test early and often, and m
 
     \end{tikzpicture}%
     }
-    \caption{The Automotive CI/CD Pipeline. Data artifacts are shown in rectangular boxes; processing steps are shown in rounded boxes. Security validation (highlighted) is where fuzzing integrates into the pipeline. The feedback loop from telemetry to the source tree represents the continuous improvement cycle.}
+    \caption{The Automotive CI/CD/CT Pipeline. Data artifacts are shown in rectangular boxes; processing steps are shown in rounded boxes. Security validation (highlighted) is where fuzzing integrates into the pipeline. The feedback loop from telemetry to the source tree represents the continuous improvement cycle.}
     \label{fig:cicd_pipeline}
 \end{figure}
 
@@ -197,9 +197,9 @@ Everyone in machine learning hears that bigger models are better. Models with mo
 
 We wanted to know: which approach wins for fuzz driver generation?
 
-\textbf{RQ3 (Feasibility): Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines that are isolated from external networks while meeting performance, cost, and security requirements?}
+\textbf{RQ3 (Feasibility): Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD/CT pipelines that are isolated from external networks while meeting performance, cost, and security requirements?}
 
-Academic research often evaluates techniques in isolation, abstracting away deployment concerns. Production matters. Can the solution run within CI/CD time constraints? Does the cost fit budget limits? Can it operate under network security policies that restrict external communication? Is operational complexity acceptable?
+Academic research often evaluates techniques in isolation, abstracting away deployment concerns. Production matters. Can the solution run within CI/CD/CT time constraints? Does the cost fit budget limits? Can it operate under network security policies that restrict external communication? Is operational complexity acceptable?
 
 These questions drove our entire investigation. We were not just asking whether LLMs could generate code. We were asking whether this approach could work in a real company, dealing with real constraints.
 
@@ -208,9 +208,9 @@ These questions drove our entire investigation. We were not just asking whether 
 
 The rest of this thesis is structured as follows.
 
-\textbf{Chapter 2: Literature Review} surveys relevant research. It examines traditional AI approaches in software testing, traces the evolution of Large Language Models and their application to code generation, reviews fuzzing techniques from foundational methods through AI-enhanced approaches, and examines prior work on security integration in CI/CD pipelines.
+\textbf{Chapter 2: Literature Review} surveys relevant research. It examines traditional AI approaches in software testing, traces the evolution of Large Language Models and their application to code generation, reviews fuzzing techniques from foundational methods through AI-enhanced approaches, and examines prior work on security integration in CI/CD/CT pipelines.
 
-\textbf{Chapter 3: Methodology and Framework} presents our approach. It introduces the conceptual framework for AI-driven fuzzing using white-box techniques, describes our technical architecture design, and outlines the three research phases: local LLM evaluation, model optimization with LoRA, and enterprise CI/CD integration. We specify evaluation methodology and metrics.
+\textbf{Chapter 3: Methodology and Framework} presents our approach. It introduces the conceptual framework for AI-driven fuzzing using white-box techniques, describes our technical architecture design, and outlines the three research phases: local LLM evaluation, model optimization with LoRA, and enterprise CI/CD/CT integration. We specify evaluation methodology and metrics.
 
 \textbf{Chapter 4: Implementation} covers the concrete realization. It addresses toolchain selection, describes experimental setup for each phase, documents architectural challenges encountered during enterprise integration, and explains how we solved them.
 

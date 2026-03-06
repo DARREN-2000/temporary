@@ -174,8 +174,8 @@ Based on Phase 1 results, we selected a promising small model and applied Low Ra
 
 The goal was to adapt the model specifically for the fuzzing task while reducing computational cost. This phase addresses \textbf{RQ2} more directly: can smaller, fine-tuned models outperform larger general purpose models?
 
-\subsection{Phase 3: Enterprise CI/CD Integration}
-The final phase moved from controlled experiments to the real world. We integrated the solution into CARIAD's actual CI/CD infrastructure. This phase addresses \textbf{RQ3}: Can this approach work in a real corporate environment with real network security policies, cost constraints, and operational complexity?
+\subsection{Phase 3: Enterprise CI/CD/CT Integration}
+The final phase moved from controlled experiments to the real world. We integrated the solution into CARIAD's actual CI/CD/CT infrastructure. This phase addresses \textbf{RQ3}: Can this approach work in a real corporate environment with real network security policies, cost constraints, and operational complexity?
 
 \begin{figure}[htbp]
     \centering
@@ -190,7 +190,7 @@ The final phase moved from controlled experiments to the real world. We integrat
     ]
 
     % --- Corporate side ---
-    \node[comp] (runner) at (0, 0) {Self-hosted\\CI/CD Runner};
+    \node[comp] (runner) at (0, 0) {Self-hosted\\CI/CD/CT Runner};
     \node[fw] (firewall) at (5, 0) {Corporate\\Firewall};
 
     % --- Azure side ---
@@ -212,7 +212,7 @@ The final phase moved from controlled experiments to the real world. We integrat
 
     \end{tikzpicture}
     }
-    \caption{Enterprise Integration Strategy. The self-hosted CI/CD runner communicates with Azure OpenAI through a Private Link endpoint, routing traffic through the corporate firewall over a private connection without traversing the public internet.}
+    \caption{Enterprise Integration Strategy. The self-hosted CI/CD/CT runner communicates with Azure OpenAI through a Private Link endpoint, routing traffic through the corporate firewall over a private connection without traversing the public internet.}
     \label{fig:enterprise_integration}
 \end{figure}
 
@@ -228,7 +228,7 @@ We evaluated generated fuzz drivers using quantitative metrics to ensure objecti
     \item \textbf{Runtime Behavior:} Does the driver execute without crashing immediately? We checked if the driver actually runs or just fails instantly.
     \item \textbf{Code Coverage:} What percentage of the target library does the driver test? We measured this using standard tools (\texttt{llvm-cov}).
     \item \textbf{Vulnerability Discovery (MTTV):} We measured the Mean Time To Vulnerability, that is, how long the fuzzer needs to run before it finds a bug.
-    \item \textbf{Pipeline Latency (CI Overhead):} We measured how much extra time the AI adds to the build process. The system must stay within CARIAD's CI/CD feedback window (see Chapter~4, Section~\ref{sec:impl_phase3} for the specific performance requirements).
+    \item \textbf{Pipeline Latency (CI Overhead):} We measured how much extra time the AI adds to the build process. The system must stay within CARIAD's CI/CD/CT feedback window (see Chapter~4, Section~\ref{sec:impl_phase3} for the specific performance requirements).
     \item \textbf{Cost and Efficiency:} We calculated the exact price of generating a driver. By tracking the number of tokens (words) sent to the AI, we determined the cost in euros to prove it is cheaper than human engineering.
 \end{itemize}
 

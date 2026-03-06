@@ -9,12 +9,12 @@
 
 \textbf{Aufgabenstellung:}
 
-Modern automotive software systems exceed 100 million lines of code per vehicle, creating significant challenges for security testing at scale. Fuzz testing is an effective technique for discovering software vulnerabilities, but writing fuzz drivers requires deep API knowledge and considerable manual effort. This thesis investigates whether Large Language Models (LLMs) can automate fuzz driver generation for C/C++ automotive libraries and whether the resulting approach is viable for enterprise CI/CD pipelines.
+Modern automotive software systems exceed 100 million lines of code per vehicle, creating significant challenges for security testing at scale. Fuzz testing is an effective technique for discovering software vulnerabilities, but writing fuzz drivers requires deep API knowledge and considerable manual effort. This thesis investigates whether Large Language Models (LLMs) can automate fuzz driver generation for C/C++ automotive libraries and whether the resulting approach is viable for enterprise CI/CD/CT pipelines.
 
 The following tasks shall be addressed:
 
 \begin{enumerate}
-    \item \textbf{Literature Review:} Survey the state of the art in LLM-based code generation, fuzz testing techniques, and CI/CD pipeline security integration. Identify research gaps for automotive applications.
+    \item \textbf{Literature Review:} Survey the state of the art in LLM-based code generation, fuzz testing techniques, and CI/CD/CT pipeline security integration. Identify research gaps for automotive applications.
 
     \item \textbf{Framework Design:} Design a technical framework for automated LLM-based fuzz driver generation, comprising automated API context extraction, prompt construction, and coverage-based evaluation.
 
@@ -22,7 +22,7 @@ The following tasks shall be addressed:
 
     \item \textbf{Model Optimization:} Investigate whether domain-specific fine-tuning (LoRA) of smaller models can match or exceed larger general-purpose models in fuzz driver quality and efficiency.
 
-    \item \textbf{Enterprise Integration:} Deploy and validate the approach within a real automotive enterprise CI/CD environment (CARIAD SE), addressing network isolation, security compliance, and cost constraints.
+    \item \textbf{Enterprise Integration:} Deploy and validate the approach within a real automotive enterprise CI/CD/CT environment (CARIAD SE), addressing network isolation, security compliance, and cost constraints.
 
     \item \textbf{Analysis and Discussion:} Analyze the results with respect to effectiveness, optimization potential, and enterprise feasibility. Discuss limitations, implications for practice, and future research directions.
 \end{enumerate}

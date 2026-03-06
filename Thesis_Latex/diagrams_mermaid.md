@@ -65,7 +65,7 @@ flowchart TD
 
 ---
 
-## Figure 1.2 — The Automotive CI/CD Pipeline
+## Figure 1.2 — The Automotive CI/CD/CT Pipeline
 
 ```mermaid
 flowchart LR
@@ -103,14 +103,14 @@ flowchart LR
     style MONITOR fill:#fde8cd,stroke:#333,stroke-width:2px
 ```
 
-**Caption:** The Automotive CI/CD Pipeline. Data artifacts are shown in rectangular boxes; processing steps are shown in rounded boxes. Security validation (highlighted) is where fuzzing integrates into the pipeline. The feedback loop from telemetry to the source tree represents the continuous improvement cycle.
+**Caption:** The Automotive CI/CD/CT Pipeline. Data artifacts are shown in rectangular boxes; processing steps are shown in rounded boxes. Security validation (highlighted) is where fuzzing integrates into the pipeline. The feedback loop from telemetry to the source tree represents the continuous improvement cycle.
 
 **How to use:** Export as PNG from [mermaid.live](https://mermaid.live) and replace the TikZ block at `chapters/introduction.tex` lines 104–152 with:
 ```latex
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{bilder/cicd_pipeline_mermaid.png}
-    \caption{The Automotive CI/CD Pipeline. Data artifacts are shown in rectangular boxes; processing steps are shown in rounded boxes. Security validation (highlighted) is where fuzzing integrates into the pipeline. The feedback loop from telemetry to the source tree represents the continuous improvement cycle.}
+    \caption{The Automotive CI/CD/CT Pipeline. Data artifacts are shown in rectangular boxes; processing steps are shown in rounded boxes. Security validation (highlighted) is where fuzzing integrates into the pipeline. The feedback loop from telemetry to the source tree represents the continuous improvement cycle.}
     \label{fig:cicd_pipeline}
 \end{figure}
 ```
@@ -364,7 +364,7 @@ flowchart TD
 
 ---
 
-## Figure 4.2 — CI/CD Pipeline Workflow Diagram
+## Figure 4.2 — CI/CD/CT Pipeline Workflow Diagram
 
 ```mermaid
 flowchart TD
@@ -415,14 +415,14 @@ flowchart TD
     style UL fill:#fde8cd,stroke:#333,stroke-width:2px
 ```
 
-**Caption:** CI/CD Pipeline Workflow. Processing steps are in rounded boxes; data artifacts in rectangular boxes. The highlighted step (cifuzz spark) invokes the LLM via Azure Private Link. Corpus persistence through JFrog Artifactory enables cumulative coverage improvement across runs.
+**Caption:** CI/CD/CT Pipeline Workflow. Processing steps are in rounded boxes; data artifacts in rectangular boxes. The highlighted step (cifuzz spark) invokes the LLM via Azure Private Link. Corpus persistence through JFrog Artifactory enables cumulative coverage improvement across runs.
 
 **How to use:** Export as PNG from [mermaid.live](https://mermaid.live) and replace the TikZ block at `chapters/implementation.tex` lines 458–519 with:
 ```latex
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{bilder/cicd_workflow_mermaid.png}
-    \caption{CI/CD Pipeline Workflow. Processing steps are in rounded boxes; data artifacts in rectangular boxes. The highlighted step (cifuzz spark) invokes the LLM via Azure Private Link. Corpus persistence through JFrog Artifactory enables cumulative coverage improvement across runs.}
+    \caption{CI/CD/CT Pipeline Workflow. Processing steps are in rounded boxes; data artifacts in rectangular boxes. The highlighted step (cifuzz spark) invokes the LLM via Azure Private Link. Corpus persistence through JFrog Artifactory enables cumulative coverage improvement across runs.}
     \label{fig:cicd_workflow}
 \end{figure}
 ```
@@ -435,7 +435,7 @@ flowchart TD
 flowchart LR
     %% ===== COMPONENTS =====
     subgraph CARIAD["CARIAD Network"]
-        RUNNER(["Self-hosted<br/>CI/CD Runner"])
+        RUNNER(["Self-hosted<br/>CI/CD/CT Runner"])
     end
 
     subgraph Azure["Azure Cloud"]
@@ -462,14 +462,14 @@ flowchart LR
     style Azure fill:#fff3cd,stroke:#886,stroke-width:1px,stroke-dasharray:5
 ```
 
-**Caption:** Enterprise Integration Strategy. The self-hosted CI/CD runner communicates with Azure OpenAI through a Private Link endpoint, routing traffic through the corporate firewall over a private connection without traversing the public internet.
+**Caption:** Enterprise Integration Strategy. The self-hosted CI/CD/CT runner communicates with Azure OpenAI through a Private Link endpoint, routing traffic through the corporate firewall over a private connection without traversing the public internet.
 
 **How to use:** Export as PNG from [mermaid.live](https://mermaid.live) and replace the TikZ block at `chapters/methodology.tex` lines 180–213 with:
 ```latex
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{bilder/integration_mermaid.png}
-    \caption{Enterprise Integration Strategy. The self-hosted CI/CD runner communicates with Azure OpenAI through a Private Link endpoint, routing traffic through the corporate firewall over a private connection without traversing the public internet.}
+    \caption{Enterprise Integration Strategy. The self-hosted CI/CD/CT runner communicates with Azure OpenAI through a Private Link endpoint, routing traffic through the corporate firewall over a private connection without traversing the public internet.}
     \label{fig:enterprise_integration}
 \end{figure}
 ```
@@ -542,11 +542,11 @@ flowchart TD
 | # | Figure | File | TikZ | Mermaid | Notation |
 |---|--------|------|------|---------|----------|
 | 1 | Fig 1.1 — Fuzzing Process | introduction.tex | ✅ | ✅ | data=rect, process=rounded, top-down |
-| 2 | Fig 1.2 — Automotive CI/CD Pipeline | introduction.tex | ✅ | ✅ | data=rect, process=rounded, top-down |
+| 2 | Fig 1.2 — Automotive CI/CD/CT Pipeline | introduction.tex | ✅ | ✅ | data=rect, process=rounded, top-down |
 | 3 | Fig 3.1 — Technical Architecture | methodology.tex | ✅ | ✅ | data=rect, process=rounded, top-down, layers marked |
 | 4 | Fig 3.2 — Enterprise Integration | methodology.tex | ✅ | ✅ | components=rounded, data=rect, left-right |
 | 5 | Fig 4.1 — Eval Environment | implementation.tex | ✅ | ✅ | components=rounded, data=rect, top-down |
-| 6 | Fig 4.2 — CI/CD Workflow | implementation.tex | ✅ | ✅ | data=rect, process=rounded, top-down |
+| 6 | Fig 4.2 — CI/CD/CT Workflow | implementation.tex | ✅ | ✅ | data=rect, process=rounded, top-down |
 | 7 | Fig 6.1 — Network Architecture | discussion_conclusion.tex | ✅ | ✅ | components=rounded, data=rect, top-down, edges labeled |
 
 All diagrams use the same notation:

@@ -3,7 +3,7 @@
 \chapter{Implementation}
 \label{chap:implementation}
 
-We turned the methodology from Chapter 3 into working code and systems over the course of this implementation. The three research phases defined in Chapter~3 (Section~\ref{sec:meth_strategy}), namely Phase~1: Local LLM Evaluation (Section~\ref{sec:impl_phase1}), Phase~2: Model Optimization with LoRA (Section~\ref{sec:impl_phase2}), and Phase~3: Enterprise CI/CD Integration (Section~\ref{sec:impl_phase3}), map directly to the development progression described below. Each phase built on the previous one. The following sections cover our tool choices, the specific steps we followed, and the engineering decisions we made along the way.
+We turned the methodology from Chapter 3 into working code and systems over the course of this implementation. The three research phases defined in Chapter~3 (Section~\ref{sec:meth_strategy}), namely Phase~1: Local LLM Evaluation (Section~\ref{sec:impl_phase1}), Phase~2: Model Optimization with LoRA (Section~\ref{sec:impl_phase2}), and Phase~3: Enterprise CI/CD/CT Integration (Section~\ref{sec:impl_phase3}), map directly to the development progression described below. Each phase built on the previous one. The following sections cover our tool choices, the specific steps we followed, and the engineering decisions we made along the way.
 
 \section{Toolchain Selection and Rationale}
 \label{sec:impl_toolchain}
@@ -48,7 +48,7 @@ A token limit of 40,000 was necessary because fuzz driver generation requires ex
 
 \subsection{Development Environment}
 
-Local development happened on a MacBook Pro with an M1 Pro chip. For Linux container support on Apple Silicon, we chose Podman as our container runtime. Podman aligned well with the enterprise CI/CD runners, which also used Linux.
+Local development happened on a MacBook Pro with an M1 Pro chip. For Linux container support on Apple Silicon, we chose Podman as our container runtime. Podman aligned well with the enterprise CI/CD/CT runners, which also used Linux.
 
 \begin{lstlisting}[language=bash, caption={Podman Setup on macOS}]
 brew install podman
@@ -269,7 +269,7 @@ Most important for fine-tuning is the training data. High-quality examples of fu
 
 To build our dataset, we extracted training examples from OSS-Fuzz \cite{OSSFuzzBugs2021}. Google has fuzz-tested hundreds of open-source projects through OSS-Fuzz, and the fuzz drivers are publicly available. We focused on C and C++ drivers because those matched our target domain.
 
-It is important to note that Google also maintains OSS-Fuzz-Gen~\cite{ossfuzzgen}, an automated system that uses LLMs to generate fuzz targets for OSS-Fuzz projects. While OSS-Fuzz-Gen pursues a similar high-level goal, namely automated fuzz driver creation, it differs from our approach in several important ways. OSS-Fuzz-Gen operates within Google's infrastructure, has access to complete build logs and project metadata, and targets breadth across hundreds of projects. Our approach instead focuses on depth for a specific domain (automotive C++ libraries), uses locally deployable open-source models rather than proprietary APIs, and integrates into enterprise CI/CD pipelines with strict network isolation requirements. We used OSS-Fuzz as a \emph{training data source} for fine-tuning, not as a competing tool.
+It is important to note that Google also maintains OSS-Fuzz-Gen~\cite{ossfuzzgen}, an automated system that uses LLMs to generate fuzz targets for OSS-Fuzz projects. While OSS-Fuzz-Gen pursues a similar high-level goal, namely automated fuzz driver creation, it differs from our approach in several important ways. OSS-Fuzz-Gen operates within Google's infrastructure, has access to complete build logs and project metadata, and targets breadth across hundreds of projects. Our approach instead focuses on depth for a specific domain (automotive C++ libraries), uses locally deployable open-source models rather than proprietary APIs, and integrates into enterprise CI/CD/CT pipelines with strict network isolation requirements. We used OSS-Fuzz as a \emph{training data source} for fine-tuning, not as a competing tool.
 
 Our extraction process involved four steps:
 
@@ -351,24 +351,24 @@ More training data did not always produce proportionally better results. The 709
 
 We also tested the fine-tuned models on RapidJSON and pugixml to check generalization. Performance was similar to yaml-cpp, suggesting the fine-tuning improved general fuzz driver generation rather than overfitting to specific libraries.
 
-\section{Phase 3: Enterprise CI/CD Integration}
+\section{Phase 3: Enterprise CI/CD/CT Integration}
 \label{sec:impl_phase3}
 
-Phase 3 focused on deploying the validated approach from Phases 1 and 2 into CARIAD's production CI/CD infrastructure using Azure OpenAI \cite{azure_openai} as the LLM backend. The central question for this phase was \textbf{RQ3}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements? The transition from controlled local experiments with Ollama \cite{ollama} to enterprise deployment revealed additional infrastructure considerations that constituted the primary engineering focus of this phase.
+Phase 3 focused on deploying the validated approach from Phases 1 and 2 into CARIAD's production CI/CD/CT infrastructure using Azure OpenAI \cite{azure_openai} as the LLM backend. The central question for this phase was \textbf{RQ3}: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD/CT pipelines while meeting performance, cost, and security requirements? The transition from controlled local experiments with Ollama \cite{ollama} to enterprise deployment revealed additional infrastructure considerations that constituted the primary engineering focus of this phase.
 
 To guide the integration, we derived the following concrete requirements from CARIAD's operational context:
 
 \begin{itemize}
     \item \textbf{Performance requirements:}
     \begin{enumerate}
-        \item Driver generation must complete within the CI/CD feedback window (targeted at 15 to 30 minutes, with up to 45 minutes acceptable for complex libraries).
+        \item Driver generation must complete within the CI/CD/CT feedback window (targeted at 15 to 30 minutes, with up to 45 minutes acceptable for complex libraries).
         \item Fuzzing execution must not block the main build pipeline; it may run asynchronously.
         \item The system must support at least 10 target libraries per day without manual intervention.
     \end{enumerate}
     \item \textbf{Cost requirements:}
     \begin{enumerate}
         \item Annual infrastructure cost must remain below \euro{}2,000 for moderate usage.
-        \item The solution must not require dedicated GPU hardware on the CI/CD runners.
+        \item The solution must not require dedicated GPU hardware on the CI/CD/CT runners.
         \item Token consumption must be predictable and auditable.
     \end{enumerate}
     \item \textbf{Security requirements:}
@@ -388,7 +388,7 @@ Our initial integration strategy appeared simple in concept. The working local p
 
 \textbf{Challenge 1: Network Isolation}
 
-CARIAD operates with a zero-trust security model. CI/CD runners are isolated from the public internet, and external connections require explicit approval. Integrating cloud-based AI services within this security framework required a tailored architectural approach.
+CARIAD operates with a zero-trust security model. CI/CD/CT runners are isolated from the public internet, and external connections require explicit approval. Integrating cloud-based AI services within this security framework required a tailored architectural approach.
 
 Our initial pipeline configuration was designed for direct connectivity and was subsequently adapted for the network isolation requirements. The Azure OpenAI requests were routed through the corporate firewall, which, as expected in a zero-trust environment, did not permit direct external API access.
 
@@ -406,7 +406,7 @@ Investigation revealed that the proxy configuration scope needed refinement to s
 
 Runners use Buildah containers for isolation. Each build step runs in its own network namespace, providing strong security boundaries. External service access must be explicitly configured at the container level.
 
-\textbf{Attack model.} The container isolation addresses two distinct threat categories. First, \emph{tenant isolation}: in a shared runner environment, containers prevent one CI/CD job from accessing another's data or network connections. Buildah's rootless, daemonless architecture strengthens this boundary compared to Docker, as there is no long-running daemon with elevated privileges that could be exploited. Second, \emph{generated code containment}: since LLM-generated fuzz drivers are untrusted code, they execute inside containers with restricted privileges, no shell access, and sanitizer instrumentation (ASan/UBSan) that terminates on memory violations.
+\textbf{Attack model.} The container isolation addresses two distinct threat categories. First, \emph{tenant isolation}: in a shared runner environment, containers prevent one CI/CD/CT job from accessing another's data or network connections. Buildah's rootless, daemonless architecture strengthens this boundary compared to Docker, as there is no long-running daemon with elevated privileges that could be exploited. Second, \emph{generated code containment}: since LLM-generated fuzz drivers are untrusted code, they execute inside containers with restricted privileges, no shell access, and sanitizer instrumentation (ASan/UBSan) that terminates on memory violations.
 
 However, container isolation does \emph{not} protect against a compromised cloud provider. If the Azure infrastructure itself were malicious, it could inspect the prompts and responses. This is a fundamental limitation of any cloud-based approach and is mitigated through contractual and compliance mechanisms (Azure's SOC~2, ISO~27001, and GDPR certifications) rather than technical isolation alone. For organizations requiring protection against cloud-provider-level threats, the alternative is on-premises model deployment, which we evaluated in Phase~1 using Ollama (Section~\ref{sec:impl_phase1}).
 
@@ -467,7 +467,7 @@ We prepared a detailed business case including cost analysis (approximately \eur
 
 \textbf{Working Pipeline Configuration}
 
-Once Private Link was operational, the pipeline worked reliably. Figure~\ref{fig:cicd_workflow} illustrates the CI/CD pipeline as a workflow diagram. The full YAML configuration is provided in Appendix~\ref{sec:appendix_pipeline}.
+Once Private Link was operational, the pipeline worked reliably. Figure~\ref{fig:cicd_workflow} illustrates the CI/CD/CT pipeline as a workflow diagram. The full YAML configuration is provided in Appendix~\ref{sec:appendix_pipeline}.
 
 \begin{figure}[htbp]
     \centering
@@ -528,7 +528,7 @@ Once Private Link was operational, the pipeline worked reliably. Figure~\ref{fig
 
     \end{tikzpicture}
     }
-    \caption{CI/CD Pipeline Workflow. Processing steps are in rounded boxes; data artifacts in rectangular boxes. The highlighted step (cifuzz spark) invokes the LLM via Azure Private Link. Corpus persistence through JFrog Artifactory enables cumulative coverage improvement across runs.}
+    \caption{CI/CD/CT Pipeline Workflow. Processing steps are in rounded boxes; data artifacts in rectangular boxes. The highlighted step (cifuzz spark) invokes the LLM via Azure Private Link. Corpus persistence through JFrog Artifactory enables cumulative coverage improvement across runs.}
     \label{fig:cicd_workflow}
 \end{figure}
 
@@ -571,7 +571,7 @@ We added fallback logic, so if the LLM-generated driver fails, the pipeline fall
 
 \textbf{Security Review}
 
-Generated code running in CI/CD pipelines poses security considerations. What if the LLM generates malicious code? We addressed this concern in our security review:
+Generated code running in CI/CD/CT pipelines poses security considerations. What if the LLM generates malicious code? We addressed this concern in our security review:
 
 \begin{enumerate}
     \item The code runs inside containers with limited privileges

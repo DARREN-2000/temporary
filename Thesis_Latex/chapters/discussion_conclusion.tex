@@ -36,7 +36,7 @@ We anticipated the core technical challenge would be generating high-quality fuz
 
 Infrastructure integration constituted a major focus of the implementation effort.
 
-When we moved from local experiments to CARIAD's production environment, we identified that integrating with the corporate network architecture required additional design considerations. The CI/CD runners operated in isolated network segments by design, and external API access required explicit network path configuration. Our architecture assumed we could call LLM services from build processes, but the corporate network security policies required a tailored approach.
+When we moved from local experiments to CARIAD's production environment, we identified that integrating with the corporate network architecture required additional design considerations. The CI/CD/CT runners operated in isolated network segments by design, and external API access required explicit network path configuration. Our architecture assumed we could call LLM services from build processes, but the corporate network security policies required a tailored approach.
 
 Resolving this required evaluating several architectural approaches. The existing proxy infrastructure was configured for approved HTTP destinations, and the runner environment was designed without VPN client capabilities, consistent with its security-hardened configuration. Caching model responses was considered but would not support dynamic code generation effectively.
 
@@ -116,7 +116,7 @@ The answer is affirmative, though several conditions apply.
 
 The experiments demonstrated that specialized code models can generate fuzz drivers meeting these criteria. Results from Chapter~5, Section~\ref{sec:results_successful}, show that the best-performing models achieved 43 to 45\% line coverage on yaml-cpp.
 
-It is important to contextualize this finding relative to prior work. Previous studies such as TitanFuzz~\cite{TitanFuzz2022} and Fuzz4All~\cite{Fuzz4All2023} have demonstrated that LLMs can generate fuzz targets for Python libraries and deep learning frameworks. The novel contribution of our work is threefold: (1) we demonstrate this capability specifically for C/C++ libraries with libFuzzer-style drivers, which impose stricter structural requirements than Python test cases; (2) we provide a systematic comparison across 14 models showing that model selection has a decisive impact on success; and (3) we validate the approach within an enterprise CI/CD pipeline under real network isolation and security constraints, which no prior work has reported.
+It is important to contextualize this finding relative to prior work. Previous studies such as TitanFuzz~\cite{TitanFuzz2022} and Fuzz4All~\cite{Fuzz4All2023} have demonstrated that LLMs can generate fuzz targets for Python libraries and deep learning frameworks. The novel contribution of our work is threefold: (1) we demonstrate this capability specifically for C/C++ libraries with libFuzzer-style drivers, which impose stricter structural requirements than Python test cases; (2) we provide a systematic comparison across 14 models showing that model selection has a decisive impact on success; and (3) we validate the approach within an enterprise CI/CD/CT pipeline under real network isolation and security constraints, which no prior work has reported.
 
 However, the qualifications matter. Not all models succeed. General-purpose models, even large ones, frequently did not produce usable output. Model selection matters. In practice, the question ``can LLMs do this'' should more precisely be ``which LLMs can do this, and under what conditions.''
 
@@ -130,11 +130,11 @@ Evidence from Chapter~5, Section~\ref{sec:results_successful}, indicates that th
 
 This finding has practical implications. Organizations deploying LLM-based fuzzing should focus on models with recent architectures and high-quality training data rather than selecting solely based on size or code-specialization labels. Fine-tuning smaller models offers a cost-effective alternative when the target task is well-defined.
 
-\textbf{RQ3: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD pipelines while meeting performance, cost, and security requirements?}
+\textbf{RQ3: Can LLM-assisted fuzz driver generation be integrated into secure enterprise CI/CD/CT pipelines while meeting performance, cost, and security requirements?}
 
 Integration is feasible, but requires approximately one month of infrastructure coordination (security review, Azure Private Link provisioning, DNS configuration, and network testing).
 
-The performance requirement was met. As defined in Chapter~4 (Section~\ref{sec:impl_phase3}), the performance requirements specified that driver generation must complete within the CI/CD feedback window (targeted at 15 to 30 minutes, with up to 45 minutes acceptable for complex libraries) and that fuzzing execution must not block the main build pipeline. Driver generation completed within 10 to 43 minutes depending on the model (see Table~\ref{tab:model_performance}), with the best models (Qwen~2.5-Coder 32B, Gemma~3 27B) completing in approximately 33 minutes. While this slightly exceeds the 30-minute target for complex libraries, it remains within the acceptable range for asynchronous pipeline execution. Fuzzing execution runs asynchronously without blocking developer feedback.
+The performance requirement was met. As defined in Chapter~4 (Section~\ref{sec:impl_phase3}), the performance requirements specified that driver generation must complete within the CI/CD/CT feedback window (targeted at 15 to 30 minutes, with up to 45 minutes acceptable for complex libraries) and that fuzzing execution must not block the main build pipeline. Driver generation completed within 10 to 43 minutes depending on the model (see Table~\ref{tab:model_performance}), with the best models (Qwen~2.5-Coder 32B, Gemma~3 27B) completing in approximately 33 minutes. While this slightly exceeds the 30-minute target for complex libraries, it remains within the acceptable range for asynchronous pipeline execution. Fuzzing execution runs asynchronously without blocking developer feedback.
 
 The cost requirement was met. As detailed in Chapter~5, Section~\ref{sec:results_economics}, enterprise deployment costs (\euro{}74 to \euro{}1,452 annually) represent less than 2\% of a single security engineer's salary, well within the \euro{}2,000 annual budget cap defined in Section~\ref{sec:impl_phase3}.
 
@@ -224,7 +224,7 @@ Software complexity continues to grow. Modern vehicles contain millions of lines
 The cost analysis from Chapter~5, Section~\ref{sec:results_economics}, shows that even at the enterprise usage level, annual costs remain under \euro{}1,500. We recommend a phased adoption approach: start with non safety-critical subsystems like infotainment or connectivity features, build confidence and collect metrics, then gradually expand to more critical systems as the approach proves reliable.
 
 
-\subsection{Enterprise CI/CD Deployment Patterns}
+\subsection{Enterprise CI/CD/CT Deployment Patterns}
 \label{sec:discussion_enterprise_challenges}
 
 Our integration experience at CARIAD (detailed in Chapter~4) illustrates deployment patterns applicable to other enterprises. We identify four main approaches for integrating LLM services into security-constrained environments:
@@ -270,7 +270,7 @@ This thesis makes the following contributions:
 \begin{enumerate}
     \item \textbf{Empirical model evaluation:} A systematic comparison of 14 LLMs for C/C++ fuzz driver generation, establishing that model architecture and training quality matter more than size or specialization label (Chapter~5, Sections~\ref{sec:results_successful}--\ref{sec:results_unsuccessful}).
     \item \textbf{Fine-tuning for efficiency:} Demonstration that LoRA fine-tuning of a 1.5B model achieves 33\% faster generation and 55\% fewer tokens while maintaining driver quality (Chapter~5, Section~\ref{sec:results_optimization}).
-    \item \textbf{Enterprise integration architecture:} A documented end-to-end architecture for deploying LLM-assisted fuzzing in secure enterprise CI/CD pipelines using Azure Private Link (Chapter~4, Section~\ref{sec:impl_phase3}).
+    \item \textbf{Enterprise integration architecture:} A documented end-to-end architecture for deploying LLM-assisted fuzzing in secure enterprise CI/CD/CT pipelines using Azure Private Link (Chapter~4, Section~\ref{sec:impl_phase3}).
     \item \textbf{Economic analysis:} A cost framework showing enterprise deployment costs remain below \euro{}1,500 annually (Chapter~5, Section~\ref{sec:results_economics}).
 \end{enumerate}
 

@@ -1,6 +1,6 @@
 \chapter*{Abstract}
 
-Modern automotive software exceeds 100 million lines of code per vehicle, making security testing essential under ISO~26262 and UNECE~WP.29. Fuzz testing effectively discovers vulnerabilities, but writing fuzz drivers requires deep API knowledge that many teams lack. This thesis investigates whether Large Language Models~(LLMs) can automate fuzz driver generation for C/C++ libraries and whether the approach is viable for enterprise CI/CD pipelines.
+Modern automotive software exceeds 100 million lines of code per vehicle, making security testing essential under ISO~26262 and UNECE~WP.29. Fuzz testing effectively discovers vulnerabilities, but writing fuzz drivers requires deep API knowledge that many teams lack. This thesis investigates whether Large Language Models~(LLMs) can automate fuzz driver generation for C/C++ libraries and whether the approach is viable for enterprise CI/CD/CT pipelines.
 
 We evaluated 14~LLMs (1.5B--46.7B parameters) on \texttt{yaml-cpp} and additional C++ targets. The results were counterintuitive: larger models did not perform better. General-purpose models such as Yi~(34B) produced non-functional drivers, and Mixtral~(46.7B) could not be evaluated due to hardware constraints. In contrast, Gemma~3~(27B) achieved 45.06\% line coverage and Qwen~2.5-Coder~(32B) reached 43.08\%. Several code-specialized models including CodeLlama~(34B) also failed, showing that neither size nor specialization label alone predicts success.
 
@@ -9,4 +9,4 @@ Fine-tuning a compact 1.5B model with Low-Rank Adaptation~(LoRA) on OSS-Fuzz dri
 Overall, LLM-based fuzz driver generation is technically viable for automotive security testing when models are chosen carefully and infrastructure is adapted to enterprise constraints.
 
 \vspace{0.5cm}
-\noindent \textbf{Keywords:} Large Language Models, Fuzz Testing, Automotive Security, CI/CD Integration, LoRA Fine-Tuning, ISO~26262, Code Coverage.
+\noindent \textbf{Keywords:} Large Language Models, Fuzz Testing, Automotive Security, CI/CD/CT Integration, LoRA Fine-Tuning, ISO~26262, Code Coverage.

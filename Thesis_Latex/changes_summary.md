@@ -6,7 +6,7 @@ This document lists every professor comment, what was in the original thesis, an
 
 ## Latest Changes (Session 8)
 
-### Figure 1.2 (CI/CD Pipeline) redesigned
+### Figure 1.2 (CI/CD/CT Pipeline) redesigned
 **Issue:** Figure 1.2 used a PNG image (`bilder/cicd.png`) that did NOT follow the professor's data/process notation rule. Boxes were directly connected without alternating data→process→data.
 
 | Before | After |
@@ -56,11 +56,11 @@ This document lists every professor comment, what was in the original thesis, an
 ### Mermaid diagrams
 All 7 diagrams now have both TikZ (in .tex files) and Mermaid (in `diagrams_mermaid.md`):
 - Fig 1.1 — Fuzzing Process
-- Fig 1.2 — Automotive CI/CD Pipeline (NEW)
+- Fig 1.2 — Automotive CI/CD/CT Pipeline (NEW)
 - Fig 3.1 — Technical Architecture
 - Fig 3.2 — Enterprise Integration
 - Fig 4.1 — Evaluation Environment
-- Fig 4.2 — CI/CD Workflow
+- Fig 4.2 — CI/CD/CT Workflow
 - Fig 6.1 — Network Architecture
 
 ---
@@ -210,7 +210,7 @@ All 7 diagrams now have both TikZ (in .tex files) and Mermaid (in `diagrams_merm
 
 | Before | After |
 |--------|-------|
-| "baseline assessment, model evaluation, and fine-tuning" | "Phase 1: Local LLM Evaluation, Phase 2: Model Optimization with LoRA, and Phase 3: Enterprise CI/CD Integration" (matching Chapter 3 exactly) |
+| "baseline assessment, model evaluation, and fine-tuning" | "Phase 1: Local LLM Evaluation, Phase 2: Model Optimization with LoRA, and Phase 3: Enterprise CI/CD/CT Integration" (matching Chapter 3 exactly) |
 | **File:** `chapters/implementation.tex` line 6 | Same location |
 
 ### Comment 18: Example prompt
@@ -250,7 +250,7 @@ All 7 diagrams now have both TikZ (in .tex files) and Mermaid (in `diagrams_merm
 
 | Before | After |
 |--------|-------|
-| No comparison | Added paragraph comparing: Google infra vs enterprise CI/CD, breadth (300+ projects) vs depth (automotive), cloud-only vs hybrid local/cloud. Referenced `\cite{ossfuzzgen}` |
+| No comparison | Added paragraph comparing: Google infra vs enterprise CI/CD/CT, breadth (300+ projects) vs depth (automotive), cloud-only vs hybrid local/cloud. Referenced `\cite{ossfuzzgen}` |
 | **File:** `chapters/implementation.tex` line 272 | New paragraph |
 
 ### Comment 23: Training libraries representative for automotive?
@@ -318,7 +318,7 @@ All 7 diagrams now have both TikZ (in .tex files) and Mermaid (in `diagrams_merm
 
 | Before | After |
 |--------|-------|
-| No automotive connection mentioned | Added: "YAML is widely used in build systems, CI/CD pipelines, and deployment configurations across the automotive industry. The yaml-cpp library is found in several public repositories within automotive organizations including CARIAD." |
+| No automotive connection mentioned | Added: "YAML is widely used in build systems, CI/CD/CT pipelines, and deployment configurations across the automotive industry. The yaml-cpp library is found in several public repositories within automotive organizations including CARIAD." |
 | **File:** `chapters/results.tex` line 17 | New sentence |
 
 ### Comment 31: Additional targets automotive connection
@@ -450,7 +450,7 @@ All 7 diagrams now have both TikZ (in .tex files) and Mermaid (in `diagrams_merm
 
 | Before | After |
 |--------|-------|
-| Just restated that LLMs can generate drivers | Added threefold novelty: (1) C/C++ libFuzzer-style drivers specifically, (2) systematic comparison across 14 models of varying size and specialization, (3) validation within enterprise CI/CD pipeline with real constraints |
+| Just restated that LLMs can generate drivers | Added threefold novelty: (1) C/C++ libFuzzer-style drivers specifically, (2) systematic comparison across 14 models of varying size and specialization, (3) validation within enterprise CI/CD/CT pipeline with real constraints |
 | **File:** `chapters/discussion_conclusion.tex` lines 113–123 | Expanded paragraph |
 
 ### Comment 47: Performance = timing
@@ -525,7 +525,7 @@ All 6 diagrams have **both TikZ (embedded in .tex) and Mermaid (in diagrams_merm
 | 2 | Fig 3.1 — Technical Architecture | Top-down | ✅ | ✅ | data=rect, process=rounded, layers marked, contributions highlighted |
 | 3 | Fig 3.2 — Enterprise Integration | Left-right | ✅ | ✅ | components=rounded, data=rect |
 | 4 | Fig 4.1 — Eval Environment | Top-down | ✅ | ✅ | components=rounded, data=rect |
-| 5 | Fig 4.2 — CI/CD Workflow | Top-down | ✅ | ✅ | data=rect, process=rounded |
+| 5 | Fig 4.2 — CI/CD/CT Workflow | Top-down | ✅ | ✅ | data=rect, process=rounded |
 | 6 | Fig 6.1 — Network Architecture | Top-down | ✅ | ✅ | components=rounded, data=rect, all edges labeled |
 
 **Consistent notation across ALL diagrams:**
@@ -598,7 +598,7 @@ An examiner who checks the original model documentation would immediately catch 
 
 | Location | Before | After |
 |----------|--------|-------|
-| methodology.tex L231 | "15-30 minute window developers expect" (no source) | References Chapter 4 requirements: "CARIAD's CI/CD feedback window (see Chapter~4, Section~\ref{sec:impl_phase3})" |
+| methodology.tex L231 | "15-30 minute window developers expect" (no source) | References Chapter 4 requirements: "CARIAD's CI/CD/CT feedback window (see Chapter~4, Section~\ref{sec:impl_phase3})" |
 
 ---
 
