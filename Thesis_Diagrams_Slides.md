@@ -428,27 +428,29 @@ flowchart TD
 %%{init: {"theme": "base", "themeVariables": {"fontSize": "18px"}, "flowchart": {"diagramPadding": 24, "nodeSpacing": 50, "rankSpacing": 60}} }%%
 flowchart TD
 
-    INPUT["Input  x"]
+    INPUT["Input vector  x ∈ ℝ^d"]
 
-    subgraph frozen_path ["Frozen Path  (no gradient)"]
-        W["Pre-trained Weight  W\n❄ not updated during training"]
+    subgraph frozen_path ["Frozen Pretrained Path"]
+        W["Frozen linear layer\nWx\nW ∈ ℝ^(d×d)\n❄ weights not updated"]
     end
 
-    subgraph lora_path ["LoRA Adapter  (trainable)"]
+    subgraph lora_path ["LoRA Update Branch (trainable)"]
         DROP(["Dropout"])
-        A["Matrix A\ndown-project  d → r"]
-        B["Matrix B\nup-project  r → d"]
+        A["Matrix A\nDown-projection\nA ∈ ℝ^(r×d)"]
+        B["Matrix B\nUp-projection\nB ∈ ℝ^(d×r)"]
+        SCALE["Scaling\nα / r"]
     end
 
-    ADD(["➕  Add\nh = Wx + BAx"])
-    OUTPUT["Output  h"]
+    ADD(["Residual Addition\nh = Wx + (α/r)BAx"])
+    OUTPUT["Layer Output  h"]
 
     INPUT  --> W
     INPUT  --> DROP
     DROP   --> A
     A      --> B
+    B      --> SCALE
     W      --> ADD
-    B      --> ADD
+    SCALE  --> ADD
     ADD    --> OUTPUT
 
     style INPUT  fill:#dce6f1,stroke:#333,stroke-width:2px
@@ -456,6 +458,7 @@ flowchart TD
     style A      fill:#d4edda,stroke:#155724,stroke-width:2px
     style B      fill:#d4edda,stroke:#155724,stroke-width:2px
     style DROP   fill:#fde8cd,stroke:#333,stroke-width:2px
+    style SCALE  fill:#fde8cd,stroke:#333,stroke-width:2px
     style ADD    fill:#fde8cd,stroke:#333,stroke-width:2px
     style OUTPUT fill:#dce6f1,stroke:#333,stroke-width:2px
 
@@ -463,7 +466,7 @@ flowchart TD
     style lora_path   fill:#edfaf1,stroke:#27ae60,stroke-width:1px,stroke-dasharray:5
 ```
 
-**Caption:** LoRA adds a small trainable bypass path (A then B) alongside each frozen pre-trained weight W. Only the low-rank matrices A and B are updated during fine-tuning; the base model weights remain unchanged.
+**Caption:** LoRA inserts a trainable low-rank bypass (A → B → scale) alongside each frozen weight W. The output is the residual sum h = Wx + (α/r)BAx, where only matrices A and B are updated during fine-tuning.
 
 ---
 
