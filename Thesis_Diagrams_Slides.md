@@ -422,6 +422,124 @@ flowchart TD
 
 ---
 
+## Figure LoRA — Low-Rank Adaptation (LoRA) Configuration
+
+> **What this diagram shows:**
+> The left column traces how LoRA adds a low-rank bypass path alongside the frozen pre-trained weight matrix for a single attention projection.
+> The right column lists all four target modules that each receive their own independent LoRA adapter.
+> Both halves are connected at the top (input token embedding) and bottom (adapted output), giving a landscape shape that fills a 16:9 slide.
+
+```mermaid
+%%{init: {"theme": "base", "themeVariables": {"fontSize": "17px"}, "flowchart": {"diagramPadding": 28, "nodeSpacing": 45, "rankSpacing": 58}} }%%
+flowchart TD
+
+    %% ================================================================
+    %%  SHARED INPUT
+    %% ================================================================
+    INPUT["Input Token Embedding<br/><i>x  ∈  ℝ<sup>d</sup>,  dtype = float16</i>"]
+
+    %% ================================================================
+    %%  LEFT COLUMN — LoRA adapter path (one projection shown)
+    %% ================================================================
+    subgraph LoRA_Adapter ["LoRA Adapter (applied to each target module)"]
+        direction TB
+
+        FROZEN["Frozen Pre-trained Weight<br/><i>W ∈ ℝ<sup>d×d</sup> — not updated</i>"]
+        DROP(["Dropout<br/><i>p = 0.1 — prevents overfitting</i>"])
+        A["Low-Rank Matrix A<br/><i>A ∈ ℝ<sup>r×d</sup>,  r = 16<br/>randomly initialised</i>"]
+        B["Low-Rank Matrix B<br/><i>B ∈ ℝ<sup>d×r</sup>,  r = 16<br/>zero-initialised</i>"]
+        SCALE(["Scale &amp; Merge<br/><i>ΔW = (α / r) · B · A<br/>α = 32,  r = 16  →  scale = 2.0</i>"])
+        MERGED["Adapted Weight<br/><i>W' = W + ΔW</i>"]
+    end
+
+    %% ================================================================
+    %%  RIGHT COLUMN — target modules
+    %% ================================================================
+    subgraph Target_Modules ["Target Attention Modules (fine-tuned)"]
+        direction TB
+        QPROJ(["q_proj<br/><i>Query projection</i>"])
+        VPROJ(["v_proj<br/><i>Value projection</i>"])
+        KPROJ(["k_proj<br/><i>Key projection</i>"])
+        OPROJ(["o_proj<br/><i>Output projection</i>"])
+    end
+
+    %% ================================================================
+    %%  BOTTOM — output & persistence
+    %% ================================================================
+    OUTPUT["Adapted Hidden State<br/><i>h = W'x,  dtype = float16</i>"]
+    SAVE["Saved Adapter Weights<br/><i>safetensors format<br/>adapter_model.safetensors</i>"]
+
+    %% ================================================================
+    %%  FLOW — adapter path
+    %% ================================================================
+    INPUT  --> FROZEN
+    INPUT  --> DROP
+    DROP   --> A
+    A      --> B
+    FROZEN --> SCALE
+    B      --> SCALE
+    SCALE  --> MERGED
+    MERGED --> OUTPUT
+
+    %% ================================================================
+    %%  FLOW — target modules (each gets the same adapter structure)
+    %% ================================================================
+    INPUT  --> QPROJ
+    INPUT  --> KPROJ
+    INPUT  --> VPROJ
+    INPUT  --> OPROJ
+    QPROJ  --> OUTPUT
+    KPROJ  --> OUTPUT
+    VPROJ  --> OUTPUT
+    OPROJ  --> OUTPUT
+
+    OUTPUT --> SAVE
+
+    %% ================================================================
+    %%  STYLING
+    %% ================================================================
+    %% Frozen / existing weights — blue rectangle
+    style FROZEN fill:#dce6f1,stroke:#333,stroke-width:2px
+    style INPUT  fill:#dce6f1,stroke:#333,stroke-width:2px
+    style OUTPUT fill:#dce6f1,stroke:#333,stroke-width:2px
+
+    %% New trainable adapter matrices — green rectangle (our contribution)
+    style A      fill:#d4edda,stroke:#155724,stroke-width:2px
+    style B      fill:#d4edda,stroke:#155724,stroke-width:2px
+    style MERGED fill:#d4edda,stroke:#155724,stroke-width:2px
+    style SAVE   fill:#d4edda,stroke:#155724,stroke-width:2px
+
+    %% Processing steps — orange rounded
+    style DROP   fill:#fde8cd,stroke:#333,stroke-width:2px
+    style SCALE  fill:#fde8cd,stroke:#333,stroke-width:2px
+
+    %% Target modules — yellow rounded (new process, our contribution)
+    style QPROJ  fill:#fff3cd,stroke:#856404,stroke-width:2px
+    style VPROJ  fill:#fff3cd,stroke:#856404,stroke-width:2px
+    style KPROJ  fill:#fff3cd,stroke:#856404,stroke-width:2px
+    style OPROJ  fill:#fff3cd,stroke:#856404,stroke-width:2px
+
+    %% Subgraph borders
+    style LoRA_Adapter   fill:#f0f4ff,stroke:#668,stroke-width:1px,stroke-dasharray:5
+    style Target_Modules fill:#fffde6,stroke:#886,stroke-width:1px,stroke-dasharray:5
+```
+
+**Caption:** LoRA (Low-Rank Adaptation) configuration used for fine-tuning. The adapter adds two trainable low-rank matrices A (r × d) and B (d × r) alongside each frozen pre-trained weight W. The update is scaled by α/r = 32/16 = 2.0 before being merged into the adapted weight W′ = W + ΔW. Dropout (p = 0.1) is applied before matrix A to prevent overfitting. All four attention projections — q_proj, v_proj, k_proj, o_proj — receive their own independent adapter. Weights are stored in float16 precision and saved in safetensors format.
+
+**LoRA Hyperparameters at a glance:**
+
+| Parameter | Value | Role |
+|-----------|-------|------|
+| Rank r | 16 | Controls adapter size; limits trainable parameters to 2 × d × r per module |
+| Alpha α | 32 | Scaling factor; effective scale = α/r = 2.0 |
+| Dropout | 0.1 | Regularisation applied before matrix A |
+| Target modules | q_proj, v_proj, k_proj, o_proj | Only attention projections are fine-tuned |
+| Precision | float16 | Halves memory vs. float32; compatible with mixed-precision training |
+| Save format | safetensors | Safe, fast adapter serialisation |
+| Objective | Structural improvement + reduced token waste | Without full retraining of base model weights |
+
+---
+
 ## How to Put Each Diagram on Its Own Slide
 
 1. **Open** [mermaid.live](https://mermaid.live)
