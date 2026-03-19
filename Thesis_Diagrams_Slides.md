@@ -8,72 +8,72 @@ In PowerPoint set the image to fill the slide (`Format Picture → Size → Heig
 
 ---
 
-## Figure 1.0 — Automotive V-Model: Development & Security Testing Context
+## Figure 1.0 — The V-Model Development Lifecycle (ISO 26262)
 
-> **Purpose:** Shows *where* the thesis problem lives. The left arm descends through ISO 26262 development phases; the right arm ascends through the corresponding testing and validation levels. Unit/fuzz testing (red) is the bottleneck: every other level is supported by established tooling, but writing effective C/C++ fuzz drivers remains a manual, expert-intensive task that cannot keep pace with CI/CD release cycles.
+> **Purpose:** Shows *where* the thesis problem lives. The left arm descends through the development phases (Verification); the right arm ascends through the corresponding testing phases (Validation). Each dashed horizontal arrow traces a development artefact to its matching test level, as required by ISO 26262.
 
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"fontSize": "16px"}, "flowchart": {"diagramPadding": 28, "nodeSpacing": 40, "rankSpacing": 60}} }%%
 flowchart LR
 
-    %% ── LEFT ARM : Development (top → bottom) ───────────────────────
-    subgraph DEV["Development  ↓  (ISO 26262 Left Arm)"]
+    %% ── LEFT ARM : Verification Phase (top → bottom) ─────────────────
+    subgraph VER["Verification Phase"]
         direction TB
-        REQ["<b>Vehicle &amp; System Requirements</b><br/>ISO 26262 · Item Definition<br/>UNECE WP.29 / UN R155 scope"]
-        SYS["<b>System Architecture</b><br/>HW / SW partitioning<br/>ASIL decomposition"]
-        SWR["<b>Software Requirements</b><br/>Functional &amp; cybersecurity goals<br/>ISO/SAE 21434 objectives"]
-        SWA["<b>SW Architecture Design</b><br/>C/C++ component interfaces<br/>Module boundaries"]
-        MOD["<b>Module / Unit Design</b><br/>Detailed API contracts<br/>C++ class &amp; function specs"]
+        BRS["BRS<br/>(Business Req. Specs)"]
+        SRS["SRS<br/>(System Req. Specs)"]
+        HLD["HLD<br/>(High Level Design)"]
+        LLD["LLD<br/>(Low Level Design)"]
+        CODING["Coding"]
 
-        REQ --> SYS --> SWR --> SWA --> MOD
+        BRS --> SRS --> HLD --> LLD --> CODING
     end
 
-    %% ── APEX : Implementation ────────────────────────────────────────
-    IMPL(["⚙  Implementation<br/>C / C++  Source Code"])
+    %% ── APEX : CODE ──────────────────────────────────────────────────
+    CODE["<b>CODE</b>"]
 
-    %% ── RIGHT ARM : Testing (bottom → top) ──────────────────────────
-    subgraph TEST["Testing &amp; Verification  ↑  (Right Arm)"]
+    %% ── RIGHT ARM : Validation Phase (bottom → top) ──────────────────
+    subgraph VAL["Validation Phase"]
         direction BT
-        UT["⚠  <b>Unit / Fuzz Testing</b><br/>libFuzzer · ASan · UBSan<br/><i>Bottleneck: manual fuzz driver creation<br/>cannot scale to CI/CD commit rate</i>"]
-        MIT["<b>Module Integration Test</b><br/>Interface &amp; boundary coverage<br/>Regression testing"]
-        SIT["<b>SW Integration Test</b><br/>Functional safety verification<br/>SIL / HIL testing"]
-        SQT["<b>SW Qualification Test</b><br/>ISO 26262 ASIL traceability<br/>Safety case sign-off"]
-        VAL["<b>System Validation</b><br/>UNECE WP.29 / UN R155<br/>Type Approval"]
+        UT["Unit Testing"]
+        CT["Component Testing"]
+        SIT["System Int. Testing"]
+        ST["System Testing"]
+        AT["Acceptance Testing"]
 
-        UT --> MIT --> SIT --> SQT --> VAL
+        UT --> CT --> SIT --> ST --> AT
     end
 
     %% ── APEX CONNECTIONS ─────────────────────────────────────────────
-    MOD  --> IMPL
-    IMPL --> UT
+    CODING --> CODE
+    CODE   --> UT
 
-    %% ── TRACEABILITY CROSS-LINKS (dashed) ────────────────────────────
-    REQ -.->|"requirement traces to"| VAL
-    SYS -.->|"architecture traces to"| SQT
-    SWR -.->|"SW reqs trace to"| SIT
-    SWA -.->|"interface specs trace to"| MIT
-    MOD -.->|"unit specs trace to"| UT
+    %% ── HORIZONTAL TRACEABILITY LINKS (dashed) ───────────────────────
+    BRS    -.-> AT
+    SRS    -.-> ST
+    HLD    -.-> SIT
+    LLD    -.-> CT
+    CODING -.-> UT
 
     %% ── STYLING ──────────────────────────────────────────────────────
-    style REQ  fill:#dce6f1,stroke:#333,stroke-width:2px
-    style SYS  fill:#dce6f1,stroke:#333,stroke-width:2px
-    style SWR  fill:#dce6f1,stroke:#333,stroke-width:2px
-    style SWA  fill:#dce6f1,stroke:#333,stroke-width:2px
-    style MOD  fill:#dce6f1,stroke:#333,stroke-width:2px
+    style BRS    fill:#ffffff,stroke:#333,stroke-width:2px
+    style SRS    fill:#ffffff,stroke:#333,stroke-width:2px
+    style HLD    fill:#ffffff,stroke:#333,stroke-width:2px
+    style LLD    fill:#ffffff,stroke:#333,stroke-width:2px
+    style CODING fill:#ffffff,stroke:#333,stroke-width:2px
 
-    style IMPL fill:#fde8cd,stroke:#333,stroke-width:2px
+    style CODE   fill:#f0f0f0,stroke:#333,stroke-width:2px
 
-    style UT   fill:#f8d0d0,stroke:#c00,stroke-width:3px
-    style MIT  fill:#fde8cd,stroke:#333,stroke-width:2px
-    style SIT  fill:#fde8cd,stroke:#333,stroke-width:2px
-    style SQT  fill:#fde8cd,stroke:#333,stroke-width:2px
-    style VAL  fill:#dce6f1,stroke:#333,stroke-width:2px
+    style UT     fill:#ffffff,stroke:#333,stroke-width:2px
+    style CT     fill:#ffffff,stroke:#333,stroke-width:2px
+    style SIT    fill:#ffffff,stroke:#333,stroke-width:2px
+    style ST     fill:#ffffff,stroke:#333,stroke-width:2px
+    style AT     fill:#ffffff,stroke:#333,stroke-width:2px
 
-    style DEV  fill:#eef4fb,stroke:#6699cc,stroke-width:1px,stroke-dasharray:5
-    style TEST fill:#fff5ee,stroke:#c64,stroke-width:1px,stroke-dasharray:5
+    style VER    fill:#eef4fb,stroke:#6699cc,stroke-width:1px,stroke-dasharray:5
+    style VAL    fill:#fff5ee,stroke:#c64,stroke-width:1px,stroke-dasharray:5
 ```
 
-**Caption:** Automotive V-Model showing ISO 26262-aligned development phases (left arm) and their corresponding verification levels (right arm). Dashed arrows indicate requirement-to-test traceability. Unit/fuzz testing (red) is the bottleneck addressed by this thesis: all other levels are supported by established tooling, but writing effective C/C++ fuzz drivers requires deep API knowledge and manual effort that cannot keep pace with CI/CD commit rates or UNECE WP.29 / UN R155 security obligations.
+**Caption:** The V-Model Development Lifecycle (adapted from ISO 26262). The diagram illustrates the relationship between each development phase (left) and its corresponding testing phase (right), converging at the Code implementation. Dashed arrows indicate requirement-to-test traceability.
 
 ---
 
