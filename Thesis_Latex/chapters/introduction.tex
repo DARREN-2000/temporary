@@ -25,6 +25,56 @@ Regulators noticed a critical security gap in vehicle software. UNECE Regulation
 
 This regulatory pressure collides with a fundamental tension in automotive security testing. Safety-critical systems undergo exhaustive verification against precisely defined requirements, like ISO 26262 \cite{ISO26262}. Every possible failure mode is analyzed. Fixes are tested. This works for safety, where hazards are known and physics are deterministic.
 
+\begin{figure}[htbp]
+\centering
+\adjustbox{max width=0.95\textwidth, max height=0.55\textheight}{%
+\begin{tikzpicture}[
+    box/.style={draw, rectangle, minimum width=3.5cm, minimum height=1.2cm, align=center, fill=white, thick, font=\footnotesize},
+    arrow/.style={->, >=stealth, thick}
+]
+% --- COORDINATE GRID ---
+\node[box] (brs) at (0, 0) {BRS\\(Business Req. Specs)};
+\node[box] (srs) at (1.5, -2) {SRS\\(System Req. Specs)};
+\node[box] (hld) at (3.0, -4) {HLD\\(High Level Design)};
+\node[box] (lld) at (4.5, -6) {LLD\\(Low Level Design)};
+\node[box] (coding) at (6.0, -8) {Coding};
+
+\node[box] (at) at (16, 0) {Acceptance Testing};
+\node[box] (st) at (14.5, -2) {System Testing};
+\node[box] (sit) at (13.0, -4) {System Int. Testing};
+\node[box] (ct) at (11.5, -6) {Component Testing};
+\node[box] (ut) at (10.0, -8) {Unit Testing};
+
+\node[box, fill=gray!10] (code) at (8.0, -10) {\textbf{CODE}};
+
+% --- FLOW ARROWS ---
+\draw[arrow] (brs) -- (srs);
+\draw[arrow] (srs) -- (hld);
+\draw[arrow] (hld) -- (lld);
+\draw[arrow] (lld) -- (coding);
+\draw[arrow] (coding) -- (code);
+
+\draw[arrow] (code) -- (ut);
+\draw[arrow] (ut) -- (ct);
+\draw[arrow] (ct) -- (sit);
+\draw[arrow] (sit) -- (st);
+\draw[arrow] (st) -- (at);
+
+% --- HORIZONTAL LINKS ---
+\draw[dashed, ->] (brs) -- (at);
+\draw[dashed, ->] (srs) -- (st);
+\draw[dashed, ->] (hld) -- (sit);
+\draw[dashed, ->] (lld) -- (ct);
+\draw[dashed, ->] (coding) -- (ut);
+
+\node[above=0.2cm of brs, font=\bfseries] {Verification Phase};
+\node[above=0.2cm of at, font=\bfseries] {Validation Phase};
+\end{tikzpicture}
+}
+\caption{The V-Model Development Lifecycle (adapted from ISO~26262~\cite{ISO26262}). The diagram illustrates the relationship between each development phase (left) and its corresponding testing phase (right), converging at the Code implementation.}
+\label{fig:v_model}
+\end{figure}
+
 Security is different. The adversary is intelligent, creative, and unconstrained by specifications. Attackers do not limit themselves to documented interfaces. They probe for implementation weaknesses, logic errors, overlooked edge cases. Testing for security means exploring the unexpected, not verifying the expected. This requires fundamentally different approaches.
 
 \subsection{Fuzzing}
