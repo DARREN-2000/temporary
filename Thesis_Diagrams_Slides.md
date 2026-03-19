@@ -8,6 +8,75 @@ In PowerPoint set the image to fill the slide (`Format Picture → Size → Heig
 
 ---
 
+## Figure 1.0 — Automotive V-Model: Development & Security Testing Context
+
+> **Purpose:** Shows *where* the thesis problem lives. The left arm descends through ISO 26262 development phases; the right arm ascends through the corresponding testing and validation levels. Unit/fuzz testing (red) is the bottleneck: every other level is supported by established tooling, but writing effective C/C++ fuzz drivers remains a manual, expert-intensive task that cannot keep pace with CI/CD release cycles.
+
+```mermaid
+%%{init: {"theme": "base", "themeVariables": {"fontSize": "16px"}, "flowchart": {"diagramPadding": 28, "nodeSpacing": 40, "rankSpacing": 60}} }%%
+flowchart LR
+
+    %% ── LEFT ARM : Development (top → bottom) ───────────────────────
+    subgraph DEV["Development  ↓  (ISO 26262 Left Arm)"]
+        direction TB
+        REQ["<b>Vehicle &amp; System Requirements</b><br/>ISO 26262 · Item Definition<br/>UNECE WP.29 / UN R155 scope"]
+        SYS["<b>System Architecture</b><br/>HW / SW partitioning<br/>ASIL decomposition"]
+        SWR["<b>Software Requirements</b><br/>Functional &amp; cybersecurity goals<br/>ISO/SAE 21434 objectives"]
+        SWA["<b>SW Architecture Design</b><br/>C/C++ component interfaces<br/>Module boundaries"]
+        MOD["<b>Module / Unit Design</b><br/>Detailed API contracts<br/>C++ class &amp; function specs"]
+
+        REQ --> SYS --> SWR --> SWA --> MOD
+    end
+
+    %% ── APEX : Implementation ────────────────────────────────────────
+    IMPL(["⚙  Implementation<br/>C / C++  Source Code"])
+
+    %% ── RIGHT ARM : Testing (bottom → top) ──────────────────────────
+    subgraph TEST["Testing &amp; Verification  ↑  (Right Arm)"]
+        direction BT
+        UT["⚠  <b>Unit / Fuzz Testing</b><br/>libFuzzer · ASan · UBSan<br/><i>Bottleneck: manual fuzz driver creation<br/>cannot scale to CI/CD commit rate</i>"]
+        MIT["<b>Module Integration Test</b><br/>Interface &amp; boundary coverage<br/>Regression testing"]
+        SIT["<b>SW Integration Test</b><br/>Functional safety verification<br/>SIL / HIL testing"]
+        SQT["<b>SW Qualification Test</b><br/>ISO 26262 ASIL traceability<br/>Safety case sign-off"]
+        VAL["<b>System Validation</b><br/>UNECE WP.29 / UN R155<br/>Type Approval"]
+
+        UT --> MIT --> SIT --> SQT --> VAL
+    end
+
+    %% ── APEX CONNECTIONS ─────────────────────────────────────────────
+    MOD  --> IMPL
+    IMPL --> UT
+
+    %% ── TRACEABILITY CROSS-LINKS (dashed) ────────────────────────────
+    REQ -.->|"requirement traces to"| VAL
+    SYS -.->|"architecture traces to"| SQT
+    SWR -.->|"SW reqs trace to"| SIT
+    SWA -.->|"interface specs trace to"| MIT
+    MOD -.->|"unit specs trace to"| UT
+
+    %% ── STYLING ──────────────────────────────────────────────────────
+    style REQ  fill:#dce6f1,stroke:#333,stroke-width:2px
+    style SYS  fill:#dce6f1,stroke:#333,stroke-width:2px
+    style SWR  fill:#dce6f1,stroke:#333,stroke-width:2px
+    style SWA  fill:#dce6f1,stroke:#333,stroke-width:2px
+    style MOD  fill:#dce6f1,stroke:#333,stroke-width:2px
+
+    style IMPL fill:#fde8cd,stroke:#333,stroke-width:2px
+
+    style UT   fill:#f8d0d0,stroke:#c00,stroke-width:3px
+    style MIT  fill:#fde8cd,stroke:#333,stroke-width:2px
+    style SIT  fill:#fde8cd,stroke:#333,stroke-width:2px
+    style SQT  fill:#fde8cd,stroke:#333,stroke-width:2px
+    style VAL  fill:#dce6f1,stroke:#333,stroke-width:2px
+
+    style DEV  fill:#eef4fb,stroke:#6699cc,stroke-width:1px,stroke-dasharray:5
+    style TEST fill:#fff5ee,stroke:#c64,stroke-width:1px,stroke-dasharray:5
+```
+
+**Caption:** Automotive V-Model showing ISO 26262-aligned development phases (left arm) and their corresponding verification levels (right arm). Dashed arrows indicate requirement-to-test traceability. Unit/fuzz testing (red) is the bottleneck addressed by this thesis: all other levels are supported by established tooling, but writing effective C/C++ fuzz drivers requires deep API knowledge and manual effort that cannot keep pace with CI/CD commit rates or UNECE WP.29 / UN R155 security obligations.
+
+---
+
 ## Figure 1.1 — The Fuzzing Process
 
 ```mermaid
